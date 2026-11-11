@@ -18,3 +18,4 @@ if %ERRORLEVEL% equ 0 (
     echo 3. Paste the token as the password.
 )
 pause
+

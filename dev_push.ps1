@@ -13,3 +13,4 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "2. Generate token with 'repo' scope"
     Write-Host "3. Paste token when prompted for password."
 }
+
