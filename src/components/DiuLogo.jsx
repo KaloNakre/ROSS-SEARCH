@@ -1,17 +1,17 @@
 import React from 'react';
+import diuLogoShield from '../assets/diu_logo_shield.png';
 
 export const DiuLogo = ({ variant = 'light', size = 'md', className = '' }) => {
-  // variant: 'light' (white background), 'dark' (dark navy background), 'icon-only'
-  
+  // variant: 'light' (white/public navbar), 'dark' (sidebar/footer), 'icon-only'
+
   if (variant === 'icon-only') {
     return (
       <div className={`relative inline-flex items-center justify-center ${className}`}>
         <img
-          src="/assets/diu_logo_sidebar.png"
+          src={diuLogoShield}
           alt="DIU"
           className="h-9 w-9 object-contain rounded-full shadow-sm"
           onError={(e) => {
-            // Fallback SVG if image not found
             e.currentTarget.style.display = 'none';
           }}
         />
@@ -24,7 +24,7 @@ export const DiuLogo = ({ variant = 'light', size = 'md', className = '' }) => {
       <div className={`flex items-center gap-3 ${className}`}>
         <div className="w-10 h-10 rounded-full bg-white/10 p-1 flex items-center justify-center shrink-0 border border-white/20">
           <img
-            src="/assets/diu_logo_sidebar.png"
+            src={diuLogoShield}
             alt="DIU Shield"
             className="w-full h-full object-contain"
           />
@@ -41,17 +41,23 @@ export const DiuLogo = ({ variant = 'light', size = 'md', className = '' }) => {
     );
   }
 
-  // Light variant (as on Landing Page and Registration headers)
+  // Light variant — public navbar, login/register header
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
       <img
-        src="/assets/diu_logo_light.png"
+        src={diuLogoShield}
         alt="Daffodil International University"
         className="h-10 object-contain"
+        onError={(e) => {
+          e.currentTarget.style.display = 'none';
+        }}
       />
+      <div className="flex flex-col leading-tight">
+        <span className="text-diu-blue font-extrabold text-sm tracking-wide">Daffodil</span>
+        <span className="text-slate-600 text-[10px] font-medium">International University</span>
+      </div>
     </div>
   );
 };
 
 export default DiuLogo;
-

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import DiuLogo from '../components/DiuLogo';
+import campusImg from '../assets/diu_campus_new.jpg';
 
 export const HomePage = () => {
   const featureCards = [
@@ -102,14 +103,14 @@ export const HomePage = () => {
                 {/* Image frame */}
                 <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white/80 bg-slate-100 aspect-[4/3] group">
                   <img
-                    src="/assets/diu_campus_building.png"
-                    alt="Daffodil International University Permanent Campus"
+                    src={campusImg}
+                    alt="DIU Permanent Campus, Birulia, Ashulia, Dhaka"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent flex items-end p-5">
                     <div>
                       <p className="text-white font-bold text-sm">DIU Permanent Campus</p>
-                      <p className="text-blue-200 text-xs">Knowledge & Innovation Hub, Ashulia</p>
+                      <p className="text-blue-200 text-xs">Birulia, Ashulia, Savar, Dhaka</p>
                     </div>
                   </div>
                 </div>
