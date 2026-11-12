@@ -1,45 +1,67 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Users, UserPlus, Filter, CheckCircle2, User, Building, BookOpen } from 'lucide-react';
+import { Search, Users, User, ChevronRight, Loader2, BookOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { SECTIONS, DEPARTMENTS } from '../data/mockData';
-import NeutralAvatar from '../components/NeutralAvatar';
 
 export const SearchStudentsSection = () => {
-  const { students, teams, addTeamMember } = useAuth();
+  const { apiCall } = useAuth();
   const [selectedSection, setSelectedSection] = useState('60_A');
   const [selectedDept, setSelectedDept] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [inviteSuccess, setInviteSuccess] = useState('');
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [activeTeam, setActiveTeam] = useState(null);
 
-  // Primary active team
-  const activeTeam = teams[0] || null;
+  useEffect(() => {
+    let mounted = true;
+    const fetchActiveTeam = async () => {
+      try {
+        const teams = await apiCall('/api/teams/my-teams');
+        if (mounted && Array.isArray(teams) && teams.length > 0) {
+          setActiveTeam(teams[0]);
+        }
+      } catch (err) {
+        console.error('Failed to load my teams:', err);
+      }
+    };
+    fetchActiveTeam();
+    return () => { mounted = false; };
+  }, [apiCall]);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchSectionStudents = async () => {
+      setLoading(true);
+      try {
+        const data = await apiCall(`/api/students/section/${selectedSection}`);
+        if (mounted) {
+          setStudents(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch section students:', err);
+        if (mounted) setStudents([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchSectionStudents();
+    return () => { mounted = false; };
+  }, [selectedSection, apiCall]);
 
   const filteredStudents = useMemo(() => {
     return students.filter((stu) => {
-      const matchSection = selectedSection === 'All' || stu.section === selectedSection;
-      const matchDept = selectedDept === 'All' || stu.department.includes(selectedDept);
+      const name = stu.full_name || stu.name || '';
+      const dept = stu.department || '';
+      const stuId = stu.student_id || '';
+      const matchDept = selectedDept === 'All' || dept.includes(selectedDept);
       const matchSearch =
-        stu.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        stu.interests.some(i => i.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        stu.preferredTopic.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchSection && matchDept && matchSearch;
+        name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        stuId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        dept.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchDept && matchSearch;
     });
-  }, [students, selectedSection, selectedDept, searchTerm]);
-
-  const handleInvite = (student) => {
-    if (!activeTeam) {
-      alert('Please create an FYP/Thesis team first before sending teammate invites.');
-      return;
-    }
-    if (activeTeam.membersCount >= activeTeam.maxMembers) {
-      alert('Your team has already reached the maximum 5-member limit.');
-      return;
-    }
-    addTeamMember(activeTeam.id, student);
-    setInviteSuccess(`Invitation sent and ${student.name} added to ${activeTeam.teamName}!`);
-    setTimeout(() => setInviteSuccess(''), 4000);
-  };
+  }, [students, selectedDept, searchTerm]);
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -59,25 +81,17 @@ export const SearchStudentsSection = () => {
             to={`/teams/${activeTeam.id}`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 text-diu-blue text-xs font-semibold rounded-xl"
           >
-            <Users size={14} /> My Active Team ({activeTeam.membersCount}/{activeTeam.maxMembers})
+            <Users size={14} /> My Active Team ({activeTeam.member_count || 1}/{activeTeam.max_members || 5})
           </Link>
         )}
       </div>
-
-      {/* Success banner */}
-      {inviteSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 text-emerald-800 text-xs font-bold animate-fadeIn">
-          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-          <span>{inviteSuccess}</span>
-        </div>
-      )}
 
       {/* Filter Bar */}
       <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
           
           {/* Section Selector */}
-          <div className="sm:col-span-3">
+          <div className="sm:col-span-4">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
               Select Section
             </label>
@@ -86,7 +100,6 @@ export const SearchStudentsSection = () => {
               onChange={(e) => setSelectedSection(e.target.value)}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue"
             >
-              <option value="All">All Sections</option>
               {SECTIONS.map((sec) => (
                 <option key={sec} value={sec}>Section {sec}</option>
               ))}
@@ -104,26 +117,27 @@ export const SearchStudentsSection = () => {
               className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue"
             >
               <option value="All">All Departments</option>
-              <option value="CSE">Computer Science and Engineering</option>
-              <option value="SWE">Software Engineering</option>
+              {DEPARTMENTS.map((dept) => (
+                <option key={dept} value={dept}>{dept}</option>
+              ))}
             </select>
           </div>
 
-          {/* Search Term */}
-          <div className="sm:col-span-5">
+          {/* Search Box */}
+          <div className="sm:col-span-4">
             <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-              Search by Domain or Topic
+              Search by Name / ID
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                <Search size={16} />
+                <Search size={15} />
               </span>
               <input
                 type="text"
-                placeholder="e.g. Machine Learning, Cyber Security..."
+                placeholder="Student name or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-diu-blue"
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue"
               />
             </div>
           </div>
@@ -131,92 +145,86 @@ export const SearchStudentsSection = () => {
         </div>
       </div>
 
-      {/* Student List */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-          <h2 className="text-base font-bold text-slate-900">
-            Eligible Teammates in Section {selectedSection} ({filteredStudents.length})
-          </h2>
-          <span className="text-xs text-slate-400">
-            Status: Looking for FYP Team
-          </span>
+      {/* Results Header */}
+      <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+        <span>Showing registered students for <strong>Section {selectedSection}</strong></span>
+        <span>{filteredStudents.length} Students Found</span>
+      </div>
+
+      {/* Main Student Cards Grid */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center min-h-[30vh] gap-3">
+          <Loader2 className="w-8 h-8 text-diu-blue animate-spin" />
+          <p className="text-xs text-slate-500 font-medium">Fetching section students...</p>
         </div>
+      ) : filteredStudents.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredStudents.map((stu) => {
+            const name = stu.full_name || stu.name || 'Student';
+            const studentId = stu.student_id || 'N/A';
+            const department = stu.department || 'Department of CSE';
+            const batch = stu.batch || 'Batch';
 
-        {filteredStudents.length > 0 ? (
-          <div className="space-y-3">
-            {filteredStudents.map((stu) => {
-              const isAlreadyMember = activeTeam?.members.some(m => m.id === stu.id);
-              return (
-                <div
-                  key={stu.id}
-                  className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-slate-200 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
+            return (
+              <div
+                key={stu.id}
+                className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-4"
+              >
+                <div>
                   <div className="flex items-start gap-3.5">
-                    {/* Neutral Avatar */}
-                    <NeutralAvatar size="md" className="rounded-xl shadow-xs shrink-0" />
-                    
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-bold text-slate-900">{stu.name}</h3>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-700">
-                          {stu.studentId}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
-                          Sec {stu.section}
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {stu.department} • {stu.batch}
+                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-diu-blue flex items-center justify-center shrink-0 border border-blue-100">
+                      <User size={22} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h2 className="text-sm font-bold text-slate-900 truncate">
+                        {name}
+                      </h2>
+                      <p className="text-[11px] font-semibold text-diu-blue">
+                        {studentId}
                       </p>
-
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {stu.interests.map((interest) => (
-                          <span
-                            key={interest}
-                            className="px-2 py-0.5 rounded-md bg-blue-50 text-diu-blue text-[11px] font-medium"
-                          >
-                            {interest}
-                          </span>
-                        ))}
-                      </div>
-
-                      <p className="text-xs text-slate-600 mt-2 italic">
-                        "Focus: {stu.preferredTopic}"
+                      <p className="text-[11px] text-slate-500 truncate">
+                        {department}
                       </p>
                     </div>
                   </div>
 
-                  {/* Action */}
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                    {isAlreadyMember ? (
-                      <span className="px-4 py-2 rounded-xl bg-slate-100 text-slate-500 text-xs font-semibold">
-                        Already in Team
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleInvite(stu)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white text-xs font-semibold shadow-xs transition-colors"
+                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                    <span>Section: <strong>{selectedSection}</strong></span>
+                    <span>{batch}</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+                      <Users size={12} /> Section Peer
+                    </span>
+                    {activeTeam && (
+                      <Link
+                        to={`/teams/${activeTeam.id}`}
+                        className="text-diu-blue hover:underline font-semibold"
                       >
-                        <UserPlus size={14} /> Invite to Team
-                      </button>
+                        Invite to Team &rarr;
+                      </Link>
                     )}
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="p-8 text-center text-slate-400 space-y-2">
-            <Users size={32} className="mx-auto text-slate-300" />
-            <p className="text-sm font-medium">No students found matching current section filters.</p>
-            <p className="text-xs">Try selecting "All Sections" or adjusting your search keyword.</p>
-          </div>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Empty State */
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 max-w-lg mx-auto space-y-3">
+          <Users size={36} className="mx-auto text-slate-400" />
+          <h3 className="text-base font-bold text-slate-800">No Students Found</h3>
+          <p className="text-xs text-slate-500 max-w-xs mx-auto">
+            No registered students currently found for Section {selectedSection}.
+          </p>
+        </div>
+      )}
     </div>
   );
 };
 
 export default SearchStudentsSection;
-

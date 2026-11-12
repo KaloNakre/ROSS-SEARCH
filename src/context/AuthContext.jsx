@@ -1,216 +1,137 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_SUPERVISORS, INITIAL_STUDENTS, INITIAL_TEAMS } from '../data/mockData';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const AuthContext = createContext();
 
+// ── API base URL — change to production URL when deploying backend ──────────
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// ── Thin API client ─────────────────────────────────────────────────────────
+async function apiCall(path, options = {}) {
+  const token = localStorage.getItem('ross_token');
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  };
+  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = data?.detail || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+// ── Provider ─────────────────────────────────────────────────────────────────
 export const AuthProvider = ({ children }) => {
-  // Current active role: 'student', 'supervisor', 'admin'
-  const [currentUserRole, setCurrentUserRole] = useState(() => {
-    return localStorage.getItem('ross_role') || 'student';
-  });
+  const [token, setToken] = useState(() => localStorage.getItem('ross_token') || null);
+  const [currentUser, setCurrentUser] = useState(null); // { id, email, role, is_active, profile }
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); // initial hydration
 
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('ross_auth') === 'true';
-  });
+  // ── Derived role shortcut ───────────────────────────────────────────────
+  const currentUserRole = currentUser?.role || 'student';
 
-  // User Profile (Strict rule: NO hardcoded real personal data, neutral empty image by default)
-  const [studentProfile, setStudentProfile] = useState(() => {
-    const saved = localStorage.getItem('ross_student_profile');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+  // ── Persist token ───────────────────────────────────────────────────────
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem('ross_token', token);
+    } else {
+      localStorage.removeItem('ross_token');
     }
-    return {
-      name: "Student Candidate",
-      studentId: "211-15-XXXX",
-      department: "Department of Computer Science and Engineering",
-      email: "student.candidate@s.diu.edu.bd",
-      phone: "+880 1XXXXXXXXX",
-      section: "60_A",
-      batch: "60th Batch",
-      interests: ["Machine Learning", "Data Science", "Cyber Security", "AI & Robotics"],
-      preferredDomain: "Machine Learning",
-      projectTitle: "Predictive Analytics Framework for Academic Performance",
-      profileImage: null, // neutral empty state placeholder by default!
-      bio: "Undergraduate researcher focused on artificial intelligence, distributed data structures, and computer science engineering."
-    };
-  });
+  }, [token]);
 
-  const [supervisorProfile, setSupervisorProfile] = useState(() => {
-    const saved = localStorage.getItem('ross_supervisor_profile');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
+  // ── Hydrate user from /api/auth/me on mount ────────────────────────────
+  const hydrateUser = useCallback(async () => {
+    const stored = localStorage.getItem('ross_token');
+    if (!stored) { setLoading(false); return; }
+    try {
+      const user = await apiCall('/api/auth/me');
+      setCurrentUser(user);
+      setIsAuthenticated(true);
+      setToken(stored);
+    } catch {
+      // Token invalid or expired — clear everything
+      localStorage.removeItem('ross_token');
+      setToken(null);
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
-    return {
-      name: "Dr. Full Name",
-      designation: "Professor",
-      department: "Department of CSE",
-      email: "supervisor.faculty@diu.edu.bd",
-      phone: "+880 1XXXXXXXXX",
-      room: "Room 602, Academic Building 4",
-      expertise: ["Machine Learning", "Data Science", "Cyber Security", "AI & Robotics", "Data Analytics"],
-      about: "A dedicated researcher in the field of Machine Learning and Artificial Intelligence, with numerous publications in top-tier journals.",
-      profileImage: null, // neutral empty state placeholder by default!
-      availableSlots: 2,
-      maxSlots: 5,
-      education: "Ph.D. in Computer Science & Engineering"
-    };
-  });
+  }, []);
 
-  // State for Teams, Supervisors, and Students
-  const [teams, setTeams] = useState(() => {
-    const saved = localStorage.getItem('ross_teams');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return INITIAL_TEAMS;
-  });
+  useEffect(() => { hydrateUser(); }, [hydrateUser]);
 
-  const [supervisors, setSupervisors] = useState(() => {
-    const saved = localStorage.getItem('ross_supervisors');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return INITIAL_SUPERVISORS;
-  });
-
-  const [students, setStudents] = useState(() => {
-    const saved = localStorage.getItem('ross_students');
-    if (saved) {
-      try { return JSON.parse(saved); } catch (e) {}
-    }
-    return INITIAL_STUDENTS;
-  });
-
-  // Sync with localStorage
-  useEffect(() => {
-    localStorage.setItem('ross_role', currentUserRole);
-  }, [currentUserRole]);
-
-  useEffect(() => {
-    localStorage.setItem('ross_auth', isAuthenticated);
-  }, [isAuthenticated]);
-
-  useEffect(() => {
-    localStorage.setItem('ross_student_profile', JSON.stringify(studentProfile));
-  }, [studentProfile]);
-
-  useEffect(() => {
-    localStorage.setItem('ross_supervisor_profile', JSON.stringify(supervisorProfile));
-  }, [supervisorProfile]);
-
-  useEffect(() => {
-    localStorage.setItem('ross_teams', JSON.stringify(teams));
-  }, [teams]);
-
-  useEffect(() => {
-    localStorage.setItem('ross_supervisors', JSON.stringify(supervisors));
-  }, [supervisors]);
-
-  // Auth operations
-  const login = (email, password, role = 'student') => {
-    setCurrentUserRole(role);
+  // ── Register (student only) ─────────────────────────────────────────────
+  const register = async ({ fullName, studentId, department, email, password }) => {
+    const data = await apiCall('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        full_name: fullName,
+        student_id: studentId,
+        department,
+        email,
+        password,
+      }),
+    });
+    setToken(data.access_token);
+    // Fetch full profile after registration
+    const user = await apiCall('/api/auth/me', {
+      headers: { Authorization: `Bearer ${data.access_token}` },
+    });
+    setCurrentUser(user);
     setIsAuthenticated(true);
-    return true;
+    return user;
   };
 
-  const logout = () => {
+  // ── Login ───────────────────────────────────────────────────────────────
+  const login = async (email, password) => {
+    const data = await apiCall('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    setToken(data.access_token);
+    const user = await apiCall('/api/auth/me', {
+      headers: { Authorization: `Bearer ${data.access_token}` },
+    });
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    return user;
+  };
+
+  // ── Logout ──────────────────────────────────────────────────────────────
+  const logout = async () => {
+    try { await apiCall('/api/auth/logout', { method: 'POST' }); } catch {}
+    setToken(null);
+    setCurrentUser(null);
     setIsAuthenticated(false);
+    localStorage.removeItem('ross_token');
   };
 
-  const switchRole = (newRole) => {
-    setCurrentUserRole(newRole);
-  };
-
-  // Profile operations
-  const updateStudentProfile = (updatedFields) => {
-    setStudentProfile(prev => ({ ...prev, ...updatedFields }));
-  };
-
-  const updateSupervisorProfile = (updatedFields) => {
-    setSupervisorProfile(prev => ({ ...prev, ...updatedFields }));
-  };
-
-  // Team operations
-  const createTeam = (newTeamData) => {
-    const team = {
-      id: `team-${Date.now()}`,
-      membersCount: 1,
-      maxMembers: 5,
-      status: "In Formation",
-      members: [
-        {
-          id: "stu-current",
-          name: studentProfile.name,
-          studentId: studentProfile.studentId,
-          role: "Leader",
-          department: studentProfile.department
-        }
-      ],
-      ...newTeamData
-    };
-    setTeams(prev => [team, ...prev]);
-    return team;
-  };
-
-  const addTeamMember = (teamId, student) => {
-    setTeams(prev => prev.map(t => {
-      if (t.id === teamId) {
-        if (t.members.some(m => m.id === student.id)) return t;
-        const updatedMembers = [...t.members, {
-          id: student.id,
-          name: student.name,
-          studentId: student.studentId,
-          role: "Member",
-          department: student.department
-        }];
-        return {
-          ...t,
-          members: updatedMembers,
-          membersCount: updatedMembers.length
-        };
-      }
-      return t;
-    }));
-  };
-
-  const removeTeamMember = (teamId, memberId) => {
-    setTeams(prev => prev.map(t => {
-      if (t.id === teamId) {
-        const updatedMembers = t.members.filter(m => m.id !== memberId);
-        return {
-          ...t,
-          members: updatedMembers,
-          membersCount: updatedMembers.length
-        };
-      }
-      return t;
-    }));
-  };
-
-  const deleteTeam = (teamId) => {
-    setTeams(prev => prev.filter(t => t.id !== teamId));
+  // ── Update student profile locally after PUT /api/students/me ──────────
+  const refreshUser = async () => {
+    try {
+      const user = await apiCall('/api/auth/me');
+      setCurrentUser(user);
+    } catch {}
   };
 
   return (
     <AuthContext.Provider value={{
+      // State
+      token,
+      currentUser,
       currentUserRole,
       isAuthenticated,
+      loading,
+      // Actions
+      register,
       login,
       logout,
-      switchRole,
-      studentProfile,
-      updateStudentProfile,
-      supervisorProfile,
-      updateSupervisorProfile,
-      teams,
-      createTeam,
-      addTeamMember,
-      removeTeamMember,
-      deleteTeam,
-      supervisors,
-      setSupervisors,
-      students,
-      setStudents
+      refreshUser,
+      apiCall,
+      API_BASE,
     }}>
       {children}
     </AuthContext.Provider>
@@ -218,4 +139,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-

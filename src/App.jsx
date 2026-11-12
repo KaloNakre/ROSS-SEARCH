@@ -1,6 +1,7 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Layout
 import DashboardLayout from './components/DashboardLayout';
@@ -34,7 +35,7 @@ import ManageUsersPage from './pages/ManageUsersPage';
 import ManageSupervisorsPage from './pages/ManageSupervisorsPage';
 import RoleManagementPage from './pages/RoleManagementPage';
 
-// Shared Auxiliary Pages
+// Shared
 import ResourcesPage from './pages/ResourcesPage';
 import SettingsPage from './pages/SettingsPage';
 
@@ -43,45 +44,129 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Routes */}
+          {/* ── Public Routes ─────────────────────────────────────────── */}
           <Route path="/" element={<HomePage />} />
           <Route path="/register" element={<RegistrationPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* Authenticated Dashboard Routes */}
+          {/* ── Authenticated Dashboard Routes ─────────────────────────── */}
           <Route element={<DashboardLayout />}>
-            {/* Student Pages */}
-            <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route path="/student/profile" element={<StudentProfile />} />
-            <Route path="/student/profile/edit" element={<EditStudentProfile />} />
-            <Route path="/student/research-interests" element={<ResearchInterestsPage />} />
-            <Route path="/students/section" element={<SearchStudentsSection />} />
 
-            {/* Supervisor Pages */}
-            <Route path="/supervisors" element={<FindSupervisorPage />} />
-            <Route path="/supervisors/:id" element={<SupervisorProfile />} />
-            <Route path="/supervisor/dashboard" element={<SupervisorProfile />} />
-            <Route path="/supervisor/profile" element={<SupervisorProfile />} />
-            <Route path="/supervisor/profile/edit" element={<EditSupervisorProfile />} />
+            {/* ── STUDENT routes — students and admins only ─────────────── */}
+            <Route path="/student/dashboard" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/profile" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <StudentProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/profile/edit" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <EditStudentProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/research-interests" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <ResearchInterestsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/students/section" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <SearchStudentsSection />
+              </ProtectedRoute>
+            } />
 
-            {/* Team Pages */}
-            <Route path="/teams/search" element={<TeamSearchPage />} />
-            <Route path="/teams/create" element={<CreateTeamPage />} />
-            <Route path="/teams/:id" element={<TeamDetailsPage />} />
-            <Route path="/teams/my-teams" element={<MyTeamsPage />} />
+            {/* ── SUPERVISOR discovery — students + supervisors + admin ─── */}
+            <Route path="/supervisors" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <FindSupervisorPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisors/:id" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <SupervisorProfile />
+              </ProtectedRoute>
+            } />
 
-            {/* Admin Pages */}
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<ManageUsersPage />} />
-            <Route path="/admin/supervisors" element={<ManageSupervisorsPage />} />
-            <Route path="/admin/roles" element={<RoleManagementPage />} />
+            {/* ── SUPERVISOR self-management — supervisors only ───────────── */}
+            <Route path="/supervisor/dashboard" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <SupervisorProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/profile" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <SupervisorProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/profile/edit" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <EditSupervisorProfile />
+              </ProtectedRoute>
+            } />
 
-            {/* Auxiliary Routes */}
-            <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            {/* ── TEAM routes — students + supervisors + admin ────────────── */}
+            <Route path="/teams/search" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <TeamSearchPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/teams/create" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <CreateTeamPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/teams/:id" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <TeamDetailsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/teams/my-teams" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <MyTeamsPage />
+              </ProtectedRoute>
+            } />
+
+            {/* ── ADMIN routes — admin only ───────────────────────────────── */}
+            <Route path="/admin/dashboard" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <ManageUsersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/supervisors" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <ManageSupervisorsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/roles" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <RoleManagementPage />
+              </ProtectedRoute>
+            } />
+
+            {/* ── Shared ─────────────────────────────────────────────────── */}
+            <Route path="/resources" element={
+              <ProtectedRoute>
+                <ResourcesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            } />
+
           </Route>
 
-          {/* Catch-all redirect to Home */}
+          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
@@ -90,4 +175,3 @@ function App() {
 }
 
 export default App;
-

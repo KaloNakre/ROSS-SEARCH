@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Shield, 
@@ -7,20 +7,17 @@ import {
   Check, 
   X, 
   ArrowLeft, 
-  CheckCircle2, 
-  Settings,
   Lock,
   Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export const RoleManagementPage = () => {
-  const { currentUserRole, switchRole } = useAuth();
-  const [feedback, setFeedback] = useState('');
+  const { currentUserRole } = useAuth();
 
   const permissionsMatrix = [
     { module: "Browse & Search Supervisors", student: true, supervisor: true, admin: true },
-    { module: "Edit Own Student Profile & Picture", student: true, supervisor: false, admin: true },
+    { module: "Edit Own Student Profile & Credentials", student: true, supervisor: false, admin: true },
     { module: "Manage Research Interests & Domains", student: true, supervisor: false, admin: true },
     { module: "Search Classmates by Section", student: true, supervisor: true, admin: true },
     { module: "Create & Disband Research Teams", student: true, supervisor: false, admin: true },
@@ -31,14 +28,8 @@ export const RoleManagementPage = () => {
     { module: "Configure System Roles & Access", student: false, supervisor: false, admin: true }
   ];
 
-  const handleSimulateRole = (role) => {
-    switchRole(role);
-    setFeedback(`Active viewing session changed to ${role.toUpperCase()} role.`);
-    setTimeout(() => setFeedback(''), 3000);
-  };
-
   return (
-    <div className="space-y-8 animate-fadeIn max-w-5xl mx-auto">
+    <div className="space-y-8 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -49,121 +40,105 @@ export const RoleManagementPage = () => {
             <ArrowLeft size={18} />
           </Link>
           <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-diu-blue text-xs font-semibold mb-1">
+              <Sparkles size={13} /> Strict RBAC System
+            </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Role & Access Management
+              Role-Based Access Control (RBAC)
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Role-Based Access Control (RBAC) and permission matrices for ROSS-SEARCH Module 1
+            <p className="text-xs sm:text-sm text-slate-500">
+              Authenticated role architecture enforced at both frontend router and backend API endpoints
             </p>
           </div>
         </div>
 
-        {/* Live Simulator */}
-        <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-[11px] font-bold text-slate-400 pl-2">Current Context:</span>
-          {['student', 'supervisor', 'admin'].map((r) => (
-            <button
-              key={r}
-              onClick={() => handleSimulateRole(r)}
-              className={`px-3 py-1 text-xs font-bold rounded-xl capitalize transition-all ${
-                currentUserRole === r
-                  ? 'bg-diu-blue text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-600">Your Current Role:</span>
+          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-100 text-purple-700 border border-purple-200">
+            {currentUserRole}
+          </span>
         </div>
       </div>
-
-      {/* Feedback Toast */}
-      {feedback && (
-        <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2 text-emerald-800 text-xs font-semibold animate-fadeIn">
-          <CheckCircle2 size={16} className="text-emerald-600" />
-          <span>{feedback}</span>
-        </div>
-      )}
 
       {/* 3 Role Definition Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Student Role */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Student Card */}
+        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-blue-50 text-diu-blue flex items-center justify-center mb-4">
               <Users size={24} />
             </div>
             <h2 className="text-lg font-bold text-slate-900">Student Role</h2>
             <p className="text-xs text-slate-500 mt-1">
-              For undergraduate DIU students enrolled in Final Year Project (FYP) and Thesis development.
+              For undergraduate candidates completing their mandatory FYP or Thesis courses.
             </p>
 
             <div className="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Search supervisors by domain</span>
+                <span>Self-service registration</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Find peers in same section</span>
+                <span>Profile & topic definition</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Create and join research teams</span>
+                <span>Peer search in same section</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Upload optional profile picture</span>
+                <span>Form 3–5 member teams</span>
               </div>
             </div>
           </div>
 
           <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Default Role:</span>
-            <span className="font-bold text-diu-blue">Student</span>
+            <span className="text-slate-400">Authority Level:</span>
+            <span className="font-bold text-blue-600">Student Access</span>
           </div>
         </div>
 
-        {/* Supervisor Role */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Supervisor Card */}
+        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
               <GraduationCap size={24} />
             </div>
             <h2 className="text-lg font-bold text-slate-900">Supervisor Role</h2>
             <p className="text-xs text-slate-500 mt-1">
-              For DIU faculty members advising and mentoring student research groups.
+              For faculty advisors, lecturers, and professors mentoring research teams.
             </p>
 
             <div className="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Review student requests</span>
+                <span>Accept or decline teams</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Configure research expertise</span>
+                <span>Manage supervisory quota</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Manage available supervision slots</span>
+                <span>Publish expertise tags</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check size={14} className="text-emerald-600 shrink-0" />
-                <span>Track assigned team milestones</span>
+                <span>Track assigned project groups</span>
               </div>
             </div>
           </div>
 
           <div className="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-            <span className="text-slate-400">Assigned Faculty:</span>
-            <span className="font-bold text-emerald-600">Faculty Member</span>
+            <span className="text-slate-400">Authority Level:</span>
+            <span className="font-bold text-emerald-600">Faculty Access</span>
           </div>
         </div>
 
-        {/* Admin Role */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+        {/* Admin Card */}
+        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4">
               <Shield size={24} />
@@ -272,4 +247,3 @@ export const RoleManagementPage = () => {
 };
 
 export default RoleManagementPage;
-

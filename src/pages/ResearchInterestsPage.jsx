@@ -1,55 +1,106 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Check, Sparkles, Save, ArrowLeft, CheckCircle2, Bookmark, Info } from 'lucide-react';
+import { Check, Sparkles, Save, ArrowLeft, CheckCircle2, Bookmark, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { RESEARCH_DOMAINS } from '../data/mockData';
 
 export const ResearchInterestsPage = () => {
   const navigate = useNavigate();
-  const { studentProfile, updateStudentProfile } = useAuth();
+  const { apiCall } = useAuth();
 
-  const [selectedInterests, setSelectedInterests] = useState(
-    studentProfile.interests || ["Machine Learning", "Data Science"]
-  );
-  const [preferredDomain, setPreferredDomain] = useState(
-    studentProfile.preferredDomain || "Machine Learning"
-  );
-  const [customInterest, setCustomInterest] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  
+  const [availableInterests, setAvailableInterests] = useState([]);
+  const [selectedInterestIds, setSelectedInterestIds] = useState([]);
 
-  const toggleInterest = (name) => {
-    setSelectedInterests(prev => {
-      if (prev.includes(name)) {
-        return prev.filter(item => item !== name);
+  useEffect(() => {
+    let mounted = true;
+    const fetchInterests = async () => {
+      try {
+        const [allRes, meRes] = await Promise.allSettled([
+          apiCall('/api/research/interests'),
+          apiCall('/api/students/me')
+        ]);
+
+        if (mounted) {
+          let interestsList = [];
+          if (allRes.status === 'fulfilled' && Array.isArray(allRes.value)) {
+            interestsList = allRes.value;
+          }
+          // If backend research interests list is empty, fallback to mockData references formatted as objects
+          if (interestsList.length === 0) {
+            interestsList = RESEARCH_DOMAINS.map(d => ({
+              id: d.id,
+              name: d.name,
+              category: d.category
+            }));
+          }
+          setAvailableInterests(interestsList);
+
+          if (meRes.status === 'fulfilled' && meRes.value) {
+            const current = meRes.value.interests || [];
+            // Current interests can be objects with id or names
+            const currentIds = current.map(item => (typeof item === 'object' ? item.id : item));
+            setSelectedInterestIds(currentIds);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load interests:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchInterests();
+    return () => { mounted = false; };
+  }, [apiCall]);
+
+  const toggleInterest = (id) => {
+    setSelectedInterestIds(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(item => item !== id);
       } else {
-        return [...prev, name];
+        return [...prev, id];
       }
     });
   };
 
-  const handleAddCustom = (e) => {
-    e.preventDefault();
-    if (!customInterest.trim()) return;
-    if (!selectedInterests.includes(customInterest.trim())) {
-      setSelectedInterests(prev => [...prev, customInterest.trim()]);
+  const handleSave = async () => {
+    setSaving(true);
+    setErrorMsg('');
+    try {
+      // Backend expects { interest_ids: [...] } where ids are integers or IDs registered in DB
+      // Convert to integers where valid
+      const numericIds = selectedInterestIds.map(id => Number(id)).filter(id => !isNaN(id));
+      await apiCall('/api/students/me/interests', {
+        method: 'PUT',
+        body: JSON.stringify({ interest_ids: numericIds })
+      });
+      setSavedSuccess(true);
+      setTimeout(() => {
+        setSavedSuccess(false);
+        navigate('/student/profile');
+      }, 1200);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to update research interests.');
+    } finally {
+      setSaving(false);
     }
-    setCustomInterest('');
   };
 
-  const handleSave = () => {
-    updateStudentProfile({
-      interests: selectedInterests,
-      preferredDomain: preferredDomain
-    });
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-      navigate('/student/profile');
-    }, 1200);
-  };
+  // Group by category
+  const categories = Array.from(new Set(availableInterests.map(d => d.category || 'General')));
 
-  // Group domains by category
-  const categories = Array.from(new Set(RESEARCH_DOMAINS.map(d => d.category)));
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="w-8 h-8 text-diu-blue animate-spin" />
+        <p className="text-xs text-slate-500 font-medium">Loading research domains catalog...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fadeIn">
@@ -74,80 +125,66 @@ export const ResearchInterestsPage = () => {
 
         <button
           onClick={handleSave}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white text-xs font-semibold shadow-sm transition-all self-start sm:self-auto"
+          disabled={saving}
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white text-xs font-semibold shadow-sm transition-all self-start sm:self-auto disabled:opacity-50"
         >
-          <Save size={15} /> Save Interests
+          {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+          <span>Save Interests</span>
         </button>
       </div>
 
       {/* Success banner */}
       {savedSuccess && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 text-emerald-800 text-xs font-bold animate-fadeIn">
-          <CheckCircle2 size={16} className="text-emerald-600" />
+          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
           <span>Research interests updated successfully! Redirecting...</span>
         </div>
       )}
 
-      {/* Primary Domain Card */}
-      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-3">
-        <div className="flex items-center gap-2 text-diu-blue">
-          <Bookmark size={18} />
-          <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-            Primary Research Domain
-          </h2>
+      {/* Error banner */}
+      {errorMsg && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2.5 text-rose-800 text-xs font-bold animate-fadeIn">
+          <AlertCircle size={16} className="text-rose-600 shrink-0" />
+          <span>{errorMsg}</span>
         </div>
-        <p className="text-xs text-slate-500">
-          This primary domain will be prioritized when searching for suitable faculty supervisors.
-        </p>
-
-        <div className="max-w-md">
-          <select
-            value={preferredDomain}
-            onChange={(e) => setPreferredDomain(e.target.value)}
-            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue focus:bg-white"
-          >
-            {RESEARCH_DOMAINS.map(d => (
-              <option key={d.id} value={d.name}>{d.name} ({d.category})</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      )}
 
       {/* Categories Grid */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
         <div>
           <h2 className="text-base font-bold text-slate-900">
-            Select All Areas of Interest
+            Select Your Areas of Interest
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Choose as many domains as relevant. These tags will be displayed on your student profile.
+            Choose topics that align with your thesis goals to find compatible supervisors and peers.
           </p>
         </div>
 
         <div className="space-y-6">
           {categories.map((category) => {
-            const domainsInCat = RESEARCH_DOMAINS.filter(d => d.category === category);
+            const items = availableInterests.filter(d => (d.category || 'General') === category);
             return (
               <div key={category} className="space-y-2.5">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
                   {category}
-                </h3>
-                <div className="flex flex-wrap gap-2.5">
-                  {domainsInCat.map((domain) => {
-                    const isSelected = selectedInterests.includes(domain.name);
+                </span>
+
+                <div className="flex flex-wrap gap-2">
+                  {items.map((item) => {
+                    const isSelected = selectedInterestIds.includes(item.id);
                     return (
                       <button
-                        key={domain.id}
+                        key={item.id}
                         type="button"
-                        onClick={() => toggleInterest(domain.name)}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                        onClick={() => toggleInterest(item.id)}
+                        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
                           isSelected
-                            ? 'bg-diu-blue text-white shadow-sm shadow-blue-500/20'
-                            : 'bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
+                            ? 'bg-diu-blue text-white shadow-xs'
+                            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
                         }`}
                       >
-                        {isSelected && <Check size={14} className="stroke-[3]" />}
-                        <span>{domain.name}</span>
+                        {isSelected && <Check size={13} className="shrink-0 stroke-[3]" />}
+                        <span>{item.name}</span>
                       </button>
                     );
                   })}
@@ -156,68 +193,9 @@ export const ResearchInterestsPage = () => {
             );
           })}
         </div>
-
-        {/* Custom Domain Input */}
-        <div className="pt-4 border-t border-slate-100">
-          <label className="block text-xs font-bold text-slate-700 mb-2">
-            Don't see your specific research area? Add custom topic:
-          </label>
-          <div className="flex gap-2 max-w-md">
-            <input
-              type="text"
-              placeholder="e.g. Quantum Computing, Edge AI..."
-              value={customInterest}
-              onChange={(e) => setCustomInterest(e.target.value)}
-              className="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue"
-            />
-            <button
-              type="button"
-              onClick={handleAddCustom}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl"
-            >
-              Add Tag
-            </button>
-          </div>
-        </div>
-
-        {/* Currently Selected Summary */}
-        <div className="pt-4 border-t border-slate-100">
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-2">
-            Currently Selected ({selectedInterests.length})
-          </span>
-          <div className="flex flex-wrap gap-2">
-            {selectedInterests.map((item) => (
-              <span
-                key={item}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-blue-50 text-diu-blue text-xs font-medium border border-blue-100"
-              >
-                <span>{item}</span>
-                <button
-                  type="button"
-                  onClick={() => toggleInterest(item)}
-                  className="hover:text-rose-600 font-bold ml-1"
-                >
-                  &times;
-                </button>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Save Footer */}
-        <div className="flex justify-end pt-4 border-t border-slate-100">
-          <button
-            onClick={handleSave}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white text-xs font-semibold shadow-sm transition-all"
-          >
-            <Save size={15} /> Save Interests & Return
-          </button>
-        </div>
-
       </div>
     </div>
   );
 };
 
 export default ResearchInterestsPage;
-

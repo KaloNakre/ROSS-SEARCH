@@ -1,23 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  User, 
   Mail, 
-  Phone, 
   Building, 
   GraduationCap, 
   Edit3, 
-  Sparkles, 
-  BookOpen, 
   FolderKanban,
-  CheckCircle2,
-  ImageOff
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NeutralAvatar from '../components/NeutralAvatar';
 
 export const StudentProfile = () => {
-  const { studentProfile } = useAuth();
+  const { currentUser, apiCall } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchProfile = async () => {
+      try {
+        const data = await apiCall('/api/students/me');
+        if (mounted) setProfile(data);
+      } catch (err) {
+        console.error('Failed to load profile:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchProfile();
+    return () => { mounted = false; };
+  }, [apiCall]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="w-8 h-8 text-diu-blue animate-spin" />
+        <p className="text-xs text-slate-500 font-medium">Loading student profile...</p>
+      </div>
+    );
+  }
+
+  const fullName = profile?.full_name || currentUser?.full_name || 'Student';
+  const studentId = profile?.student_id || 'N/A';
+  const department = profile?.department || 'Department of CSE';
+  const section = profile?.section || 'Not assigned';
+  const batch = profile?.batch || 'N/A';
+  const email = currentUser?.email || 'N/A';
+  const phone = profile?.phone || 'Not provided';
+  const bio = profile?.bio || 'Undergraduate student at Daffodil International University pursuing FYP / Thesis.';
+  const projectTitle = profile?.project_title || 'No formal thesis title registered yet.';
+  const interests = profile?.interests || [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
@@ -44,48 +78,47 @@ export const StudentProfile = () => {
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 pb-8 border-b border-slate-100">
           
-          {/* Neutral Avatar / Uploaded Picture Container */}
           <div className="flex flex-col items-center">
             <NeutralAvatar
-              src={studentProfile.profileImage}
+              src={null}
               size="card"
-              showLabel={!studentProfile.profileImage}
+              showLabel={true}
               className="w-32 h-32 sm:w-36 sm:h-36 rounded-2xl shadow-sm"
             />
             <span className="text-[11px] text-slate-400 mt-2 font-medium">
-              {studentProfile.profileImage ? "Custom Profile Photo" : "Neutral Placeholder"}
+              Academic ID Verified
             </span>
           </div>
 
           {/* Details */}
           <div className="flex-1 text-center sm:text-left space-y-2">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h2 className="text-2xl font-black text-slate-900">{studentProfile.name}</h2>
+              <h2 className="text-2xl font-black text-slate-900">{fullName}</h2>
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-diu-blue">
                 Undergraduate Student
               </span>
             </div>
 
             <p className="text-xs font-semibold text-diu-green flex items-center justify-center sm:justify-start gap-1">
-              <Building size={14} /> {studentProfile.department}
+              <Building size={14} /> {department}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 pt-3 text-xs text-slate-600">
               <div className="flex items-center justify-center sm:justify-start gap-2">
                 <GraduationCap size={15} className="text-slate-400" />
-                <span><strong>Student ID:</strong> {studentProfile.studentId}</span>
+                <span><strong>Student ID:</strong> {studentId}</span>
               </div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
                 <FolderKanban size={15} className="text-slate-400" />
-                <span><strong>Section:</strong> {studentProfile.section} ({studentProfile.batch})</span>
+                <span><strong>Section:</strong> {section} ({batch})</span>
               </div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
                 <Mail size={15} className="text-slate-400" />
-                <span><strong>Email:</strong> {studentProfile.email}</span>
+                <span><strong>Email:</strong> {email}</span>
               </div>
               <div className="flex items-center justify-center sm:justify-start gap-2">
-                <Phone size={15} className="text-slate-400" />
-                <span><strong>Phone:</strong> {studentProfile.phone}</span>
+                <span className="text-slate-400 font-bold">Tel:</span>
+                <span><strong>Phone:</strong> {phone}</span>
               </div>
             </div>
           </div>
@@ -106,44 +139,47 @@ export const StudentProfile = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {studentProfile.interests && studentProfile.interests.length > 0 ? (
-              studentProfile.interests.map((interest) => (
-                <span
-                  key={interest}
-                  className="px-3.5 py-1.5 rounded-xl bg-blue-50 border border-blue-100 text-diu-blue text-xs font-semibold"
-                >
-                  {interest}
-                </span>
-              ))
+            {interests.length > 0 ? (
+              interests.map((interest, idx) => {
+                const name = typeof interest === 'string' ? interest : interest.name;
+                return (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-medium border border-blue-100"
+                  >
+                    <Sparkles size={12} />
+                    <span>{name}</span>
+                  </span>
+                );
+              })
             ) : (
-              <span className="text-xs text-slate-400 italic">No research domains selected yet.</span>
+              <p className="text-xs text-slate-400 italic">
+                No research domains selected yet. Click "Update Preferences" to define your topics.
+              </p>
             )}
           </div>
         </div>
 
-        {/* About / Bio */}
-        <div className="pt-6 space-y-2">
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-            About / Research Statement
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
-            {studentProfile.bio || "No research statement provided yet."}
-          </p>
-        </div>
-
-        {/* Current Project / Thesis Proposal */}
-        <div className="pt-6 space-y-2">
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-            Registered FYP / Thesis Topic
-          </h3>
-          <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-start gap-3">
-            <BookOpen size={18} className="text-diu-green shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs sm:text-sm font-bold text-slate-800">
-                {studentProfile.projectTitle || "Topic Title Pending Final Approval"}
+        {/* Project Title & Bio */}
+        <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Registered Thesis Topic
+            </h4>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+              <p className="text-xs text-slate-800 font-medium">
+                {projectTitle}
               </p>
-              <p className="text-xs text-slate-500 mt-1">
-                Domain: <strong className="text-diu-blue">{studentProfile.preferredDomain || "Machine Learning"}</strong> • Status: Registered
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Academic Background & Bio
+            </h4>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {bio}
               </p>
             </div>
           </div>
@@ -155,4 +191,3 @@ export const StudentProfile = () => {
 };
 
 export default StudentProfile;
-

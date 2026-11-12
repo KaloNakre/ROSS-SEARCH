@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, 
@@ -9,20 +9,51 @@ import {
   User, 
   ArrowRight, 
   CheckCircle2, 
-  AlertCircle,
   FileText,
-  Sparkles
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { RECENT_ACTIVITIES } from '../data/mockData';
 
 export const StudentDashboard = () => {
-  const { studentProfile, teams, supervisors } = useAuth();
+  const { currentUser, apiCall } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [studentProfile, setStudentProfile] = useState(null);
+  const [myTeams, setMyTeams] = useState([]);
+  const [supervisorCount, setSupervisorCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchData = async () => {
+      try {
+        const [profileRes, teamsRes, supsRes] = await Promise.allSettled([
+          apiCall('/api/students/me'),
+          apiCall('/api/teams/my-teams'),
+          apiCall('/api/supervisors/?limit=100')
+        ]);
+
+        if (mounted) {
+          if (profileRes.status === 'fulfilled') setStudentProfile(profileRes.value);
+          if (teamsRes.status === 'fulfilled') setMyTeams(Array.isArray(teamsRes.value) ? teamsRes.value : []);
+          if (supsRes.status === 'fulfilled') {
+            const list = Array.isArray(supsRes.value) ? supsRes.value : (supsRes.value?.items || []);
+            setSupervisorCount(list.length);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load student dashboard:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchData();
+    return () => { mounted = false; };
+  }, [apiCall]);
 
   const statCards = [
     {
       label: "Find Supervisors",
-      value: supervisors.length,
+      value: supervisorCount,
       icon: Search,
       bgColor: "bg-blue-50/70",
       textColor: "text-blue-600",
@@ -31,7 +62,7 @@ export const StudentDashboard = () => {
     },
     {
       label: "My Teams",
-      value: teams.length,
+      value: myTeams.length,
       icon: Users,
       bgColor: "bg-emerald-50/70",
       textColor: "text-emerald-600",
@@ -40,7 +71,7 @@ export const StudentDashboard = () => {
     },
     {
       label: "My Projects",
-      value: 1,
+      value: myTeams.length > 0 ? myTeams.length : 0,
       icon: FolderKanban,
       bgColor: "bg-purple-50/70",
       textColor: "text-purple-600",
@@ -48,13 +79,13 @@ export const StudentDashboard = () => {
       link: "/teams/my-teams"
     },
     {
-      label: "Pending Requests",
-      value: 1,
+      label: "Active Status",
+      value: currentUser?.is_active ? "Active" : "Pending",
       icon: Clock,
       bgColor: "bg-amber-50/70",
       textColor: "text-amber-600",
       borderColor: "border-amber-100",
-      link: "/teams/my-teams"
+      link: "/student/profile"
     }
   ];
 
@@ -89,6 +120,17 @@ export const StudentDashboard = () => {
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="w-8 h-8 text-diu-blue animate-spin" />
+        <p className="text-xs text-slate-500 font-medium">Loading your research workspace...</p>
+      </div>
+    );
+  }
+
+  const studentName = studentProfile?.full_name || currentUser?.full_name || 'Student';
+
   return (
     <div className="space-y-8 animate-fadeIn">
       {/* Welcome Banner */}
@@ -98,7 +140,7 @@ export const StudentDashboard = () => {
             <Sparkles size={13} /> Student Research Workspace
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Welcome Back, {studentProfile.name}!
+            Welcome Back, {studentName}!
           </h1>
           <p className="text-slate-500 text-xs sm:text-sm mt-1">
             Your research journey continues. Track team progress and connect with supervisors.
@@ -184,29 +226,42 @@ export const StudentDashboard = () => {
           </div>
         </div>
 
-        {/* Recent Activities Panel */}
+        {/* Live Academic Guidelines Panel */}
         <div className="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-slate-900">Recent Activities</h2>
-              <span className="text-xs text-slate-400">Live Updates</span>
+              <h2 className="text-base font-bold text-slate-900">Academic Status & Guidelines</h2>
+              <span className="text-xs text-slate-400">DIU Portal</span>
             </div>
 
             <div className="space-y-4">
-              {RECENT_ACTIVITIES.student.map((activity) => (
-                <div
-                  key={activity.id}
-                  className="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-100"
-                >
-                  <div className="w-8 h-8 rounded-xl bg-blue-100/60 text-diu-blue flex items-center justify-center shrink-0 mt-0.5">
-                    <CheckCircle2 size={16} />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs font-semibold text-slate-800">{activity.text}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">{activity.time}</p>
-                  </div>
+              <div className="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="w-8 h-8 rounded-xl bg-blue-100/60 text-diu-blue flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 size={16} />
                 </div>
-              ))}
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-slate-800">
+                    Account Registered & Active ({studentProfile?.department || 'CSE'})
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Student ID: {studentProfile?.student_id || 'N/A'} | Section: {studentProfile?.section || 'Not assigned'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100/60 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                  <Users size={16} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-slate-800">
+                    Team Membership ({myTeams.length} Active Team{myTeams.length === 1 ? '' : 's'})
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    {myTeams.length > 0 ? myTeams[0].team_name : 'No active thesis group yet. Click Create Team to form one.'}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -226,4 +281,3 @@ export const StudentDashboard = () => {
 };
 
 export default StudentDashboard;
-

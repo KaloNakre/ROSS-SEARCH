@@ -1,51 +1,96 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Save, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Save, ArrowLeft, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import ImageUploadWidget from '../components/ImageUploadWidget';
 import { DEPARTMENTS, SECTIONS } from '../data/mockData';
 
 export const EditStudentProfile = () => {
   const navigate = useNavigate();
-  const { studentProfile, updateStudentProfile } = useAuth();
+  const { apiCall, refreshUser } = useAuth();
+  
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const [formData, setFormData] = useState({
-    name: studentProfile.name || '',
-    studentId: studentProfile.studentId || '',
-    department: studentProfile.department || DEPARTMENTS[0],
-    section: studentProfile.section || '60_A',
-    batch: studentProfile.batch || '60th Batch',
-    email: studentProfile.email || '',
-    phone: studentProfile.phone || '',
-    projectTitle: studentProfile.projectTitle || '',
-    bio: studentProfile.bio || '',
-    profileImage: studentProfile.profileImage || null
+    fullName: '',
+    department: 'Department of CSE',
+    section: '60_A',
+    batch: '',
+    phone: '',
+    projectTitle: '',
+    bio: ''
   });
 
-  const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
+  useEffect(() => {
+    let mounted = true;
+    const fetchProfile = async () => {
+      try {
+        const data = await apiCall('/api/students/me');
+        if (mounted && data) {
+          setFormData({
+            fullName: data.full_name || '',
+            department: data.department || 'Department of CSE',
+            section: data.section || '60_A',
+            batch: data.batch || '',
+            phone: data.phone || '',
+            projectTitle: data.project_title || '',
+            bio: data.bio || ''
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load profile for edit:', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    fetchProfile();
+    return () => { mounted = false; };
+  }, [apiCall]);
 
-  const handleImageChange = (newImage) => {
-    setFormData(prev => ({ ...prev, profileImage: newImage }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      setStatusMessage({ type: 'error', text: 'Name cannot be empty.' });
-      return;
+    setSaving(true);
+    setErrorMsg('');
+    try {
+      await apiCall('/api/students/me', {
+        method: 'PUT',
+        body: JSON.stringify({
+          full_name: formData.fullName,
+          department: formData.department,
+          section: formData.section,
+          batch: formData.batch,
+          phone: formData.phone,
+          project_title: formData.projectTitle,
+          bio: formData.bio
+        })
+      });
+
+      await refreshUser();
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/student/profile');
+      }, 1200);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to update profile.');
+    } finally {
+      setSaving(false);
     }
-
-    updateStudentProfile(formData);
-    setStatusMessage({ type: 'success', text: 'Profile updated successfully!' });
-
-    setTimeout(() => {
-      navigate('/student/profile');
-    }, 1200);
   };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+        <Loader2 className="w-8 h-8 text-diu-blue animate-spin" />
+        <p className="text-xs text-slate-500 font-medium">Loading form...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fadeIn">
-      {/* Top Header */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
@@ -59,7 +104,7 @@ export const EditStudentProfile = () => {
               Edit Student Profile
             </h1>
             <p className="text-xs text-slate-500">
-              Update personal details and manage optional profile picture
+              Update your registered academic profile details on the live server
             </p>
           </div>
         </div>
@@ -72,58 +117,41 @@ export const EditStudentProfile = () => {
         </Link>
       </div>
 
-      {/* Status Alert */}
-      {statusMessage.text && (
-        <div
-          className={`p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold ${
-            statusMessage.type === 'success'
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-rose-50 text-rose-800 border border-rose-200'
-          }`}
-        >
-          {statusMessage.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-          <span>{statusMessage.text}</span>
+      {/* Success Notification */}
+      {success && (
+        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 text-emerald-800 text-xs font-bold animate-fadeIn">
+          <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+          <span>Profile changes saved successfully! Redirecting...</span>
         </div>
       )}
 
-      {/* Main Form Card */}
+      {/* Error Notification */}
+      {errorMsg && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2.5 text-rose-800 text-xs font-bold animate-fadeIn">
+          <AlertCircle size={16} className="text-rose-600 shrink-0" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      {/* Form Card */}
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
         
-        {/* Optional Image Upload Widget */}
-        <ImageUploadWidget
-          currentImage={formData.profileImage}
-          onImageChange={handleImageChange}
-          label="Profile Picture (Optional)"
-        />
-
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           
           {/* Full Name */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Full Name</label>
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">Full Legal Name</label>
             <input
               type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue focus:bg-white"
-              placeholder="e.g. Student Candidate"
-            />
-          </div>
-
-          {/* Student ID */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Student ID</label>
-            <input
-              type="text"
-              value={formData.studentId}
-              onChange={(e) => setFormData({ ...formData, studentId: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue focus:bg-white"
-              placeholder="e.g. 211-15-XXXX"
             />
           </div>
 
           {/* Department */}
-          <div className="sm:col-span-2">
+          <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">Department</label>
             <select
               value={formData.department}
@@ -159,18 +187,6 @@ export const EditStudentProfile = () => {
               onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue focus:bg-white"
               placeholder="e.g. 60th Batch"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">University Email</label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue focus:bg-white"
-              placeholder="student.candidate@s.diu.edu.bd"
             />
           </div>
 
@@ -222,9 +238,11 @@ export const EditStudentProfile = () => {
           </Link>
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white text-xs font-semibold shadow-sm transition-all"
+            disabled={saving}
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-50"
           >
-            <Save size={15} /> Save Changes
+            {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+            <span>Save Changes</span>
           </button>
         </div>
 
@@ -234,4 +252,3 @@ export const EditStudentProfile = () => {
 };
 
 export default EditStudentProfile;
-
