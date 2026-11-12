@@ -11,7 +11,8 @@ for p in [r"D:\Anaconda\Lib\site-packages", r"D:\Python\Lib\site-packages"]:
     if os.path.exists(p) and p not in sys.path:
         sys.path.append(p)
 
-from typing import List
+from typing import List, Any
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -37,6 +38,14 @@ class Settings(BaseSettings):
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://kalonakre.github.io"
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, v: Any) -> bool:
+        """Handle strings like 'release', 'debug', 'true', '1' safely."""
+        if isinstance(v, str):
+            return v.strip().lower() in ("true", "1", "t", "yes", "debug")
+        return bool(v)
 
     @property
     def cors_origins(self) -> List[str]:

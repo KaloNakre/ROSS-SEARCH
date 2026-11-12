@@ -3,6 +3,7 @@ from app.models.student import Student, StudentInterest
 from app.models.supervisor import Supervisor, SupervisorExpertise, SupervisorPublication
 from app.models.research_interest import ResearchInterest
 from app.models.team import Team, TeamMember, TeamStatus, MemberRole
+from app.models.revoked_token import RevokedToken
 
 __all__ = [
     "User",
@@ -17,4 +18,5 @@ __all__ = [
     "TeamMember",
     "TeamStatus",
     "MemberRole",
+    "RevokedToken",
 ]

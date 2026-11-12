@@ -97,7 +97,7 @@ assert verify_password("WrongPassword", hashed) is False
 print("  Argon2 Verification: PASSED", flush=True)
 
 token = create_access_token({"sub": "42", "role": "student"})
-decoded = decode_token(token)
+decoded, _ = decode_token(token)
 print(f"  JWT Token Created & Decoded: sub={decoded.get('sub')}, role={decoded.get('role')}", flush=True)
 assert decoded.get("sub") == "42"
 assert decoded.get("role") == "student"

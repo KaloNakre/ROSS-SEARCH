@@ -1,7 +1,7 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 from app.core.dependencies import get_db, require_admin
 from app.core.security import hash_password
@@ -28,7 +28,7 @@ class RoleUpdateRequest(BaseModel):
 
 
 class CreateSupervisorRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     full_name: str
     designation: Optional[str] = None

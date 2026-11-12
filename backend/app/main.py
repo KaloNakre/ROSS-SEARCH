@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.database.connection import check_db_connection
+from app.api.routes import auth
 
 # OpenAPI metadata description
 TAGS_METADATA = [
@@ -25,7 +26,7 @@ TAGS_METADATA = [
     },
     {
         "name": "Authentication",
-        "description": "Student registration, login, and JWT token management (Phase 3).",
+        "description": "Student registration, login, logout, and token management.",
     },
     {
         "name": "Students",
@@ -67,6 +68,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Phase 3A: Mount Authentication Router
+app.include_router(auth.router)
+
 
 @app.get("/", tags=["Health"], summary="API Root")
 def root():
@@ -76,7 +80,8 @@ def root():
         "version": settings.APP_VERSION,
         "status": "online",
         "docs": "/docs",
-        "health": "/api/health"
+        "health": "/api/health",
+        "auth": "/api/auth"
     }
 
 
