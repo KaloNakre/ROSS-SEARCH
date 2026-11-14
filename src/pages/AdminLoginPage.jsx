@@ -27,6 +27,16 @@ export const AdminLoginPage = () => {
     password: '',
   });
 
+  const handleQuickFill = () => {
+    setFormData({
+      fullId: 'DIU-ADM-201',
+      adminId: 'ADM-809',
+      gmailAddress: 'admin@diu.edu.bd',
+      password: 'Admin@12345',
+    });
+    setError('');
+  };
+
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -147,6 +157,21 @@ export const AdminLoginPage = () => {
               <span>{error}</span>
             </div>
           )}
+
+          {/* Quick Demo Fill Pill for Teacher / Examiner */}
+          <div className="mb-5 p-3 rounded-2xl bg-purple-950/40 border border-purple-800/40 flex items-center justify-between gap-3 text-xs">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-purple-300 block">Default Admin Account</span>
+              <span className="font-mono text-purple-200 text-[11px]">admin@diu.edu.bd • Pass: Admin@12345</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleQuickFill}
+              className="px-3 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold transition-all active:scale-95 shadow-sm"
+            >
+              Autofill
+            </button>
+          </div>
 
           <form onSubmit={handleAdminLogin} className="space-y-4" noValidate>
             {/* 1. Full ID (as requested) */}

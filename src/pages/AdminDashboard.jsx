@@ -10,7 +10,8 @@ import {
   ShieldCheck, 
   ArrowRight,
   Sparkles,
-  Loader2
+  Loader2,
+  Database
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -84,6 +85,13 @@ export const AdminDashboard = () => {
 
   const quickActions = [
     {
+      title: "Live Database Tables Explorer",
+      desc: "Tabular live overview of users, students, supervisors, and teams",
+      icon: Database,
+      path: "/admin/database",
+      color: "text-emerald-700 bg-emerald-50"
+    },
+    {
       title: "User Management",
       desc: "Activate, deactivate or review student registrations",
       icon: Users,
@@ -131,7 +139,13 @@ export const AdminDashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            to="/admin/database"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5"
+          >
+            <Database size={14} /> Database Tables
+          </Link>
           <Link
             to="/admin/roles"
             className="px-4 py-2 rounded-xl border border-diu-blue text-diu-blue hover:bg-blue-50 text-xs font-semibold transition-colors"

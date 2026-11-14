@@ -24,6 +24,10 @@ from app.models.supervision_request import SupervisionRequest
 from app.api.routes import auth, students, supervisors, teams, admin, research, supervision_requests
 
 
+from app.core.security import hash_password
+from app.models.user import User, UserRole
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Ensure database tables exist and default seed data is populated on boot."""
@@ -31,6 +35,7 @@ async def lifespan(app: FastAPI):
         Base.metadata.create_all(bind=engine)
         db = SessionLocal()
         try:
+            # 1. Seed default DIU research domains
             if db.query(ResearchInterest).count() == 0:
                 domains = [
                     "Machine Learning", "Natural Language Processing", "Computer Vision",
@@ -43,6 +48,24 @@ async def lifespan(app: FastAPI):
                     db.add(ResearchInterest(name=d))
                 db.commit()
                 print("[ROSS-SEARCH Startup] Seeded default DIU research domains.")
+
+            # 2. Seed default Administrator accounts if none exist
+            admin_accounts = [
+                ("admin@diu.edu.bd", "Admin@12345"),
+                ("admin@ross-search.diu.edu.bd", "Admin@12345")
+            ]
+            for email_acc, pass_plain in admin_accounts:
+                existing = db.query(User).filter(User.email == email_acc).first()
+                if not existing:
+                    admin_user = User(
+                        email=email_acc,
+                        password_hash=hash_password(pass_plain),
+                        role=UserRole.admin,
+                        is_active=True,
+                    )
+                    db.add(admin_user)
+            db.commit()
+            print("[ROSS-SEARCH Startup] Verified default DIU System Administrator credentials.")
         finally:
             db.close()
     except Exception as e:

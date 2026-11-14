@@ -16,6 +16,7 @@ import {
   Inbox,
   UserPlus,
   Sparkles,
+  Database,
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -59,6 +60,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
   const adminLinks = [
     { label: 'Admin Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Database Explorer', path: '/admin/database', icon: Database },
     { label: 'Manage Users', path: '/admin/users', icon: Users },
     { label: 'Manage Supervisors', path: '/admin/supervisors', icon: UserCheck },
     { label: 'Role Management', path: '/admin/roles', icon: Shield },

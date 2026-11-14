@@ -46,6 +46,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ManageUsersPage from './pages/ManageUsersPage';
 import ManageSupervisorsPage from './pages/ManageSupervisorsPage';
 import RoleManagementPage from './pages/RoleManagementPage';
+import DatabaseViewerPage from './pages/admin/DatabaseViewerPage';
 
 // Shared
 import ResourcesPage from './pages/ResourcesPage';
@@ -204,6 +205,11 @@ function App() {
             <Route path="/admin/roles" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <RoleManagementPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/database" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DatabaseViewerPage />
               </ProtectedRoute>
             } />
 
