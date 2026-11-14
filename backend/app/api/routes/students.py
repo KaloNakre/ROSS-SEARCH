@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db, get_current_user, require_admin
 from app.models.user import User
-from app.models.student import Student, student_interests
+from app.models.student import Student, StudentInterest
 from app.models.research_interest import ResearchInterest
 from app.schemas.student import StudentOut, StudentProfileUpdate, InterestUpdateRequest
 

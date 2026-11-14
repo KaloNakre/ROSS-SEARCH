@@ -40,3 +40,6 @@ class Student(Base):
     student_interest_items = relationship("StudentInterest", back_populates="student", cascade="all, delete-orphan")
     interests = relationship("ResearchInterest", secondary="student_interests", viewonly=True)
     team_memberships = relationship("TeamMember", back_populates="student")
+
+
+student_interests = StudentInterest
