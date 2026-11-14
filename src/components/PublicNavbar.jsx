@@ -59,13 +59,22 @@ export const PublicNavbar = () => {
                 Go to Dashboard <ArrowRight size={15} />
               </Link>
             ) : (
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-diu-blue hover:bg-diu-accentBlue text-white text-sm font-medium shadow-sm hover:shadow transition-all"
-              >
-                <User size={15} className="stroke-[2.5]" />
-                <span>Login</span>
-              </Link>
+              <>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-slate-300 text-slate-700 hover:text-diu-blue hover:border-diu-blue text-sm font-medium transition-all"
+                >
+                  <User size={15} />
+                  <span>Login</span>
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-diu-blue hover:bg-diu-accentBlue text-white text-sm font-medium shadow-sm hover:shadow transition-all"
+                >
+                  <span>Get Started</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </>
             )}
           </div>
 
@@ -108,7 +117,7 @@ export const PublicNavbar = () => {
               onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center py-2.5 rounded-full border border-diu-blue text-diu-blue text-sm font-medium hover:bg-blue-50"
             >
-              Student Registration
+              Get Started / Register
             </Link>
           </div>
         </div>

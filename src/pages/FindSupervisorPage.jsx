@@ -4,11 +4,17 @@ import {
   Search, 
   ChevronRight, 
   Users, 
-  Loader2
+  Loader2,
+  Sparkles,
+  BookOpen,
+  CheckCircle2,
+  Filter,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { DEPARTMENTS, RESEARCH_DOMAINS } from '../data/mockData';
 import NeutralAvatar from '../components/NeutralAvatar';
+import module1Service from '../services/module1Service';
 
 export const FindSupervisorPage = () => {
   const { apiCall } = useAuth();
@@ -76,21 +82,28 @@ export const FindSupervisorPage = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6 animate-fadeIn pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Find Supervisor
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            <Search className="text-diu-blue" size={26} />
+            Find Thesis Supervisor
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Discover faculty advisors and research supervisors matching your FYP/Thesis domain
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-500">
-            {filteredSupervisors.length} Verified Faculty Members
+        <div className="flex items-center gap-3">
+          <Link
+            to="/student/matching"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs font-bold rounded-xl shadow-xs transition-all"
+          >
+            <Sparkles size={15} /> Topic Match Finder
+          </Link>
+          <span className="text-xs font-semibold text-slate-500 bg-white px-3 py-2 rounded-xl border border-slate-200">
+            {filteredSupervisors.length} Verified Faculty
           </span>
         </div>
       </div>
@@ -180,6 +193,7 @@ export const FindSupervisorPage = () => {
             const isAccepting = supervisor.is_accepting_teams ?? supervisor.acceptingTeams ?? true;
             const availableSlots = supervisor.available_slots ?? supervisor.availableSlots ?? 3;
             const maxSlots = supervisor.max_slots ?? supervisor.maxSlots ?? 5;
+            const profileImageUrl = supervisor.profile_image_url || null;
             const expertiseList = Array.isArray(supervisor.expertise)
               ? supervisor.expertise.map(e => (typeof e === 'string' ? e : e.name || ''))
               : [];
@@ -193,7 +207,7 @@ export const FindSupervisorPage = () => {
                   {/* Top: Avatar & Info */}
                   <div className="flex items-start gap-4">
                     <NeutralAvatar
-                      src={null}
+                      src={profileImageUrl}
                       size="md"
                       className="rounded-2xl shrink-0"
                     />
@@ -208,54 +222,49 @@ export const FindSupervisorPage = () => {
                         {department}
                       </p>
                     </div>
-
-                    {/* Availability Badge */}
-                    <span
-                      className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider shrink-0 ${
-                        isAccepting
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-500 border border-slate-200'
-                      }`}
-                    >
-                      {isAccepting ? 'Available' : 'Slots Full'}
-                    </span>
                   </div>
 
-                  {/* Research Expertise Tags */}
-                  <div className="mt-4 pt-3 border-t border-slate-100">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                      Research Expertise
+                  {/* Expertise Tags */}
+                  <div className="mt-4">
+                    <span className="text-[11px] font-semibold text-slate-400 block mb-1.5">
+                      Expertise & Domains:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {expertiseList.length > 0 ? (
-                        expertiseList.slice(0, 4).map((exp, idx) => (
+                        expertiseList.slice(0, 3).map((exp, i) => (
                           <span
-                            key={idx}
-                            className="px-2.5 py-1 rounded-lg bg-blue-50/80 text-diu-blue text-[11px] font-medium"
+                            key={i}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium bg-blue-50 text-diu-blue"
                           >
                             {exp}
                           </span>
                         ))
                       ) : (
-                        <span className="text-[11px] text-slate-400 italic">Expertise listed on profile</span>
+                        <span className="text-xs text-slate-400 italic">No expertise declared yet</span>
+                      )}
+                      {expertiseList.length > 3 && (
+                        <span className="px-2 py-1 rounded-lg text-xs font-medium bg-slate-100 text-slate-500">
+                          +{expertiseList.length - 3} more
+                        </span>
                       )}
                     </div>
                   </div>
-
-                  {/* Slots info */}
-                  <div className="mt-4 text-xs text-slate-500 flex items-center justify-between">
-                    <span>Available Slots:</span>
-                    <span className="font-bold text-slate-700">
-                      {availableSlots} / {maxSlots} Teams
-                    </span>
-                  </div>
                 </div>
 
-                {/* View Profile Action Link / Button */}
-                <div className="mt-5 pt-3 border-t border-slate-100">
+                {/* Capacity & Link */}
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-400 font-medium">Availability</span>
+                    <span className={`font-bold ${isAccepting && availableSlots > 0 ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      {isAccepting && availableSlots > 0
+                        ? `${availableSlots}/${maxSlots} Slots Open`
+                        : 'Unavailable'}
+                    </span>
+                  </div>
+
                   <Link
                     to={`/supervisors/${supervisor.id}`}
-                    className="w-full py-2 px-4 rounded-xl bg-blue-50 hover:bg-diu-blue text-diu-blue hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-diu-blue hover:bg-diu-accentBlue text-white font-semibold transition-colors shadow-xs"
                   >
                     <span>View Profile</span>
                     <ChevronRight size={14} />
@@ -266,56 +275,40 @@ export const FindSupervisorPage = () => {
           })}
         </div>
       ) : (
-        /* Empty State */
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 max-w-lg mx-auto space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-diu-blue flex items-center justify-center mx-auto">
-            <Search size={26} />
-          </div>
-          <h3 className="text-base font-bold text-slate-800">No Supervisors Found</h3>
-          <p className="text-xs text-slate-500 max-w-xs mx-auto">
-            We couldn't find any supervisors matching your current search criteria.
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+          <Users className="mx-auto text-slate-400 mb-3" size={36} />
+          <h2 className="text-lg font-bold text-slate-800">No Matching Supervisors Found</h2>
+          <p className="text-xs text-slate-500 mt-1 mb-4">
+            Try adjusting your search criteria or domain filters.
           </p>
           <button
             onClick={handleReset}
-            className="px-5 py-2 rounded-xl bg-diu-blue text-white text-xs font-semibold hover:bg-diu-accentBlue"
+            className="px-5 py-2 rounded-xl bg-diu-blue text-white text-xs font-semibold"
           >
             Reset Filters
           </button>
         </div>
       )}
 
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
+        <div className="flex justify-center items-center gap-2 pt-6">
           <button
-            onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-xs text-slate-600 disabled:opacity-40 hover:bg-slate-50"
+            className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
           >
-            &lt;
+            Previous
           </button>
-          {Array.from({ length: totalPages }).map((_, i) => {
-            const pageNum = i + 1;
-            return (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={`w-8 h-8 rounded-lg text-xs font-semibold transition-colors ${
-                  currentPage === pageNum
-                    ? 'bg-diu-blue text-white shadow-xs'
-                    : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
+          <span className="text-xs text-slate-600 font-medium">
+            Page {currentPage} of {totalPages}
+          </span>
           <button
-            onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-xs text-slate-600 disabled:opacity-40 hover:bg-slate-50"
+            className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
           >
-            &gt;
+            Next
           </button>
         </div>
       )}

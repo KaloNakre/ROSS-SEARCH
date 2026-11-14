@@ -2,10 +2,10 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 const AuthContext = createContext();
 
-// ── API base URL — change to production URL when deploying backend ──────────
+// API base URL
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// ── Thin API client ─────────────────────────────────────────────────────────
+// API client helper
 async function apiCall(path, options = {}) {
   const token = localStorage.getItem('ross_token');
   const headers = {
@@ -22,17 +22,16 @@ async function apiCall(path, options = {}) {
   return data;
 }
 
-// ── Provider ─────────────────────────────────────────────────────────────────
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem('ross_token') || null);
   const [currentUser, setCurrentUser] = useState(null); // { id, email, role, is_active, profile }
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // initial hydration
+  const [loading, setLoading] = useState(true);
 
-  // ── Derived role shortcut ───────────────────────────────────────────────
+  // Derived role shortcut
   const currentUserRole = currentUser?.role || 'student';
 
-  // ── Persist token ───────────────────────────────────────────────────────
+  // Persist token
   useEffect(() => {
     if (token) {
       localStorage.setItem('ross_token', token);
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // ── Hydrate user from /api/auth/me on mount ────────────────────────────
+  // Hydrate user from /api/auth/me on mount
   const hydrateUser = useCallback(async () => {
     const stored = localStorage.getItem('ross_token');
     if (!stored) { setLoading(false); return; }
@@ -51,7 +50,6 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
       setToken(stored);
     } catch {
-      // Token invalid or expired — clear everything
       localStorage.removeItem('ross_token');
       setToken(null);
       setCurrentUser(null);
@@ -63,7 +61,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => { hydrateUser(); }, [hydrateUser]);
 
-  // ── Register (student only) ─────────────────────────────────────────────
+  // Student Registration
   const register = async ({ fullName, studentId, department, email, password }) => {
     const data = await apiCall('/api/auth/register', {
       method: 'POST',
@@ -76,7 +74,6 @@ export const AuthProvider = ({ children }) => {
       }),
     });
     setToken(data.access_token);
-    // Fetch full profile after registration
     const user = await apiCall('/api/auth/me', {
       headers: { Authorization: `Bearer ${data.access_token}` },
     });
@@ -85,7 +82,28 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
-  // ── Login ───────────────────────────────────────────────────────────────
+  // Supervisor Registration
+  const registerSupervisor = async ({ fullName, department, designation, email, password }) => {
+    const data = await apiCall('/api/auth/register/supervisor', {
+      method: 'POST',
+      body: JSON.stringify({
+        full_name: fullName,
+        department,
+        designation: designation || 'Assistant Professor',
+        email,
+        password,
+      }),
+    });
+    setToken(data.access_token);
+    const user = await apiCall('/api/auth/me', {
+      headers: { Authorization: `Bearer ${data.access_token}` },
+    });
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    return user;
+  };
+
+  // Standard Login
   const login = async (email, password) => {
     const data = await apiCall('/api/auth/login', {
       method: 'POST',
@@ -100,7 +118,29 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
-  // ── Logout ──────────────────────────────────────────────────────────────
+  // Admin Login (Secure Portal)
+  const adminLogin = async ({ fullId, adminId, gmailAddress, password }) => {
+    const data = await apiCall('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: gmailAddress.trim().toLowerCase(), password }),
+    });
+    setToken(data.access_token);
+    const user = await apiCall('/api/auth/me', {
+      headers: { Authorization: `Bearer ${data.access_token}` },
+    });
+    if (user.role !== 'admin') {
+      localStorage.removeItem('ross_token');
+      setToken(null);
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+      throw new Error('Access denied. This account does not possess System Administrator privileges.');
+    }
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    return user;
+  };
+
+  // Logout
   const logout = async () => {
     try { await apiCall('/api/auth/logout', { method: 'POST' }); } catch {}
     setToken(null);
@@ -109,7 +149,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('ross_token');
   };
 
-  // ── Update student profile locally after PUT /api/students/me ──────────
+  // Profile refresh
   const refreshUser = async () => {
     try {
       const user = await apiCall('/api/auth/me');
@@ -119,15 +159,15 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      // State
       token,
       currentUser,
       currentUserRole,
       isAuthenticated,
       loading,
-      // Actions
       register,
+      registerSupervisor,
       login,
+      adminLogin,
       logout,
       refreshUser,
       apiCall,

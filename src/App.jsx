@@ -6,9 +6,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 // Layout
 import DashboardLayout from './components/DashboardLayout';
 
-// Public Pages
+// Public & Auth Pages
 import HomePage from './pages/HomePage';
-import RegistrationPage from './pages/RegistrationPage';
+import AccountTypeSelectionPage from './pages/AccountTypeSelectionPage';
+import StudentRegistrationPage from './pages/StudentRegistrationPage';
+import SupervisorRegistrationPage from './pages/SupervisorRegistrationPage';
+import AdminLoginPage from './pages/AdminLoginPage';
 import LoginPage from './pages/LoginPage';
 
 // Student Pages
@@ -17,19 +20,28 @@ import StudentProfile from './pages/StudentProfile';
 import EditStudentProfile from './pages/EditStudentProfile';
 import ResearchInterestsPage from './pages/ResearchInterestsPage';
 import SearchStudentsSection from './pages/SearchStudentsSection';
+import ResearchMatchingPage from './pages/student/ResearchMatchingPage';
 
-// Supervisor Pages
+// Supervisor Pages & Robayet Islam's Modules
 import FindSupervisorPage from './pages/FindSupervisorPage';
 import SupervisorProfile from './pages/SupervisorProfile';
 import EditSupervisorProfile from './pages/EditSupervisorProfile';
+import SupervisorDashboard from './pages/supervisor/SupervisorDashboard';
+import ResearchExpertisePage from './pages/supervisor/ResearchExpertisePage';
+import PublishResearchInterestPage from './pages/supervisor/PublishResearchInterestPage';
+import ResearchOpportunitiesPage from './pages/supervisor/ResearchOpportunitiesPage';
+import SupervisorRequestsPage from './pages/supervisor/SupervisorRequestsPage';
+import IndividualStudentAssignmentPage from './pages/supervisor/IndividualStudentAssignmentPage';
+import TeamAssignmentPage from './pages/supervisor/TeamAssignmentPage';
+import AssignedStudentsTeamsPage from './pages/supervisor/AssignedStudentsTeamsPage';
 
-// Team Pages
+// Team Pages (Tamim Hasan Sami integration)
 import TeamSearchPage from './pages/TeamSearchPage';
 import CreateTeamPage from './pages/CreateTeamPage';
 import TeamDetailsPage from './pages/TeamDetailsPage';
 import MyTeamsPage from './pages/MyTeamsPage';
 
-// Admin Pages
+// Admin Pages (Riya Saha / System Admin)
 import AdminDashboard from './pages/AdminDashboard';
 import ManageUsersPage from './pages/ManageUsersPage';
 import ManageSupervisorsPage from './pages/ManageSupervisorsPage';
@@ -44,15 +56,18 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* ── Public Routes ─────────────────────────────────────────── */}
+          {/* ── Public & Registration Routes (Phase 1–4) ────────────────── */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/register" element={<RegistrationPage />} />
+          <Route path="/register" element={<AccountTypeSelectionPage />} />
+          <Route path="/register/student" element={<StudentRegistrationPage />} />
+          <Route path="/register/supervisor" element={<SupervisorRegistrationPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* ── Authenticated Dashboard Routes ─────────────────────────── */}
+          {/* ── Authenticated Dashboard Wrapper ─────────────────────────── */}
           <Route element={<DashboardLayout />}>
 
-            {/* ── STUDENT routes — students and admins only ─────────────── */}
+            {/* ── STUDENT ROUTES ────────────────────────────────────────── */}
             <Route path="/student/dashboard" element={
               <ProtectedRoute allowedRoles={['student', 'admin']}>
                 <StudentDashboard />
@@ -73,28 +88,33 @@ function App() {
                 <ResearchInterestsPage />
               </ProtectedRoute>
             } />
+            <Route path="/student/matching" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <ResearchMatchingPage />
+              </ProtectedRoute>
+            } />
             <Route path="/students/section" element={
               <ProtectedRoute allowedRoles={['student', 'admin']}>
                 <SearchStudentsSection />
               </ProtectedRoute>
             } />
 
-            {/* ── SUPERVISOR discovery — students + supervisors + admin ─── */}
+            {/* ── SUPERVISOR DISCOVERY (Student & Supervisor View) ──────── */}
             <Route path="/supervisors" element={
-              <ProtectedRoute allowedRoles={['student', 'admin']}>
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <FindSupervisorPage />
               </ProtectedRoute>
             } />
             <Route path="/supervisors/:id" element={
-              <ProtectedRoute allowedRoles={['student', 'admin']}>
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <SupervisorProfile />
               </ProtectedRoute>
             } />
 
-            {/* ── SUPERVISOR self-management — supervisors only ───────────── */}
+            {/* ── ROBAYET ISLAM'S 10 MODULE 1 SUPERVISOR AREAS ─────────── */}
             <Route path="/supervisor/dashboard" element={
               <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
-                <SupervisorProfile />
+                <SupervisorDashboard />
               </ProtectedRoute>
             } />
             <Route path="/supervisor/profile" element={
@@ -107,8 +127,43 @@ function App() {
                 <EditSupervisorProfile />
               </ProtectedRoute>
             } />
+            <Route path="/supervisor/expertise" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <ResearchExpertisePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/interests/publish" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <PublishResearchInterestPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/opportunities" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <ResearchOpportunitiesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/requests" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <SupervisorRequestsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/assign-student" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <IndividualStudentAssignmentPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/assign-team" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <TeamAssignmentPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/assignments" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <AssignedStudentsTeamsPage />
+              </ProtectedRoute>
+            } />
 
-            {/* ── TEAM routes — students + supervisors + admin ────────────── */}
+            {/* ── TEAM ROUTES (Tamim Hasan Sami Integration) ─────────────── */}
             <Route path="/teams/search" element={
               <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <TeamSearchPage />
@@ -125,12 +180,12 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/teams/my-teams" element={
-              <ProtectedRoute allowedRoles={['student', 'admin']}>
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <MyTeamsPage />
               </ProtectedRoute>
             } />
 
-            {/* ── ADMIN routes — admin only ───────────────────────────────── */}
+            {/* ── ADMIN ROUTES (Riya Saha Integration) ───────────────────── */}
             <Route path="/admin/dashboard" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
@@ -152,7 +207,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* ── Shared ─────────────────────────────────────────────────── */}
+            {/* ── SHARED UTILITIES ───────────────────────────────────────── */}
             <Route path="/resources" element={
               <ProtectedRoute>
                 <ResourcesPage />
@@ -166,7 +221,7 @@ function App() {
 
           </Route>
 
-          {/* Catch-all */}
+          {/* Catch-all redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
