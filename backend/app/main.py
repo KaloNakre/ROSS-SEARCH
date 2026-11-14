@@ -20,7 +20,8 @@ from app.database.connection import check_db_connection, engine, SessionLocal
 from app.database.base import Base
 from app.models import user, student, supervisor, research_interest, team
 from app.models.research_interest import ResearchInterest
-from app.api.routes import auth, students, supervisors, teams, admin, research
+from app.models.supervision_request import SupervisionRequest
+from app.api.routes import auth, students, supervisors, teams, admin, research, supervision_requests
 
 
 @asynccontextmanager
@@ -72,6 +73,10 @@ TAGS_METADATA = [
         "description": "FYP and thesis team formation, member management, and collaboration.",
     },
     {
+        "name": "Supervision Requests",
+        "description": "Student supervision request flow — send, accept, reject, and dashboard.",
+    },
+    {
         "name": "Admin",
         "description": "System administration, user role management, and operational stats.",
     },
@@ -107,6 +112,7 @@ app.include_router(supervisors.router)
 app.include_router(teams.router)
 app.include_router(admin.router)
 app.include_router(research.router)
+app.include_router(supervision_requests.router)
 
 
 @app.get("/", tags=["Health"], summary="API Root")
@@ -150,3 +156,73 @@ def health_check():
             }
         }
     )
+
+
+@app.get(
+    "/api/database/overview",
+    tags=["Health"],
+    summary="Module 1 Database Tables & Status Overview",
+    response_description="Summary of all Module 1 database tables and row counts"
+)
+def database_overview():
+    """
+    Provides a live, public overview of all Module 1 tables and records.
+    Allows easy verification of system database state from any browser.
+    """
+    from app.models.user import User
+    from app.models.student import Student, StudentInterest
+    from app.models.supervisor import Supervisor, SupervisorExpertise
+    from app.models.research_interest import ResearchInterest
+    from app.models.team import Team, TeamMember
+    from app.models.supervision_request import SupervisionRequest
+
+    db = SessionLocal()
+    try:
+        tables = {
+            "users": {
+                "description": "User accounts and role-based access (student, supervisor, admin)",
+                "count": db.query(User).count(),
+            },
+            "students": {
+                "description": "Student profiles, academic ID, department, section",
+                "count": db.query(Student).count(),
+            },
+            "supervisors": {
+                "description": "Faculty supervisor profiles, slots, and availability",
+                "count": db.query(Supervisor).count(),
+            },
+            "research_interests": {
+                "description": "Research domains (ML, NLP, Cybersecurity, etc.)",
+                "count": db.query(ResearchInterest).count(),
+            },
+            "supervisor_expertise": {
+                "description": "Junction table linking supervisors to research domains",
+                "count": db.query(SupervisorExpertise).count(),
+            },
+            "student_interests": {
+                "description": "Junction table linking students to preferred research domains",
+                "count": db.query(StudentInterest).count(),
+            },
+            "teams": {
+                "description": "FYP/Thesis teams created by students",
+                "count": db.query(Team).count(),
+            },
+            "team_members": {
+                "description": "Students joined in thesis teams",
+                "count": db.query(TeamMember).count(),
+            },
+            "supervision_requests": {
+                "description": "Supervision requests sent by students to supervisors (pending, accepted, rejected)",
+                "count": db.query(SupervisionRequest).count(),
+            },
+        }
+        return {
+            "status": "online",
+            "module": "Module 1: User, Supervisor and Team Management",
+            "database_type": "postgresql" if "postgres" in settings.DATABASE_URL else "sqlite",
+            "total_tables": len(tables),
+            "tables": tables,
+        }
+    finally:
+        db.close()
+

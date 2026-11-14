@@ -23,6 +23,7 @@ class SupervisorProfileUpdate(BaseModel):
     available_slots: Optional[int] = None
     max_slots: Optional[int] = None
     accepting_teams: Optional[bool] = None
+    profile_image_url: Optional[str] = None
 
 
 class SupervisorOut(BaseModel):

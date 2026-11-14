@@ -110,3 +110,46 @@ class UserOut(BaseModel):
 class LogoutResponse(BaseModel):
     """Response returned upon successful token revocation."""
     message: str = "Logged out successfully"
+
+
+class SupervisorRegisterRequest(BaseModel):
+    """
+    Supervisor self-registration schema.
+    Faculty members register directly; account is marked supervisor role.
+    """
+    email: str
+    password: str
+    full_name: str
+    designation: str
+    department: str
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        cleaned = v.strip().lower()
+        if not EMAIL_REGEX.match(cleaned):
+            raise ValueError("Please provide a valid email address")
+        return cleaned
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str) -> str:
+        if len(v.strip()) < 6:
+            raise ValueError("Password must be at least 6 characters long")
+        return v
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, v: str) -> str:
+        cleaned = v.strip()
+        if len(cleaned) < 2:
+            raise ValueError("Full name must be at least 2 characters long")
+        return cleaned
+
+    @field_validator("department")
+    @classmethod
+    def validate_department(cls, v: str) -> str:
+        cleaned = v.strip()
+        if not cleaned:
+            raise ValueError("Department cannot be empty")
+        return cleaned

@@ -15,6 +15,7 @@ from app.schemas.auth import (
     UserOut,
     UserProfileDetails,
     LogoutResponse,
+    SupervisorRegisterRequest,
 )
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
@@ -67,6 +68,48 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
     db.refresh(user)
 
     # Issue signed JWT token
+    token = create_access_token({"sub": str(user.id), "role": user.role.value})
+    return TokenResponse(access_token=token, role=user.role.value, user_id=user.id)
+
+
+@router.post("/register/supervisor", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+def register_supervisor(payload: SupervisorRegisterRequest, db: Session = Depends(get_db)):
+    """
+    Supervisor self-registration.
+    - Faculty members register with their own credentials.
+    - Automatically assigns supervisor role.
+    - Creates both User and Supervisor profile in a single transaction.
+    """
+    normalized_email = payload.email.lower().strip()
+
+    if db.query(User).filter(User.email == normalized_email).first():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+
+    user = User(
+        email=normalized_email,
+        password_hash=hash_password(payload.password),
+        role=UserRole.supervisor,
+        is_active=True,
+    )
+    db.add(user)
+    db.flush()
+
+    supervisor = Supervisor(
+        user_id=user.id,
+        full_name=payload.full_name,
+        designation=payload.designation,
+        department=payload.department,
+        available_slots=5,
+        max_slots=5,
+        accepting_teams=True,
+    )
+    db.add(supervisor)
+    db.commit()
+    db.refresh(user)
+
     token = create_access_token({"sub": str(user.id), "role": user.role.value})
     return TokenResponse(access_token=token, role=user.role.value, user_id=user.id)
 
