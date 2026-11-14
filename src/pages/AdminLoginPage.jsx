@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ShieldCheck, 
@@ -31,10 +31,13 @@ export const AdminLoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Early redirect AFTER all hooks — correct placement per React rules
-  // If already authenticated as admin, go straight to admin dashboard
+  useEffect(() => {
+    if (isAuthenticated && currentUserRole === 'admin') {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, currentUserRole, navigate]);
+
   if (isAuthenticated && currentUserRole === 'admin') {
-    navigate('/admin/dashboard', { replace: true });
     return null;
   }
 

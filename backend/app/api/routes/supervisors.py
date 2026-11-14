@@ -46,7 +46,20 @@ def list_supervisors(
 def get_my_profile(current_user: User = Depends(require_supervisor), db: Session = Depends(get_db)):
     sup = db.query(Supervisor).filter(Supervisor.user_id == current_user.id).first()
     if not sup:
-        raise HTTPException(404, "Supervisor profile not found")
+        # Gracefully auto-create default supervisor profile record if not found
+        sup = Supervisor(
+            user_id=current_user.id,
+            full_name=current_user.email.split("@")[0].replace(".", " ").title(),
+            designation="Assistant Professor",
+            department="Department of Computer Science and Engineering",
+            available_slots=5,
+            max_slots=5,
+            accepting_teams=True,
+        )
+        db.add(sup)
+        db.commit()
+        db.refresh(sup)
+
     out = SupervisorOut.model_validate(sup)
     out.email = current_user.email
     return out
@@ -60,9 +73,21 @@ def update_my_profile(
 ):
     sup = db.query(Supervisor).filter(Supervisor.user_id == current_user.id).first()
     if not sup:
-        raise HTTPException(404, "Supervisor profile not found")
+        sup = Supervisor(
+            user_id=current_user.id,
+            full_name=payload.full_name or current_user.email.split("@")[0].replace(".", " ").title(),
+            designation=payload.designation or "Assistant Professor",
+            department=payload.department or "Department of Computer Science and Engineering",
+            available_slots=payload.available_slots if payload.available_slots is not None else 5,
+            max_slots=payload.max_slots if payload.max_slots is not None else 5,
+            accepting_teams=payload.accepting_teams if payload.accepting_teams is not None else True,
+        )
+        db.add(sup)
+        db.flush()
+
     for field, value in payload.model_dump(exclude_none=True).items():
         setattr(sup, field, value)
+
     db.commit()
     db.refresh(sup)
     out = SupervisorOut.model_validate(sup)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, 
@@ -93,11 +93,13 @@ export const SupervisorRegistrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Early redirect AFTER all hooks — correct placement per React rules
-  if (isAuthenticated) {
-    navigate('/supervisor/dashboard', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/supervisor/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (isAuthenticated) return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;

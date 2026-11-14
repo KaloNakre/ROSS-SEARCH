@@ -70,6 +70,12 @@ export const SupervisorDashboard = () => {
             >
               <Inbox size={16} /> Review Student Requests ({pendingRequests.length})
             </Link>
+            <Link
+              to="/supervisor/profile/edit"
+              className="px-5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold border border-white/25 transition-all flex items-center gap-2 backdrop-blur-xs"
+            >
+              <User size={16} /> Edit My Profile
+            </Link>
           </div>
         </div>
 

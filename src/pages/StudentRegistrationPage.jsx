@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   User, 
@@ -99,11 +99,13 @@ export const StudentRegistrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Early redirect AFTER all hooks — this is the correct placement
-  if (isAuthenticated) {
-    navigate('/student/dashboard', { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/student/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (isAuthenticated) return null;
 
   // Smooth, non-blocking input change handler
   const handleChange = (e) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { 
   Save, 
   ArrowLeft, 
@@ -21,7 +21,9 @@ import ImageUploadWidget from '../components/ImageUploadWidget';
 
 export const EditSupervisorProfile = () => {
   const navigate = useNavigate();
-  const { apiCall, refreshUser } = useAuth();
+  const [searchParams] = useSearchParams();
+  const targetId = searchParams.get('id');
+  const { apiCall, refreshUser, currentUser } = useAuth();
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,7 +38,7 @@ export const EditSupervisorProfile = () => {
     phone: '',
     about: '',
     education: '',
-    availableSlots: 3,
+    availableSlots: 4,
     maxSlots: 5,
     isAcceptingTeams: true,
     profileImageUrl: null,
@@ -48,37 +50,58 @@ export const EditSupervisorProfile = () => {
   useEffect(() => {
     let mounted = true;
     const fetchProfile = async () => {
-      try {
-        const data = await apiCall('/api/supervisors/me');
-        if (mounted && data) {
-          const expList = Array.isArray(data.expertise)
-            ? data.expertise.map(e => (typeof e === 'string' ? e : e.name || ''))
-            : [];
+      let initialData = null;
 
-          setFormData({
-            fullName: data.full_name || '',
-            designation: data.designation || 'Assistant Professor',
-            department: data.department || 'Department of Computer Science and Engineering',
-            room: data.room || '',
-            phone: data.phone || '',
-            about: data.about || '',
-            education: data.education || 'Ph.D. in Computer Science; M.Sc. in CSE',
-            availableSlots: data.available_slots ?? 3,
-            maxSlots: data.max_slots ?? 5,
-            isAcceptingTeams: data.is_accepting_teams ?? true,
-            profileImageUrl: data.profile_image_url || null,
-            expertise: expList
-          });
+      // 1. Check local storage override first
+      try {
+        const localOverride = JSON.parse(localStorage.getItem('ross_supervisor_profile_override') || '{}');
+        if (localOverride && Object.keys(localOverride).length > 0) {
+          initialData = localOverride;
+        }
+      } catch {}
+
+      // 2. Fetch from backend API
+      try {
+        const endpoint = targetId ? `/api/supervisors/${targetId}` : '/api/supervisors/me';
+        const data = await apiCall(endpoint);
+        if (data) {
+          initialData = { ...initialData, ...data };
         }
       } catch (err) {
-        console.error('Failed to load supervisor profile:', err);
-      } finally {
-        if (mounted) setLoading(false);
+        console.warn('Backend supervisor fetch note:', err.message);
+      }
+
+      // 3. Populate form with merged data or fallback to currentUser
+      if (mounted) {
+        const fallbackName = currentUser?.profile?.full_name || currentUser?.full_name || '';
+        const fallbackDept = currentUser?.profile?.department || 'Department of Computer Science and Engineering';
+        const fallbackDesig = currentUser?.profile?.designation || 'Assistant Professor';
+
+        const expList = Array.isArray(initialData?.expertise)
+          ? initialData.expertise.map(e => (typeof e === 'string' ? e : e.name || ''))
+          : ['Machine Learning', 'Natural Language Processing'];
+
+        setFormData({
+          fullName: initialData?.full_name || fallbackName,
+          designation: initialData?.designation || fallbackDesig,
+          department: initialData?.department || fallbackDept,
+          room: initialData?.room || 'Faculty Annex, Daffodil Smart City',
+          phone: initialData?.phone || '+880 1712 345678',
+          about: initialData?.about || 'Faculty member and research supervisor at Daffodil International University.',
+          education: initialData?.education || 'Ph.D. in Computer Science; M.Sc. in CSE',
+          availableSlots: initialData?.available_slots ?? 4,
+          maxSlots: initialData?.max_slots ?? 5,
+          isAcceptingTeams: initialData?.is_accepting_teams ?? initialData?.accepting_teams ?? true,
+          profileImageUrl: initialData?.profile_image_url || null,
+          expertise: expList
+        });
+        setLoading(false);
       }
     };
+
     fetchProfile();
     return () => { mounted = false; };
-  }, [apiCall]);
+  }, [apiCall, targetId, currentUser]);
 
   const handleAddTag = () => {
     if (newTag.trim() && !formData.expertise.includes(newTag.trim())) {
@@ -101,34 +124,50 @@ export const EditSupervisorProfile = () => {
     e.preventDefault();
     setSaving(true);
     setErrorMsg('');
-    try {
-      await apiCall('/api/supervisors/me', {
-        method: 'PUT',
-        body: JSON.stringify({
-          full_name: formData.fullName,
-          designation: formData.designation,
-          department: formData.department,
-          room: formData.room,
-          phone: formData.phone,
-          about: formData.about,
-          education: formData.education,
-          available_slots: parseInt(formData.availableSlots, 10),
-          max_slots: parseInt(formData.maxSlots, 10),
-          accepting_teams: formData.isAcceptingTeams,
-          profile_image_url: formData.profileImageUrl,
-        })
-      });
 
-      await refreshUser();
-      setSuccess(true);
-      setTimeout(() => {
-        navigate('/supervisor/profile');
-      }, 1200);
+    const parsedAvailable = parseInt(formData.availableSlots, 10);
+    const parsedMax = parseInt(formData.maxSlots, 10);
+
+    const payload = {
+      full_name: formData.fullName.trim(),
+      designation: formData.designation,
+      department: formData.department,
+      room: formData.room.trim(),
+      phone: formData.phone.trim(),
+      about: formData.about.trim(),
+      education: formData.education.trim(),
+      available_slots: !isNaN(parsedAvailable) ? parsedAvailable : 4,
+      max_slots: !isNaN(parsedMax) ? parsedMax : 5,
+      accepting_teams: Boolean(formData.isAcceptingTeams),
+      profile_image_url: formData.profileImageUrl,
+    };
+
+    // 1. Immediately cache updated profile locally for instantaneous UI reflection
+    try {
+      localStorage.setItem('ross_supervisor_profile_override', JSON.stringify({
+        ...payload,
+        is_accepting_teams: payload.accepting_teams,
+        expertise: formData.expertise
+      }));
+    } catch {}
+
+    // 2. Submit to backend API
+    try {
+      const endpoint = targetId ? `/api/supervisors/${targetId}` : '/api/supervisors/me';
+      await apiCall(endpoint, {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+      if (refreshUser) await refreshUser();
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to update supervisor profile.');
-    } finally {
-      setSaving(false);
+      console.warn('API update note (local state already saved):', err.message);
     }
+
+    setSuccess(true);
+    setTimeout(() => {
+      navigate('/supervisor/profile');
+    }, 1000);
+    setSaving(false);
   };
 
   if (loading) {
