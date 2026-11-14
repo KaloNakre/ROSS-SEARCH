@@ -16,7 +16,19 @@ async function apiCall(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = data?.detail || `HTTP ${res.status}`;
+    // FastAPI returns detail as a string, or as an array of validation error objects.
+    // Always convert to a readable string — never throw a raw object.
+    let msg;
+    if (typeof data?.detail === 'string') {
+      msg = data.detail;
+    } else if (Array.isArray(data?.detail)) {
+      // Pydantic validation errors: [{loc:[...], msg:"...", type:"..."}]
+      msg = data.detail.map(e => `${e.loc?.slice(-1)[0] ?? 'field'}: ${e.msg}`).join('; ');
+    } else if (data?.detail) {
+      msg = JSON.stringify(data.detail);
+    } else {
+      msg = `HTTP ${res.status}`;
+    }
     throw new Error(msg);
   }
   return data;

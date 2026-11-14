@@ -43,10 +43,14 @@ export const CreateTeamPage = () => {
             }
           }
           if (profileRes.status === 'fulfilled' && profileRes.value) {
+            const profile = profileRes.value;
+            // section may come as "60_A" or "Section 60_A" — normalize it
+            let sec = profile.section || '';
+            if (sec.startsWith('Section ')) sec = sec.replace('Section ', '');
             setFormData(prev => ({
               ...prev,
-              department: profileRes.value.department || 'Department of CSE',
-              section: profileRes.value.section || '60_A'
+              department: profile.department || 'Department of Computer Science and Engineering',
+              section: sec || '60_A'
             }));
           }
         }
@@ -76,8 +80,9 @@ export const CreateTeamPage = () => {
     setApiError('');
 
     try {
+      // Backend TeamCreate schema uses 'name' (not 'team_name')
       const payload = {
-        team_name: formData.teamName,
+        name: formData.teamName,
         project_title: formData.projectTitle,
         domain: formData.domain,
         department: formData.department,
@@ -96,7 +101,17 @@ export const CreateTeamPage = () => {
         navigate(`/teams/${result.id}`);
       }, 1200);
     } catch (err) {
-      setApiError(err.message || 'Failed to create team. Ensure you are not already leader of an active team.');
+      // Translate common backend errors to user-friendly Bengali-aware messages
+      const raw = err.message || '';
+      if (raw.toLowerCase().includes('already') && raw.toLowerCase().includes('team')) {
+        setApiError('আপনি ইতিমধ্যে একটি সক্রিয় দলের Team Leader। একই সময়ে দুটো দল তৈরি করা যাবে না।');
+      } else if (raw.toLowerCase().includes('only students')) {
+        setApiError('শুধুমাত্র Student অ্যাকাউন্ট থেকে টিম তৈরি করা যাবে।');
+      } else if (raw.includes('name:') || raw.includes('field')) {
+        setApiError(`ফর্ম ডেটা সমস্যা: ${raw}`);
+      } else {
+        setApiError(raw || 'টিম তৈরি করা যায়নি। সার্ভার সংযোগ পরীক্ষা করুন।');
+      }
     } finally {
       setSubmitting(false);
     }
