@@ -27,6 +27,25 @@ from app.api.routes.admin import get_database_overview, get_database_table_data
 # Ensure all database tables exist
 Base.metadata.create_all(bind=engine)
 
+def ensure_admin_exists():
+    db = SessionLocal()
+    try:
+        from app.core.security import hash_password
+        admin = db.query(User).filter(User.email == "admin@diu.edu.bd").first()
+        if not admin:
+            admin = User(
+                email="admin@diu.edu.bd",
+                password_hash=hash_password("Admin@12345"),
+                role=UserRole.admin,
+                is_active=True
+            )
+            db.add(admin)
+            db.commit()
+    finally:
+        db.close()
+
+ensure_admin_exists()
+
 def random_string(length=6):
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
 
