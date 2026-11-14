@@ -65,7 +65,13 @@ async def lifespan(app: FastAPI):
                     )
                     db.add(admin_user)
             db.commit()
-            print("[ROSS-SEARCH Startup] Verified default DIU System Administrator credentials.")
+            # 3. Seed 4 Bangladeshi Supervisors & 10 Students for Demo / Examiner Evaluation
+            try:
+                from app.database.demo_seeder import run_demo_seeder
+                run_demo_seeder(db)
+                print("[ROSS-SEARCH Startup] Seeded realistic DIU student & supervisor demo cohort.")
+            except Exception as seed_err:
+                print(f"[ROSS-SEARCH Startup Seeder Note] {seed_err}")
         finally:
             db.close()
     except Exception as e:

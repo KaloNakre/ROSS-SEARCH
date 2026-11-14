@@ -217,8 +217,9 @@ def get_database_table_data(
                 "email": s.user.email if s.user else "N/A",
                 "department": s.department,
                 "section": s.section or "Section 60_A",
-                "cgpa": str(s.cgpa) if s.cgpa else "3.85",
                 "preferred_domain": s.preferred_domain or "Natural Language Processing",
+                "status": s.team_status or "Active (Looking for Team)",
+                "registered_at": s.user.created_at.strftime("%Y-%m-%d %H:%M:%S") if s.user and getattr(s.user, 'created_at', None) else "2026-11-12 14:20:00",
             }
             for s in rows
         ]
@@ -236,7 +237,8 @@ def get_database_table_data(
                 "room": s.room or "Faculty Annex, DSC",
                 "phone": s.phone or "+880 1712 345678",
                 "slots_available": f"{s.available_slots} / {s.max_slots}",
-                "accepting_teams": "Yes (Open)" if s.accepting_teams else "Closed",
+                "accepting_teams": "Open (Accepting)" if s.accepting_teams else "Closed",
+                "registered_at": s.user.created_at.strftime("%Y-%m-%d %H:%M:%S") if s.user and getattr(s.user, 'created_at', None) else "2026-11-05 09:30:00",
             }
             for s in rows
         ]
@@ -302,4 +304,128 @@ def get_database_table_data(
 
     else:
         raise HTTPException(404, f"Table '{table_name}' does not exist in the database.")
+
+
+# ── Database Record Management (Edit / Delete / Seed) ─────────────────────────
+
+class RecordUpdatePayload(BaseModel):
+    data: dict
+
+
+@router.delete("/database/records/{table_name}/{record_id}")
+def delete_database_record(
+    table_name: str,
+    record_id: int,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin)
+):
+    """Admin-only deletion of any database entity with full cascade integrity."""
+    if table_name == "students":
+        student = db.query(Student).filter(Student.id == record_id).first()
+        if not student:
+            raise HTTPException(404, "Student record not found")
+        user = student.user
+        db.delete(student)
+        if user:
+            db.delete(user)
+        db.commit()
+        return {"success": True, "message": f"Student record #{record_id} deleted successfully. Student may now register freshly."}
+
+    elif table_name == "supervisors":
+        sup = db.query(Supervisor).filter(Supervisor.id == record_id).first()
+        if not sup:
+            raise HTTPException(404, "Supervisor record not found")
+        user = sup.user
+        db.delete(sup)
+        if user:
+            db.delete(user)
+        db.commit()
+        return {"success": True, "message": f"Supervisor #{record_id} and user account deleted successfully."}
+
+    elif table_name == "users":
+        user = db.query(User).filter(User.id == record_id).first()
+        if not user:
+            raise HTTPException(404, "User record not found")
+        if user.id == _admin.id:
+            raise HTTPException(400, "Cannot delete your own active administrator account.")
+        db.delete(user)
+        db.commit()
+        return {"success": True, "message": f"User account #{record_id} deleted successfully."}
+
+    elif table_name == "teams":
+        team = db.query(Team).filter(Team.id == record_id).first()
+        if not team:
+            raise HTTPException(404, "Team record not found")
+        db.delete(team)
+        db.commit()
+        return {"success": True, "message": f"Team #{record_id} deleted successfully."}
+
+    elif table_name == "supervision_requests":
+        req = db.query(SupervisionRequest).filter(SupervisionRequest.id == record_id).first()
+        if not req:
+            raise HTTPException(404, "Supervision request not found")
+        db.delete(req)
+        db.commit()
+        return {"success": True, "message": f"Supervision request #{record_id} deleted successfully."}
+
+    else:
+        raise HTTPException(400, f"Deletion not supported for table '{table_name}'")
+
+
+@router.put("/database/records/{table_name}/{record_id}")
+def update_database_record(
+    table_name: str,
+    record_id: int,
+    payload: RecordUpdatePayload,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin)
+):
+    """Admin-only update of database record fields."""
+    data = payload.data
+    if table_name == "students":
+        student = db.query(Student).filter(Student.id == record_id).first()
+        if not student:
+            raise HTTPException(404, "Student not found")
+        if "full_name" in data: student.full_name = data["full_name"]
+        if "department" in data: student.department = data["department"]
+        if "section" in data: student.section = data["section"]
+        if "preferred_domain" in data: student.preferred_domain = data["preferred_domain"]
+        db.commit()
+        db.refresh(student)
+        return {"success": True, "message": "Student record updated successfully"}
+
+    elif table_name == "supervisors":
+        sup = db.query(Supervisor).filter(Supervisor.id == record_id).first()
+        if not sup:
+            raise HTTPException(404, "Supervisor not found")
+        if "full_name" in data: sup.full_name = data["full_name"]
+        if "designation" in data: sup.designation = data["designation"]
+        if "department" in data: sup.department = data["department"]
+        if "room" in data: sup.room = data["room"]
+        if "phone" in data: sup.phone = data["phone"]
+        db.commit()
+        db.refresh(sup)
+        return {"success": True, "message": "Supervisor record updated successfully"}
+
+    elif table_name == "teams":
+        team = db.query(Team).filter(Team.id == record_id).first()
+        if not team:
+            raise HTTPException(404, "Team not found")
+        if "team_name" in data: team.name = data["team_name"]
+        if "project_title" in data: team.project_title = data["project_title"]
+        if "domain" in data: team.domain = data["domain"]
+        if "section" in data: team.section = data["section"]
+        db.commit()
+        db.refresh(team)
+        return {"success": True, "message": "Team record updated successfully"}
+
+    else:
+        raise HTTPException(400, f"Update not supported for table '{table_name}'")
+
+
+@router.post("/database/seed-demo")
+def seed_demo_data(db: Session = Depends(get_db), _admin: User = Depends(require_admin)):
+    """Seed 4 supervisors and 10 students for evaluation."""
+    from app.database.demo_seeder import run_demo_seeder
+    return run_demo_seeder(db)
 
