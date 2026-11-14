@@ -21,7 +21,6 @@ export const AdminLoginPage = () => {
 
   // ── ALL HOOKS BEFORE ANY CONDITIONAL RETURN (Rules of Hooks) ─────────────
   const [formData, setFormData] = useState({
-    fullId: '',
     adminId: '',
     gmailAddress: '',
     password: '',
@@ -29,7 +28,6 @@ export const AdminLoginPage = () => {
 
   const handleQuickFill = () => {
     setFormData({
-      fullId: 'DIU-ADM-201',
       adminId: 'ADM-809',
       gmailAddress: 'admin@diu.edu.bd',
       password: 'Admin@12345',
@@ -58,10 +56,6 @@ export const AdminLoginPage = () => {
   };
 
   const validate = () => {
-    if (!formData.fullId.trim()) {
-      setError('Please provide your Full ID.');
-      return false;
-    }
     if (!formData.adminId.trim()) {
       setError('Please enter your assigned Admin ID.');
       return false;
@@ -90,7 +84,6 @@ export const AdminLoginPage = () => {
     setLoading(true);
     try {
       await adminLogin({
-        fullId: formData.fullId.trim(),
         adminId: formData.adminId.trim(),
         gmailAddress: formData.gmailAddress.trim().toLowerCase(),
         password: formData.password,
@@ -174,28 +167,7 @@ export const AdminLoginPage = () => {
           </div>
 
           <form onSubmit={handleAdminLogin} className="space-y-4" noValidate>
-            {/* 1. Full ID (as requested) */}
-            <div>
-              <label htmlFor="admin-full-id" className="block text-xs font-semibold text-slate-300 mb-1">
-                Full ID <span className="text-purple-400">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
-                  <Fingerprint size={16} />
-                </span>
-                <input
-                  id="admin-full-id"
-                  name="fullId"
-                  type="text"
-                  placeholder="e.g. DIU-CSE-ADM-01"
-                  value={formData.fullId}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                />
-              </div>
-            </div>
-
-            {/* 2. Admin ID */}
+            {/* 1. Admin ID */}
             <div>
               <label htmlFor="admin-id" className="block text-xs font-semibold text-slate-300 mb-1">
                 Admin ID <span className="text-purple-400">*</span>
@@ -216,7 +188,7 @@ export const AdminLoginPage = () => {
               </div>
             </div>
 
-            {/* 3. Gmail Address */}
+            {/* 2. Gmail Address */}
             <div>
               <label htmlFor="admin-gmail" className="block text-xs font-semibold text-slate-300 mb-1">
                 Gmail Address <span className="text-purple-400">*</span>

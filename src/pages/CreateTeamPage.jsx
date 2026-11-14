@@ -102,7 +102,11 @@ export const CreateTeamPage = () => {
       }, 1200);
     } catch (err) {
       // Translate common backend errors to user-friendly Bengali-aware messages
-      const raw = err.message || '';
+      let raw = (typeof err === 'string' ? err : err?.message) || '';
+      if (!raw || raw === '[object Object]') {
+        raw = 'টিম ডেটা সংরক্ষণে সার্ভার ত্রুটি হয়েছে। অনুগ্রহ করে ইনপুট তথ্য যাচাই করে পুনরায় চেষ্টা করুন।';
+      }
+
       if (raw.toLowerCase().includes('already') && raw.toLowerCase().includes('team')) {
         setApiError('আপনি ইতিমধ্যে একটি সক্রিয় দলের Team Leader। একই সময়ে দুটো দল তৈরি করা যাবে না।');
       } else if (raw.toLowerCase().includes('only students')) {
@@ -110,7 +114,7 @@ export const CreateTeamPage = () => {
       } else if (raw.includes('name:') || raw.includes('field')) {
         setApiError(`ফর্ম ডেটা সমস্যা: ${raw}`);
       } else {
-        setApiError(raw || 'টিম তৈরি করা যায়নি। সার্ভার সংযোগ পরীক্ষা করুন।');
+        setApiError(raw);
       }
     } finally {
       setSubmitting(false);
