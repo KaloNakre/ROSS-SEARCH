@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_db, get_current_user, require_supervisor
 from app.models.user import User, UserRole
-from app.models.supervisor import Supervisor
+from app.models.supervisor import Supervisor, SupervisorExpertise
 from app.models.research_interest import ResearchInterest
 from app.schemas.supervisor import SupervisorOut, SupervisorProfileUpdate, ExpertiseUpdateRequest
 
@@ -25,7 +25,12 @@ def list_supervisors(
             Supervisor.department.ilike(f"%{search}%")
         )
     if domain:
-        q = q.join(Supervisor.expertise).filter(ResearchInterest.name.ilike(f"%{domain}%"))
+        q = (
+            q.join(SupervisorExpertise, Supervisor.id == SupervisorExpertise.supervisor_id)
+            .join(ResearchInterest, SupervisorExpertise.interest_id == ResearchInterest.id)
+            .filter(ResearchInterest.name.ilike(f"%{domain}%"))
+            .distinct()
+        )
     if accepting is not None:
         q = q.filter(Supervisor.accepting_teams == accepting)
     supervisors = q.all()
@@ -74,8 +79,15 @@ def update_expertise(
     sup = db.query(Supervisor).filter(Supervisor.user_id == current_user.id).first()
     if not sup:
         raise HTTPException(404, "Supervisor profile not found")
-    interests = db.query(ResearchInterest).filter(ResearchInterest.id.in_(payload.interest_ids)).all()
-    sup.expertise = interests
+
+    # Clear previous expertise records
+    db.query(SupervisorExpertise).filter(SupervisorExpertise.supervisor_id == sup.id).delete()
+
+    # Add new expertise junction records
+    valid_interests = db.query(ResearchInterest).filter(ResearchInterest.id.in_(payload.interest_ids)).all()
+    for item in valid_interests:
+        db.add(SupervisorExpertise(supervisor_id=sup.id, interest_id=item.id))
+
     db.commit()
     db.refresh(sup)
     out = SupervisorOut.model_validate(sup)
