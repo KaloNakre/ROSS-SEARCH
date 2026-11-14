@@ -1,7 +1,13 @@
-# ROSS-SEARCH Frontend (Module 1)
+# ROSS-SEARCH (Module 1)
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-brightgreen?style=for-the-badge&logo=render)](https://ross-search.onrender.com)
+[![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI-blue?style=for-the-badge&logo=fastapi)](https://ross-search-api.onrender.com/docs)
+[![Backend Health](https://img.shields.io/badge/Health%20Check-Active-success?style=for-the-badge)](https://ross-search-api.onrender.com/api/health)
 
 **A Research-Oriented Smart Search and Shared Knowledge Platform for FYP and Thesis Development.**  
-**University:** Daffodil International University (DIU)
+**University:** Daffodil International University (DIU)  
+**Live Production URL:** [https://ross-search.onrender.com](https://ross-search.onrender.com)  
+**Live API Documentation:** [https://ross-search-api.onrender.com/docs](https://ross-search-api.onrender.com/docs)  
 
 ---
 

@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./ross_search.db"
 
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://kalonakre.github.io"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://kalonakre.github.io,https://ross-search.onrender.com,https://ross-search-api.onrender.com"
 
     @field_validator("DEBUG", mode="before")
     @classmethod

@@ -10,13 +10,44 @@ for p in [r"D:\Anaconda\Lib\site-packages", r"D:\Python\Lib\site-packages"]:
     if os.path.exists(p) and p not in sys.path:
         sys.path.append(p)
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
-from app.database.connection import check_db_connection
-from app.api.routes import auth
+from app.database.connection import check_db_connection, engine, SessionLocal
+from app.database.base import Base
+from app.models import user, student, supervisor, research_interest, team
+from app.models.research_interest import ResearchInterest
+from app.api.routes import auth, students, supervisors, teams, admin, research
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Ensure database tables exist and default seed data is populated on boot."""
+    try:
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        try:
+            if db.query(ResearchInterest).count() == 0:
+                domains = [
+                    "Machine Learning", "Natural Language Processing", "Computer Vision",
+                    "Cyber Security", "Data Science & Big Data", "Cloud Computing & DevOps",
+                    "Human-Computer Interaction (HCI)", "Internet of Things (IoT)",
+                    "Software Engineering & Testing", "Blockchain & Distributed Systems",
+                    "Bioinformatics & Healthcare AI", "Robotics & Embedded Systems"
+                ]
+                for d in domains:
+                    db.add(ResearchInterest(name=d))
+                db.commit()
+                print("[ROSS-SEARCH Startup] Seeded default DIU research domains.")
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"[ROSS-SEARCH Startup Notice] Database initialization: {e}")
+    yield
+
 
 # OpenAPI metadata description
 TAGS_METADATA = [
@@ -57,6 +88,7 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     openapi_tags=TAGS_METADATA,
+    lifespan=lifespan,
 )
 
 # CORS Middleware
@@ -68,8 +100,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Phase 3A: Mount Authentication Router
+# Mount Modular API Routers
 app.include_router(auth.router)
+app.include_router(students.router)
+app.include_router(supervisors.router)
+app.include_router(teams.router)
+app.include_router(admin.router)
+app.include_router(research.router)
 
 
 @app.get("/", tags=["Health"], summary="API Root")

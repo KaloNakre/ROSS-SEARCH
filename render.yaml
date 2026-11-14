@@ -1,0 +1,33 @@
+services:
+  # 1. FastAPI Backend Web Service
+  - type: web
+    name: ross-search-api
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        value: sqlite:///./ross_search.db
+      - key: ALLOWED_ORIGINS
+        value: https://ross-search.onrender.com,http://localhost:5173
+
+  # 2. React Vite Frontend Static Site
+  - type: web
+    name: ROSS-SEARCH
+    runtime: static
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://ross-search-api.onrender.com
