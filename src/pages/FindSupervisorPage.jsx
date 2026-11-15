@@ -1,3 +1,14 @@
+/**
+ * ROSS-SEARCH — Faculty Supervisor Discovery & Directory
+ * Module 1: Supervisor Management & Research Allocation
+ * Author: Md. Robayet Islam (ID: 232-35-809)
+ * 
+ * Key Capabilities:
+ * - Real-time faculty supervisor directory matching student thesis domains
+ * - Departmental filters (CSE, SWE, ITM, EEE) & DIU research taxonomy
+ * - Live thesis slot capacity indicators & direct profile consultation links
+ */
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 

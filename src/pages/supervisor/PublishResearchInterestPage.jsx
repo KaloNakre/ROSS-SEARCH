@@ -1,3 +1,9 @@
+/**
+ * ROSS-SEARCH — Publish Thesis Research Topics & Faculty Interests
+ * Module 1: Supervisor Management & Research Allocation
+ * Author: Md. Robayet Islam (ID: 232-35-809)
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
