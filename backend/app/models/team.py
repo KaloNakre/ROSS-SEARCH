@@ -17,6 +17,13 @@ class MemberRole(str, enum.Enum):
     member = "Member"
 
 
+class JoinRequestStatus(str, enum.Enum):
+    pending = "Pending"
+    accepted = "Accepted"
+    rejected = "Rejected"
+    cancelled = "Cancelled"
+
+
 class Team(Base):
     __tablename__ = "teams"
 
@@ -52,3 +59,22 @@ class TeamMember(Base):
 
     team = relationship("Team", back_populates="members")
     student = relationship("Student", back_populates="team_memberships")
+
+
+class TeamJoinRequest(Base):
+    __tablename__ = "team_join_requests"
+    __table_args__ = (
+        UniqueConstraint("team_id", "student_id", name="uq_team_join_request"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    team_id = Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"), nullable=False, index=True)
+    student_id = Column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
+    status = Column(SAEnum(JoinRequestStatus), default=JoinRequestStatus.pending, nullable=False, index=True)
+    message = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), nullable=False)
+
+    team = relationship("Team", backref="join_requests")
+    student = relationship("Student", backref="team_join_requests")
+

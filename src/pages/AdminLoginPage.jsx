@@ -41,7 +41,7 @@ export const AdminLoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated && currentUserRole === 'admin') {
-      navigate('/admin/dashboard', { replace: true });
+      navigate('/admin/database', { replace: true });
     }
   }, [isAuthenticated, currentUserRole, navigate]);
 
@@ -89,7 +89,7 @@ export const AdminLoginPage = () => {
         password: formData.password,
       });
 
-      navigate('/admin/dashboard', { replace: true });
+      navigate('/admin/database', { replace: true });
     } catch (err) {
       const msg = err.message || '';
       if (msg.includes('Access denied')) {

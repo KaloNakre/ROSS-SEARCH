@@ -51,7 +51,8 @@ export const DatabaseViewerPage = () => {
     { id: 'users', label: '4. User Accounts Database', icon: Users, desc: 'System authentication records, roles & active account flags' },
     { id: 'supervision_requests', label: '5. Supervision Requests', icon: Inbox, desc: 'Student research proposal requests & supervisor approval statuses' },
     { id: 'team_members', label: '6. Team Memberships', icon: UserCheck, desc: 'Student team membership allocations & leadership roles' },
-    { id: 'research_interests', label: '7. Research Domains', icon: Tag, desc: 'Standardized DIU academic research domains and taxonomy' },
+    { id: 'team_join_requests', label: '7. Team Join Requests', icon: UserPlus, desc: 'Student applications to join research teams & leader decisions' },
+    { id: 'research_interests', label: '8. Research Domains', icon: Tag, desc: 'Standardized DIU academic research domains and taxonomy' },
   ];
 
   const showNotification = (type, message) => {
@@ -76,15 +77,15 @@ export const DatabaseViewerPage = () => {
     setLoading(true);
     try {
       const rows = await apiCall(`/api/admin/database/tables/${tableId}`);
-      if (Array.isArray(rows) && rows.length > 0) {
+      if (Array.isArray(rows)) {
         setTableData(rows);
       } else {
-        // Fallback demo dataset
-        setTableData(getRealisticDemoCohort(tableId));
+        setTableData([]);
       }
     } catch (err) {
       console.warn('API table fetch note:', err.message);
-      setTableData(getRealisticDemoCohort(tableId));
+      setTableData([]);
+      showNotification('error', `Failed to load table data: ${err.message || 'Server error'}`);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -127,13 +128,11 @@ export const DatabaseViewerPage = () => {
       await apiCall(`/api/admin/database/records/${activeTable}/${deleteTarget.id}`, {
         method: 'DELETE'
       });
-      showNotification('success', `Record #${deleteTarget.id} successfully deleted from ${activeTable}. That account can now re-register freshly.`);
+      showNotification('success', `Record #${deleteTarget.id} permanently deleted from ${activeTable}.`);
       setTableData(prev => prev.filter(r => r.id !== deleteTarget.id));
       fetchOverview();
     } catch (err) {
-      // Local optimistic delete
-      setTableData(prev => prev.filter(r => r.id !== deleteTarget.id));
-      showNotification('success', `Record #${deleteTarget.id} removed from the view.`);
+      showNotification('error', `Deletion failed: ${err.message || 'Could not delete record from server.'}`);
     } finally {
       setDeleteTarget(null);
     }

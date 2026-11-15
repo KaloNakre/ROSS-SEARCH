@@ -16,7 +16,7 @@ export const LoginPage = () => {
 
   // If already logged in, redirect immediately
   if (isAuthenticated) {
-    if (currentUserRole === 'admin') navigate('/admin/dashboard', { replace: true });
+    if (currentUserRole === 'admin') navigate('/admin/database', { replace: true });
     else if (currentUserRole === 'supervisor') navigate('/supervisor/dashboard', { replace: true });
     else navigate('/student/dashboard', { replace: true });
     return null;
@@ -36,7 +36,7 @@ export const LoginPage = () => {
     try {
       const user = await login(email.trim().toLowerCase(), password);
       // Role-based redirect from actual server response
-      if (user.role === 'admin') navigate('/admin/dashboard', { replace: true });
+      if (user.role === 'admin') navigate('/admin/database', { replace: true });
       else if (user.role === 'supervisor') navigate('/supervisor/dashboard', { replace: true });
       else navigate('/student/dashboard', { replace: true });
     } catch (err) {

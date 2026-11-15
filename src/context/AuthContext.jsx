@@ -159,6 +159,8 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('ross_token');
+    localStorage.removeItem('ross_user_role');
+    localStorage.removeItem('ross_supervisor_profile_override');
   };
 
   // Profile refresh

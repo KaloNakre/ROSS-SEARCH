@@ -27,11 +27,23 @@ export const TeamDetailsPage = () => {
   const [feedback, setFeedback] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [addingMember, setAddingMember] = useState(false);
+  const [incomingRequests, setIncomingRequests] = useState([]);
+  const [processingRequestId, setProcessingRequestId] = useState(null);
 
   const fetchTeam = async () => {
     try {
       const data = await apiCall(`/api/teams/${id}`);
       setTeam(data);
+
+      // If user is leader or admin, load join requests
+      try {
+        const reqs = await apiCall(`/api/teams/${id}/join-requests`);
+        if (Array.isArray(reqs)) {
+          setIncomingRequests(reqs);
+        }
+      } catch {
+        // Non-leaders won't have permission to view join requests
+      }
     } catch (err) {
       console.error('Failed to load team:', err);
     } finally {
@@ -81,12 +93,42 @@ export const TeamDetailsPage = () => {
   };
 
   const handleDeleteTeam = async () => {
-    if (confirm(`Are you sure you want to disband and delete "${team.team_name}"? This action cannot be undone.`)) {
+    if (confirm(`Are you sure you want to disband and delete "${team.name || team.team_name}"? This action cannot be undone.`)) {
       try {
         await apiCall(`/api/teams/${team.id}`, { method: 'DELETE' });
         navigate('/teams/my-teams');
       } catch (err) {
         alert(err.message || 'Failed to delete team.');
+      }
+    }
+  };
+
+  const handleAcceptRequest = async (requestId, studentName) => {
+    setProcessingRequestId(requestId);
+    try {
+      await apiCall(`/api/teams/join-requests/${requestId}/accept`, { method: 'POST' });
+      setFeedback(`Accepted ${studentName}! They are now a member of your team.`);
+      await fetchTeam();
+      setTimeout(() => setFeedback(''), 4000);
+    } catch (err) {
+      alert(err.message || 'Failed to accept request');
+    } finally {
+      setProcessingRequestId(null);
+    }
+  };
+
+  const handleRejectRequest = async (requestId) => {
+    if (confirm('Decline this student\'s request to join?')) {
+      setProcessingRequestId(requestId);
+      try {
+        await apiCall(`/api/teams/join-requests/${requestId}/reject`, { method: 'POST' });
+        setFeedback('Join request declined.');
+        setIncomingRequests(prev => prev.filter(r => r.id !== requestId));
+        setTimeout(() => setFeedback(''), 3000);
+      } catch (err) {
+        alert(err.message || 'Failed to reject request');
+      } finally {
+        setProcessingRequestId(null);
       }
     }
   };
@@ -114,7 +156,7 @@ export const TeamDetailsPage = () => {
   };
 
   const members = team.members || [];
-  const currentCount = team.member_count || members.length || 1;
+  const currentCount = team.members_count || team.member_count || members.length || 1;
   const maxCount = team.max_members || 5;
 
   return (
@@ -131,7 +173,7 @@ export const TeamDetailsPage = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                {team.team_name}
+                {team.name || team.team_name}
               </h1>
               <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-diu-blue">
                 {team.status || 'Active'}
@@ -169,6 +211,75 @@ export const TeamDetailsPage = () => {
         <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center gap-2 text-emerald-800 text-xs font-semibold animate-fadeIn">
           <CheckCircle2 size={16} className="text-emerald-600" />
           <span>{feedback}</span>
+        </div>
+      )}
+
+      {/* ── Incoming Join Requests Alert Card (For Team Leader) ─────────────── */}
+      {isLeader && incomingRequests.length > 0 && (
+        <div className="bg-gradient-to-r from-amber-50 via-white to-blue-50/40 rounded-3xl p-6 sm:p-7 border border-amber-200/90 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center">
+                <UserPlus size={18} />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">
+                  Incoming Member Join Requests ({incomingRequests.length})
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Review students from your section requesting to join this research team
+                </p>
+              </div>
+            </div>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+              Action Required
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {incomingRequests.map((req) => (
+              <div
+                key={req.id}
+                className="p-4 rounded-2xl bg-white border border-amber-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-slate-900">{req.student_name}</span>
+                    <span className="text-xs font-mono text-slate-500">({req.student_number})</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-diu-blue">
+                      Sec {req.section}
+                    </span>
+                    <span className="text-[11px] text-slate-400">
+                      • {req.department}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-700 italic">
+                    "{req.message}"
+                  </p>
+                  <p className="text-[10px] text-slate-400">
+                    Domain Interest: {req.preferred_domain || 'General Research'} • Requested: {new Date(req.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleRejectRequest(req.id)}
+                    disabled={processingRequestId === req.id}
+                    className="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold"
+                  >
+                    Decline
+                  </button>
+                  <button
+                    onClick={() => handleAcceptRequest(req.id, req.student_name)}
+                    disabled={processingRequestId === req.id || currentCount >= maxCount}
+                    className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs disabled:opacity-50"
+                  >
+                    {processingRequestId === req.id ? 'Accepting...' : 'Accept & Add to Team'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

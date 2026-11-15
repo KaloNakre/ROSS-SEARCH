@@ -62,3 +62,25 @@ class TeamDetailOut(TeamOut):
 class AddMemberRequest(BaseModel):
     student_id: int
 
+
+class JoinRequestCreate(BaseModel):
+    message: Optional[str] = None
+
+
+class JoinRequestOut(BaseModel):
+    id: int
+    team_id: int
+    team_name: Optional[str] = None
+    student_id: int
+    student_name: str
+    student_number: str
+    department: Optional[str] = None
+    section: Optional[str] = None
+    preferred_domain: Optional[str] = None
+    message: Optional[str] = None
+    status: str
+    created_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+

@@ -8,7 +8,7 @@ from app.core.security import hash_password
 from app.models.user import User, UserRole
 from app.models.student import Student
 from app.models.supervisor import Supervisor
-from app.models.team import Team, TeamMember
+from app.models.team import Team, TeamMember, TeamJoinRequest
 from app.models.supervision_request import SupervisionRequest
 from app.models.research_interest import ResearchInterest
 from app.schemas.auth import UserOut
@@ -175,6 +175,12 @@ def get_database_overview(db: Session = Depends(get_db), _admin: User = Depends(
                 "description": "Formal research proposals submitted by students to supervisors with review states"
             },
             {
+                "id": "team_join_requests",
+                "name": "Team Join Requests (team_join_requests)",
+                "count": db.query(TeamJoinRequest).count(),
+                "description": "Student applications to join research teams and leader decisions"
+            },
+            {
                 "id": "research_interests",
                 "name": "Research Domains (research_interests)",
                 "count": db.query(ResearchInterest).count(),
@@ -291,6 +297,23 @@ def get_database_table_data(
             for r in rows
         ]
 
+    elif table_name == "team_join_requests":
+        rows = db.query(TeamJoinRequest).offset(skip).limit(limit).all()
+        return [
+            {
+                "id": r.id,
+                "team_name": r.team.name if r.team else "N/A",
+                "student_name": r.student.full_name if r.student else "Student",
+                "student_id": r.student.student_id if r.student else "N/A",
+                "department": r.student.department if r.student else "N/A",
+                "section": r.student.section if r.student else "N/A",
+                "status": r.status.value if hasattr(r.status, 'value') else str(r.status),
+                "message": r.message or "Request to collaborate",
+                "requested_at": r.created_at.strftime("%Y-%m-%d %H:%M:%S") if getattr(r, 'created_at', None) else "Recent"
+            }
+            for r in rows
+        ]
+
     elif table_name == "research_interests":
         rows = db.query(ResearchInterest).offset(skip).limit(limit).all()
         return [
@@ -356,9 +379,24 @@ def delete_database_record(
         team = db.query(Team).filter(Team.id == record_id).first()
         if not team:
             raise HTTPException(404, "Team record not found")
+        # 1. Clean up join requests
+        db.query(TeamJoinRequest).filter(TeamJoinRequest.team_id == team.id).delete()
+        # 2. Reset student status for members
+        for member in team.members:
+            if member.student:
+                member.student.team_status = "Looking for Team"
+        # 3. Delete the team (SQLAlchemy cascades all team_members)
         db.delete(team)
         db.commit()
-        return {"success": True, "message": f"Team #{record_id} deleted successfully."}
+        return {"success": True, "message": f"Team #{record_id} deleted permanently from database."}
+
+    elif table_name == "team_join_requests":
+        req = db.query(TeamJoinRequest).filter(TeamJoinRequest.id == record_id).first()
+        if not req:
+            raise HTTPException(404, "Team join request not found")
+        db.delete(req)
+        db.commit()
+        return {"success": True, "message": f"Team join request #{record_id} deleted successfully."}
 
     elif table_name == "supervision_requests":
         req = db.query(SupervisionRequest).filter(SupervisionRequest.id == record_id).first()

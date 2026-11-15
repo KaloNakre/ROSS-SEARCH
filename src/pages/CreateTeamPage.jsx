@@ -171,7 +171,7 @@ export const CreateTeamPage = () => {
       {apiError && (
         <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center gap-2.5 text-rose-800 text-xs font-bold animate-fadeIn">
           <AlertCircle size={16} className="text-rose-600 shrink-0" />
-          <span>{apiError}</span>
+          <span>{typeof apiError === 'object' ? (apiError?.message || JSON.stringify(apiError)) : String(apiError)}</span>
         </div>
       )}
 

@@ -27,7 +27,7 @@ export const Topbar = ({ onToggleSidebar }) => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   const displayName = currentUser?.full_name || currentUser?.email || 'User';
