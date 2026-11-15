@@ -175,14 +175,14 @@ export const LoginPage = () => {
 
             {/* Register link */}
             <div className="text-center pt-5">
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-600">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-diu-blue font-semibold hover:underline">
-                  Register as Student
+                <Link to="/register" className="text-diu-blue font-bold hover:underline transition-colors">
+                  Register
                 </Link>
               </p>
-              <p className="text-xs text-slate-400 mt-1">
-                Supervisors and admins are added by the system administrator.
+              <p className="text-[11px] text-slate-400 mt-1">
+                Choose between Student or Faculty Supervisor registration.
               </p>
             </div>
           </div>

@@ -40,16 +40,16 @@ export const Topbar = ({ onToggleSidebar }) => {
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
-          className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none"
+          className="lg:hidden p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none transition-colors"
           aria-label="Toggle Sidebar"
         >
           <Menu size={22} />
         </button>
 
-        <div className="hidden sm:flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-          <span className="text-diu-blue font-bold">ROSS-SEARCH</span>
-          <span>/</span>
-          <span className="text-slate-600 capitalize">{currentUserRole} Portal</span>
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <span className="text-diu-blue font-bold tracking-tight">ROSS-SEARCH</span>
+          <span className="text-slate-300">/</span>
+          <span className="text-slate-700 capitalize font-bold">{currentUserRole} Portal</span>
         </div>
       </div>
 

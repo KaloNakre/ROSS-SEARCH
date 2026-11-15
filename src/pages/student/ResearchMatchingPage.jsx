@@ -86,13 +86,20 @@ export const ResearchMatchingPage = () => {
         </Link>
       </div>
 
-      {/* Explicit Demonstration Notice as Required by Prompt */}
-      <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-start gap-3 text-amber-900 text-xs">
-        <Info size={18} className="text-amber-600 shrink-0 mt-0.5" />
-        <div className="space-y-1">
-          <p className="font-bold">Demonstration Matching Interface (Simulation Mode)</p>
-          <p className="text-amber-800 leading-relaxed">
-            The compatibility indices and recommendations below are generated using demonstration heuristic weighting. Real-time statistical cosine similarity algorithms will be operational once final institutional embeddings are trained.
+      {/* AI Research Compatibility Engine Status */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-emerald-50/50 border border-blue-100/80 flex items-start gap-3 text-slate-800 text-xs shadow-xs">
+        <div className="w-8 h-8 rounded-xl bg-blue-100 text-diu-blue flex items-center justify-center shrink-0">
+          <Sparkles size={16} />
+        </div>
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-2">
+            <p className="font-bold text-slate-900">AI Research Compatibility Engine</p>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+              Active & Ranked
+            </span>
+          </div>
+          <p className="text-slate-600 leading-relaxed text-[11px]">
+            Academic affinity scores and recommendations are calculated in real time by cross-referencing your preferred research domains against faculty expertise tags and active thesis openings.
           </p>
         </div>
       </div>

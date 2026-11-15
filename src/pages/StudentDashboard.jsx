@@ -241,7 +241,7 @@ export const StudentDashboard = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-slate-800">
-                    Account Registered & Active ({studentProfile?.department || 'CSE'})
+                    Account Verified & Active • {studentProfile?.department ? (studentProfile.department.includes('Computer Science') || studentProfile.department.includes('CSE') ? 'CSE Department' : studentProfile.department) : 'CSE Department'}
                   </p>
                   <p className="text-[11px] text-slate-400 mt-0.5">
                     Student ID: {studentProfile?.student_id || 'N/A'} | Section: {studentProfile?.section || 'Not assigned'}

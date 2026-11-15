@@ -36,6 +36,16 @@ class Settings(BaseSettings):
     # Default is configured from .env (e.g., sqlite:///./ross_search.db for dev, postgresql://... for prod)
     DATABASE_URL: str = "sqlite:///./ross_search.db"
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def resolve_db_url(cls, v: Any) -> str:
+        """Resolve relative sqlite paths to BACKEND_DIR so cwd differences never create empty ghost dbs."""
+        if isinstance(v, str) and v.startswith("sqlite:///./"):
+            rel_file = v.replace("sqlite:///./", "")
+            abs_file = os.path.join(BACKEND_DIR, rel_file).replace("\\", "/")
+            return f"sqlite:///{abs_file}"
+        return str(v) if v else "sqlite:///./ross_search.db"
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:5173,https://kalonakre.github.io,https://ross-search.onrender.com,https://ross-search-api.onrender.com"
 
