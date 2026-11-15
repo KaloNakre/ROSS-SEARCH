@@ -102,7 +102,7 @@ DEMO_STUDENTS = [
     {
         "email": "tamim.sami@diu.edu.bd",
         "full_name": "Tamim Hasan Sami",
-        "student_id": "201-15-313",
+        "student_id": "232-35-313",
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Machine Learning",
@@ -112,7 +112,7 @@ DEMO_STUDENTS = [
     {
         "email": "riya.saha@diu.edu.bd",
         "full_name": "Riya Saha",
-        "student_id": "201-15-715",
+        "student_id": "232-35-715",
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Cyber Security",
