@@ -21,7 +21,7 @@ This repository contains the complete frontend UI for **MODULE 1** of ROSS-SEARC
 
 | Contributor | ID | Role & Assigned Module 1 Scope | GitHub Profile |
 |---|---|---|---|
-| **Robayet Islam** | 201-15-809 | **Supervisor Management & Opportunity Matching**<br>• Supervisor Profile Management & Credentials<br>• Research Expertise & Tag-Based Topic Publishing<br>• Research Opportunity Management (Deadlines, Quotas)<br>• Student Supervision Request & Assignment Management | [![GitHub](https://img.shields.io/badge/GitHub-KaloNakre-181717?style=flat&logo=github)](https://github.com/KaloNakre) |
+| **Md. Robayet Islam** | 232-35-809 | **Supervisor Management & Opportunity Matching**<br>• Supervisor Profile Management & Credentials<br>• Research Expertise & Tag-Based Topic Publishing<br>• Research Opportunity Management (Deadlines, Quotas)<br>• Student Supervision Request & Assignment Management | [![GitHub](https://img.shields.io/badge/GitHub-KaloNakre-181717?style=flat&logo=github)](https://github.com/KaloNakre) |
 | **Riya Saha** | 201-15-715 | **Student Management & RBAC**<br>• Student Self-Registration & Academic Profiles<br>• Preferred Research Interests & Domains<br>• Role-Based Access Control (Student, Supervisor, Admin) | [![GitHub](https://img.shields.io/badge/GitHub-suronjonaSahA-181717?style=flat&logo=github)](https://github.com/suronjonaSahA) |
 | **Tamim Hasan Sami** | 201-15-313 | **Peer Discovery & Team Formation**<br>• Intra-Section Student Search & Peer Discovery<br>• FYP/Thesis Team Creation & Formation<br>• Team Member Management & Roster Integration | [![GitHub](https://img.shields.io/badge/GitHub-TamimWhos-181717?style=flat&logo=github)](https://github.com/TamimWhos) |
 
@@ -97,7 +97,7 @@ This section provides direct GitHub source code links for faculty evaluation. Ea
 
 ---
 
-### 1. 👨‍💻 Md. Robayet Islam (ID: 201-15-809) — Module 1 Lead & Core Engine Architect
+### 1. 👨‍💻 Md. Robayet Islam (ID: 232-35-809) — Module 1 Lead & Core Engine Architect
 *Primary Responsibilities:* Supervisor Management, Research Opportunity Publishing, Live Database Studio, Cascade Data Integrity, and AI Research Matching.
 
 #### Frontend UI Pages & Components

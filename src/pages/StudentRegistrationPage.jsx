@@ -296,7 +296,7 @@ export const StudentRegistrationPage = () => {
               id="student-id-field"
               name="studentId"
               label="Student ID"
-              placeholder="e.g. 201-15-809"
+              placeholder="e.g. 232-35-809"
               value={formData.studentId}
               onChange={handleChange}
               maxLength={15}

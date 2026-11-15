@@ -72,7 +72,7 @@ DEMO_STUDENTS = [
     {
         "email": "robayet.cse@diu.edu.bd",
         "full_name": "Robayet Islam",
-        "student_id": "201-15-809",
+        "student_id": "232-35-809",
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Natural Language Processing",

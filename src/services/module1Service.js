@@ -114,7 +114,7 @@ const DEFAULT_ASSIGNMENTS = [
   {
     id: 1,
     type: "individual", // "individual" | "team"
-    targetId: "201-15-809",
+    targetId: "232-35-809",
     targetName: "Robayet Islam",
     department: "Department of Computer Science and Engineering",
     opportunityId: 1,
@@ -330,7 +330,7 @@ export const module1Service = {
     const newId = list.length > 0 ? Math.max(...list.map(r => r.id)) + 1 : 1;
     const item = {
       id: newId,
-      studentId: payload.studentId || "201-15-809",
+      studentId: payload.studentId || "232-35-809",
       studentName: payload.studentName || "Current Student",
       studentEmail: payload.studentEmail || "student@diu.edu.bd",
       department: payload.department || "Department of CSE",

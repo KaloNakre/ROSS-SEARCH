@@ -606,7 +606,7 @@ function renderTableCell(key, value) {
 function getRealisticDemoCohort(tableId) {
   if (tableId === 'students') {
     return [
-      { id: 1, student_id: "201-15-809", full_name: "Robayet Islam", email: "robayet.cse@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Natural Language Processing", status: "Active (Looking for Team)", registered_at: "2026-11-12 10:15:00" },
+      { id: 1, student_id: "232-35-809", full_name: "Robayet Islam", email: "robayet.cse@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Natural Language Processing", status: "Active (Looking for Team)", registered_at: "2026-11-12 10:15:00" },
       { id: 2, student_id: "201-15-102", full_name: "Kamal Hossain", email: "kamal.hossain@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Machine Learning", status: "Active (Looking for Team)", registered_at: "2026-11-12 11:30:00" },
       { id: 3, student_id: "201-15-103", full_name: "Jamal Uddin", email: "jamal.uddin@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Cyber Security", status: "Active (Looking for Team)", registered_at: "2026-11-12 14:45:00" },
       { id: 4, student_id: "201-15-313", full_name: "Tamim Hasan Sami", email: "tamim.sami@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Machine Learning", status: "Assigned (Team Leader)", registered_at: "2026-11-12 16:00:00" },
@@ -654,7 +654,7 @@ function getRealisticDemoCohort(tableId) {
   }
   if (tableId === 'team_members') {
     return [
-      { id: 1, team_id: 1, team_name: "Cognitive Systems Research Group", student_name: "Robayet Islam", student_id: "201-15-809", role: "Leader", joined_at: "2026-11-12 15:00:00" },
+      { id: 1, team_id: 1, team_name: "Cognitive Systems Research Group", student_name: "Robayet Islam", student_id: "232-35-809", role: "Leader", joined_at: "2026-11-12 15:00:00" },
       { id: 2, team_id: 1, team_name: "Cognitive Systems Research Group", student_name: "Kamal Hossain", student_id: "201-15-102", role: "Member", joined_at: "2026-11-12 15:30:00" },
       { id: 3, team_id: 2, team_name: "CyberShield Security Lab", student_name: "Tamim Hasan Sami", student_id: "201-15-313", role: "Leader", joined_at: "2026-11-13 11:20:00" },
     ];
