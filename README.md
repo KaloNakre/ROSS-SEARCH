@@ -89,3 +89,86 @@ npm run preview
 
 > **Note on Testing Roles:** Use the interactive **Switch View** pill in the top navigation bar to seamlessly toggle between `Student`, `Supervisor`, and `Admin` perspectives at any time.
 
+---
+
+## 📂 Module 1 Source Code Directory & Direct Contribution Links
+
+This section provides direct GitHub source code links for faculty evaluation. Each team member's architectural responsibilities, UI components, backend APIs, and data models can be inspected directly by clicking the corresponding links below.
+
+---
+
+### 1. 👨‍💻 Md. Robayet Islam (ID: 201-15-809) — Module 1 Lead & Core Engine Architect
+*Primary Responsibilities:* Supervisor Management, Research Opportunity Publishing, Live Database Studio, Cascade Data Integrity, and AI Research Matching.
+
+#### Frontend UI Pages & Components
+* **Supervisor Directory & Discovery:** [`src/pages/FindSupervisorPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/FindSupervisorPage.jsx)
+* **Supervisor Public Profile:** [`src/pages/SupervisorProfile.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/SupervisorProfile.jsx)
+* **Supervisor Profile Management & Upload Widget:** [`src/pages/EditSupervisorProfile.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/EditSupervisorProfile.jsx)
+* **Supervisor Faculty Dashboard:** [`src/pages/supervisor/SupervisorDashboard.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/SupervisorDashboard.jsx)
+* **Research Expertise & Taxonomy Management:** [`src/pages/supervisor/ResearchExpertisePage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/ResearchExpertisePage.jsx)
+* **Publish Thesis Research Interests:** [`src/pages/supervisor/PublishResearchInterestPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/PublishResearchInterestPage.jsx)
+* **Research Opportunities & Capacity Quotas:** [`src/pages/supervisor/ResearchOpportunitiesPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/ResearchOpportunitiesPage.jsx)
+* **Supervision Requests & Application Pipeline:** [`src/pages/supervisor/SupervisorRequestsPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/SupervisorRequestsPage.jsx)
+* **Individual Student Thesis Assignment:** [`src/pages/supervisor/IndividualStudentAssignmentPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/IndividualStudentAssignmentPage.jsx)
+* **Team Thesis Assignment & Allocation:** [`src/pages/supervisor/TeamAssignmentPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/TeamAssignmentPage.jsx)
+* **Assigned Students & Teams Cohort Overview:** [`src/pages/supervisor/AssignedStudentsTeamsPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/supervisor/AssignedStudentsTeamsPage.jsx)
+* **Live Database Studio (Permanent Cascade Explorer):** [`src/pages/admin/DatabaseViewerPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/admin/DatabaseViewerPage.jsx)
+* **Secure Administrator Authentication Portal:** [`src/pages/AdminLoginPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/AdminLoginPage.jsx)
+* **AI Research Matching Engine:** [`src/pages/student/ResearchMatchingPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/student/ResearchMatchingPage.jsx)
+
+#### Backend API, Data Models & Architecture
+* **Supervisor Management REST API:** [`backend/app/api/routes/supervisors.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/supervisors.py)
+* **Supervisor Pydantic Validation Schemas:** [`backend/app/schemas/supervisor.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/schemas/supervisor.py)
+* **Supervisor Relational Database Model:** [`backend/app/models/supervisor.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/supervisor.py)
+* **Supervision Requests Workflow API:** [`backend/app/api/routes/supervision_requests.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/supervision_requests.py)
+* **Supervision Requests Model:** [`backend/app/models/supervision_request.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/supervision_request.py)
+* **Admin Database Studio & Cascade Engine:** [`backend/app/api/routes/admin.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/admin.py)
+* **Database Connection & Multi-Thread Pool:** [`backend/app/database/connection.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/database/connection.py)
+* **Automated 3-Iteration Verification Suite:** [`backend/test_suite.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/test_suite.py)
+
+---
+
+### 2. 👩‍💻 Riya Saha (ID: 201-15-715) — Student Registration & RBAC Architect
+*Primary Responsibilities:* Student Self-Registration, Profile Management, Academic Interests Taxonomy, and Role-Based Access Control (RBAC).
+
+#### Frontend UI Pages & Components
+* **Account Type Selection (Student / Supervisor):** [`src/pages/AccountTypeSelectionPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/AccountTypeSelectionPage.jsx)
+* **Student Self-Registration:** [`src/pages/StudentRegistrationPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/StudentRegistrationPage.jsx)
+* **Unified Authentication (Student, Supervisor, Admin):** [`src/pages/LoginPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/LoginPage.jsx)
+* **Authentication Context & JWT State Management:** [`src/context/AuthContext.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/context/AuthContext.jsx)
+* **Role-Based Access Control (RBAC) Route Guard:** [`src/components/ProtectedRoute.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/components/ProtectedRoute.jsx)
+* **Student Academic Profile:** [`src/pages/StudentProfile.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/StudentProfile.jsx)
+* **Edit Student Profile & Preferences:** [`src/pages/EditStudentProfile.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/EditStudentProfile.jsx)
+* **Student Dashboard & Overview Metrics:** [`src/pages/StudentDashboard.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/StudentDashboard.jsx)
+* **Declared Research Interests & Domains:** [`src/pages/ResearchInterestsPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/ResearchInterestsPage.jsx)
+* **Administrator User Management Directory:** [`src/pages/ManageUsersPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/ManageUsersPage.jsx)
+* **RBAC Role Definitions & Permission Matrix:** [`src/pages/RoleManagementPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/RoleManagementPage.jsx)
+
+#### Backend API, Data Models & Architecture
+* **Authentication & Token Revocation API:** [`backend/app/api/routes/auth.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/auth.py)
+* **Argon2id Password Security & JWT Utilities:** [`backend/app/core/security.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/core/security.py)
+* **Student Profile REST API:** [`backend/app/api/routes/students.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/students.py)
+* **Student Pydantic Validation Schemas:** [`backend/app/schemas/student.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/schemas/student.py)
+* **Student Relational Database Model:** [`backend/app/models/student.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/student.py)
+* **Research Domains & Taxonomy API:** [`backend/app/api/routes/research.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research.py)
+* **Research Domains Model:** [`backend/app/models/research_interest.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_interest.py)
+* **User Accounts & Role Enumeration Model:** [`backend/app/models/user.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/user.py)
+
+---
+
+### 3. 👨‍💻 Tamim Hasan Sami (ID: 201-15-313) — Peer Discovery, Team Formation & Join Workflow
+*Primary Responsibilities:* Intra-Section Peer Discovery, FYP/Thesis Team Creation, Open Slot Detection, and Team Join Request ("Add to the Team") Workflow.
+
+#### Frontend UI Pages & Components
+* **Intra-Section Student Search & Peer Discovery:** [`src/pages/SearchStudentsSection.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/SearchStudentsSection.jsx)
+* **Create FYP / Thesis Team:** [`src/pages/CreateTeamPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/CreateTeamPage.jsx)
+* **Team Search & Open Slot Exploration ("Add to the Team"):** [`src/pages/TeamSearchPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/TeamSearchPage.jsx)
+* **Team Details, Roster & Join Request Approval:** [`src/pages/TeamDetailsPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/TeamDetailsPage.jsx)
+* **My Teams Dashboard & Outgoing Applications:** [`src/pages/MyTeamsPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/MyTeamsPage.jsx)
+
+#### Backend API, Data Models & Architecture
+* **Team Management & Join Requests REST API:** [`backend/app/api/routes/teams.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/teams.py)
+* **Team Pydantic Validation Schemas:** [`backend/app/schemas/team.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/schemas/team.py)
+* **Team, TeamMember & TeamJoinRequest Database Models:** [`backend/app/models/team.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/team.py)
+
+
