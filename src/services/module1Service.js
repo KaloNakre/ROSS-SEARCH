@@ -236,8 +236,8 @@ export const module1Service = {
       name: expertiseItem.name.trim(),
       domain: expertiseItem.domain || "Computer Science",
       level: expertiseItem.level || "Advanced",
-      keywords: Array.isArray(expertiseItem.keywords) 
-        ? expertiseItem.keywords 
+      keywords: Array.isArray(expertiseItem.keywords)
+        ? expertiseItem.keywords
         : (expertiseItem.keywords ? expertiseItem.keywords.split(',').map(k => k.trim()) : [])
     };
     list.push(item);
@@ -454,7 +454,7 @@ export const module1Service = {
   // ── PART 06: Matching Calculation Engine ───────────────────────
   calculateMatches(studentInterests = [], studentPreferredDomain = '') {
     const opportunities = this.getOpportunities().filter(o => o.isPublished && o.status === 'Active');
-    
+
     // Normalize student tags
     const normalizedInterests = studentInterests.map(i => (typeof i === 'string' ? i : i.name || '').toLowerCase());
     const normalizedDomain = (studentPreferredDomain || '').toLowerCase();
@@ -462,13 +462,13 @@ export const module1Service = {
     return opportunities.map(opp => {
       const oppDomain = (opp.domain || '').toLowerCase();
       const oppKeywords = (opp.keywords || []).map(k => k.toLowerCase());
-      
-      const matchingKeywords = oppKeywords.filter(k => 
+
+      const matchingKeywords = oppKeywords.filter(k =>
         normalizedInterests.some(si => si.includes(k) || k.includes(si))
       );
-      
+
       const domainMatch = normalizedDomain && (oppDomain.includes(normalizedDomain) || normalizedDomain.includes(oppDomain));
-      
+
       let score = 0;
       if (domainMatch) score += 40;
       score += Math.min(matchingKeywords.length * 20, 60);

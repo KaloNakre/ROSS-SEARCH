@@ -18,10 +18,10 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.database.connection import check_db_connection, engine, SessionLocal
 from app.database.base import Base
-from app.models import user, student, supervisor, research_interest, team
+from app.models import user, student, supervisor, research_interest, team, research_knowledge
 from app.models.research_interest import ResearchInterest
 from app.models.supervision_request import SupervisionRequest
-from app.api.routes import auth, students, supervisors, teams, admin, research, supervision_requests
+from app.api.routes import auth, students, supervisors, teams, admin, research, supervision_requests, research_module2
 
 
 from app.core.security import hash_password
@@ -72,6 +72,13 @@ async def lifespan(app: FastAPI):
                 print("[ROSS-SEARCH Startup] Seeded realistic DIU student & supervisor demo cohort.")
             except Exception as seed_err:
                 print(f"[ROSS-SEARCH Startup Seeder Note] {seed_err}")
+
+            # 4. Seed Module 2 Previous Projects & Shared Paper Knowledge
+            try:
+                from app.database.demo_seeder_module2 import seed_module2_demo_data
+                seed_module2_demo_data(db)
+            except Exception as m2_seed_err:
+                print(f"[ROSS-SEARCH Startup Module 2 Seeder Note] {m2_seed_err}")
         finally:
             db.close()
     except Exception as e:
@@ -141,6 +148,7 @@ app.include_router(supervisors.router)
 app.include_router(teams.router)
 app.include_router(admin.router)
 app.include_router(research.router)
+app.include_router(research_module2.router)
 app.include_router(supervision_requests.router)
 
 

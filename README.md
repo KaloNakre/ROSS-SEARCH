@@ -171,4 +171,31 @@ This section provides direct GitHub source code links for faculty evaluation. Ea
 * **Team Pydantic Validation Schemas:** [`backend/app/schemas/team.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/schemas/team.py)
 * **Team, TeamMember & TeamJoinRequest Database Models:** [`backend/app/models/team.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/team.py)
 
+---
+
+## Module 2 Source Code Directory: Research Discovery and Shared Paper Knowledge
+
+### 1. 👩‍💻 Riya Saha (ID: 232-35-715) — Research Discovery & Departmental Thesis Archive
+*Primary Responsibilities:* Domain Selection, Student Research Query Exploration, and Previous Departmental FYP/Thesis Search.
+* **Research Discovery & Previous Projects Archive Page:** [`src/pages/research/ResearchDiscoveryPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/ResearchDiscoveryPage.jsx)
+* **Previous Projects & Query Log REST API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
+* **Previous Project Database Model:** [`backend/app/models/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_knowledge.py)
+
+### 2. 👨‍💻 Md. Robayet Islam (ID: 232-35-809) — AI Paper Summarizer Engine (PyMuPDF & 9-Point NLP)
+*Primary Responsibilities:* AI-Assisted Research Paper PDF Extraction (PyMuPDF), 9-Point Structured Summary Generation (Problem, Objectives, Methodology, Dataset, Model, Findings, Limitations, Research Gap, Future Work).
+* **AI Paper Summarizer Page:** [`src/pages/research/PaperSummarizerPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/PaperSummarizerPage.jsx)
+* **PyMuPDF Extraction & 9-Point NLP Summarizer API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
+* **Pydantic Validation Schemas:** [`backend/app/schemas/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/schemas/research_knowledge.py)
+* **Shared Knowledge Persistence Engine:** [`src/services/module2Service.js`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/services/module2Service.js)
+
+### 3. 👨‍💻 Tamim Hasan Sami (ID: 232-35-313) — Topic Similarity & Shared Knowledge Repository
+*Primary Responsibilities:* Duplicate FYP Detection, TF-IDF/Cosine Semantic Similarity Scoring, and Persistent Shared Paper Knowledge Database.
+* **Topic Similarity & Duplicate FYP Detector Page:** [`src/pages/research/TopicSimilarityPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/TopicSimilarityPage.jsx)
+* **Shared Paper Knowledge Repository Page:** [`src/pages/research/SharedKnowledgeRepositoryPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/SharedKnowledgeRepositoryPage.jsx)
+* **Topic Similarity & Shared Knowledge REST API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
+* **Shared Paper Knowledge Database Model:** [`backend/app/models/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_knowledge.py)
+* **Departmental Demo Seeder:** [`backend/app/database/demo_seeder_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/database/demo_seeder_module2.py)
+* **Automated Verification Test Suite:** [`backend/test_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/test_module2.py)
+
+
 

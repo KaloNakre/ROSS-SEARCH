@@ -48,6 +48,12 @@ import ManageSupervisorsPage from './pages/ManageSupervisorsPage';
 import RoleManagementPage from './pages/RoleManagementPage';
 import DatabaseViewerPage from './pages/admin/DatabaseViewerPage';
 
+// Module 2: Research Discovery & Shared Paper Knowledge
+import ResearchDiscoveryPage from './pages/research/ResearchDiscoveryPage';
+import PaperSummarizerPage from './pages/research/PaperSummarizerPage';
+import TopicSimilarityPage from './pages/research/TopicSimilarityPage';
+import SharedKnowledgeRepositoryPage from './pages/research/SharedKnowledgeRepositoryPage';
+
 // Shared
 import ResourcesPage from './pages/ResourcesPage';
 import SettingsPage from './pages/SettingsPage';
@@ -210,6 +216,28 @@ function App() {
             <Route path="/admin/database" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <DatabaseViewerPage />
+              </ProtectedRoute>
+            } />
+
+            {/* ── MODULE 2: RESEARCH DISCOVERY & SHARED PAPER KNOWLEDGE ── */}
+            <Route path="/research/discovery" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <ResearchDiscoveryPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/research/summarizer" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <PaperSummarizerPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/research/similarity" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <TopicSimilarityPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/research/shared-knowledge" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <SharedKnowledgeRepositoryPage />
               </ProtectedRoute>
             } />
 
