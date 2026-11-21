@@ -155,10 +155,15 @@ export const StudentProfile = () => {
                 );
               })
             ) : preferredDomain ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100">
-                <Sparkles size={12} />
-                <span>{preferredDomain}</span>
-              </span>
+              preferredDomain.split(',').map(s => s.trim()).filter(Boolean).map((domainName, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100"
+                >
+                  <Sparkles size={12} />
+                  <span>{domainName}</span>
+                </span>
+              ))
             ) : (
               <p className="text-xs text-slate-400 italic">
                 No research domains selected yet. Click "Update Preferences" to define your topics.

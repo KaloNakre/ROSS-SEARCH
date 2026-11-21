@@ -49,33 +49,7 @@ export const EditStudentProfile = () => {
         ]);
 
         if (mounted) {
-          // 1. Process Profile
-          if (profileRes.status === 'fulfilled' && profileRes.value) {
-            const data = profileRes.value;
-            setFormData({
-              fullName: data.full_name || '',
-              department: data.department || 'Department of Computer Science and Engineering',
-              section: data.section || '60_A',
-              batch: data.batch || '',
-              phone: data.phone || '',
-              projectTitle: data.project_title || '',
-              bio: data.bio || '',
-              preferredDomain: data.preferred_domain || 'Cybersecurity',
-              subdomains: data.subdomains || ''
-            });
-
-            if (data.subdomains) {
-              const subs = data.subdomains.split(',').map(s => s.trim()).filter(Boolean);
-              setSelectedSubdomains(subs);
-            }
-
-            // Set current selected interest IDs
-            const current = data.interests || [];
-            const curIds = current.map(item => (typeof item === 'object' ? item.id : item));
-            setSelectedInterestIds(curIds);
-          }
-
-          // 2. Process Available Interests
+          // 1. Process Available Interests first
           let list = [];
           if (interestsRes.status === 'fulfilled' && Array.isArray(interestsRes.value) && interestsRes.value.length > 0) {
             list = interestsRes.value;
@@ -87,6 +61,39 @@ export const EditStudentProfile = () => {
             }));
           }
           setAvailableInterests(list);
+
+          // 2. Process Profile
+          if (profileRes.status === 'fulfilled' && profileRes.value) {
+            const data = profileRes.value;
+            setFormData({
+              fullName: data.full_name || '',
+              department: data.department || 'Department of Computer Science and Engineering',
+              section: data.section || '60_A',
+              batch: data.batch || '',
+              phone: data.phone || '',
+              projectTitle: data.project_title || '',
+              bio: data.bio || '',
+              preferredDomain: data.preferred_domain || '',
+              subdomains: data.subdomains || ''
+            });
+
+            if (data.subdomains) {
+              const subs = data.subdomains.split(',').map(s => s.trim()).filter(Boolean);
+              setSelectedSubdomains(subs);
+            }
+
+            // Set current selected interest IDs
+            const current = data.interests || [];
+            let curIds = current.map(item => (typeof item === 'object' ? item.id : item)).filter(Boolean);
+
+            // If junction table has no records yet but preferred_domain exists, map domain names to interest IDs
+            if (curIds.length === 0 && data.preferred_domain) {
+              const prefNames = data.preferred_domain.split(',').map(s => s.trim().toLowerCase());
+              const matched = list.filter(item => prefNames.includes(item.name.toLowerCase())).map(item => item.id);
+              if (matched.length > 0) curIds = matched;
+            }
+            setSelectedInterestIds(curIds);
+          }
         }
       } catch (err) {
         console.error('Failed to load profile for edit:', err);
@@ -99,21 +106,26 @@ export const EditStudentProfile = () => {
     return () => { mounted = false; };
   }, [apiCall]);
 
-  const toggleInterest = (interest) => {
-    const id = interest.id;
-    const isCurrentlySelected = selectedInterestIds.includes(id);
-    const updatedIds = isCurrentlySelected
-      ? selectedInterestIds.filter(item => item !== id)
-      : [...selectedInterestIds, id];
-    setSelectedInterestIds(updatedIds);
+  const toggleInterest = (interestOrId) => {
+    const targetId = typeof interestOrId === 'object' && interestOrId !== null
+      ? interestOrId.id
+      : interestOrId;
+    if (targetId === undefined || targetId === null) return;
 
-    // Also update preferredDomain string with active domain names
-    const names = availableInterests
-      .filter(item => updatedIds.includes(item.id))
-      .map(item => item.name);
-    if (names.length > 0) {
-      setFormData(prev => ({ ...prev, preferredDomain: names.join(', ') }));
-    }
+    setSelectedInterestIds(prev => {
+      const isCurrentlySelected = prev.some(item => String(item) === String(targetId));
+      const updatedIds = isCurrentlySelected
+        ? prev.filter(item => String(item) !== String(targetId))
+        : [...prev, targetId];
+
+      // Update preferredDomain in formData with active domain names
+      const names = availableInterests
+        .filter(item => updatedIds.some(uid => String(uid) === String(item.id)))
+        .map(item => item.name);
+      setFormData(prevForm => ({ ...prevForm, preferredDomain: names.join(', ') }));
+
+      return updatedIds;
+    });
   };
 
   const toggleSubdomain = (subName) => {
@@ -149,12 +161,10 @@ export const EditStudentProfile = () => {
 
       // 2. Update research interests/domains in backend
       const numericIds = selectedInterestIds.map(id => Number(id)).filter(id => !isNaN(id));
-      if (numericIds.length > 0) {
-        await apiCall('/api/students/me/interests', {
-          method: 'PUT',
-          body: JSON.stringify({ interest_ids: numericIds })
-        });
-      }
+      await apiCall('/api/students/me/interests', {
+        method: 'PUT',
+        body: JSON.stringify({ interest_ids: numericIds })
+      });
 
       await refreshUser();
       setSuccess(true);
@@ -317,24 +327,61 @@ export const EditStudentProfile = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2">
             {availableInterests.map((interest) => {
-              const isSelected = selectedInterestIds.includes(interest.id);
+              const isSelected = selectedInterestIds.some(id => String(id) === String(interest.id));
               return (
                 <button
                   type="button"
                   key={interest.id}
-                  onClick={() => toggleInterest(interest.id)}
+                  onClick={() => toggleInterest(interest)}
                   className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between gap-2 ${
                     isSelected
-                      ? 'bg-blue-50 border-diu-blue text-diu-blue shadow-xs'
+                      ? 'bg-blue-50 border-diu-blue text-diu-blue shadow-xs ring-1 ring-diu-blue'
                       : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
                   }`}
                 >
                   <span className="truncate">{interest.name}</span>
                   <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${
-                    isSelected ? 'bg-diu-blue text-white' : 'border border-slate-300'
+                    isSelected ? 'bg-diu-blue text-white' : 'border border-slate-300 bg-white'
                   }`}>
                     {isSelected && <Check size={11} strokeWidth={3} />}
                   </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── SUBDOMAINS & SPECIALIZED METHODOLOGIES ── */}
+        <div className="pt-4 border-t border-slate-100 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+              <Tag className="w-4 h-4 text-emerald-600" />
+              <span>Specialized Subdomains & Focus Areas (Optional)</span>
+            </h3>
+            <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              {selectedSubdomains.length} Selected
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Select specific techniques, architectures, or application areas within your research domain:
+          </p>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            {RESEARCH_SUBDOMAINS.map((sub) => {
+              const isSelected = selectedSubdomains.includes(sub);
+              return (
+                <button
+                  type="button"
+                  key={sub}
+                  onClick={() => toggleSubdomain(sub)}
+                  className={`px-3 py-1.5 rounded-full text-xs transition-all flex items-center gap-1.5 ${
+                    isSelected
+                      ? 'bg-emerald-600 text-white shadow-xs font-semibold'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-medium'
+                  }`}
+                >
+                  <span>{sub}</span>
+                  {isSelected && <Check size={12} strokeWidth={3} />}
                 </button>
               );
             })}

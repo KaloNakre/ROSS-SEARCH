@@ -6,14 +6,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Users, 
-  Search, 
-  CheckCircle2, 
-  AlertCircle, 
-  ArrowLeft, 
-  Briefcase, 
-  Layers, 
+import {
+  Users,
+  Search,
+  CheckCircle2,
+  AlertCircle,
+  ArrowLeft,
+  Briefcase,
+  Layers,
   ShieldAlert,
   ArrowRight,
   FolderKanban,
@@ -55,7 +55,7 @@ export const TeamAssignmentPage = () => {
         setTeams(list);
         return;
       }
-    } catch {}
+    } catch { }
 
     // Fallback existing teams from the platform
     setTeams([
@@ -181,11 +181,10 @@ export const TeamAssignmentPage = () => {
 
       {/* Feedback Banner */}
       {feedback.message && (
-        <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 ${
-          feedback.type === 'success' 
-            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+        <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 ${feedback.type === 'success'
+            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
             : 'bg-rose-50 text-rose-800 border border-rose-200'
-        }`}>
+          }`}>
           {feedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
           <span>{feedback.message}</span>
         </div>
@@ -219,13 +218,12 @@ export const TeamAssignmentPage = () => {
                   onClick={() => {
                     if (!assigned) setSelectedTeam(team);
                   }}
-                  className={`p-5 rounded-2xl border transition-all ${
-                    assigned 
+                  className={`p-5 rounded-2xl border transition-all ${assigned
                       ? 'bg-slate-50 border-slate-200 opacity-70 cursor-not-allowed'
                       : isSelected
-                      ? 'bg-blue-50/70 border-diu-blue shadow-sm ring-2 ring-diu-blue cursor-pointer'
-                      : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-xs cursor-pointer'
-                  }`}
+                        ? 'bg-blue-50/70 border-diu-blue shadow-sm ring-2 ring-diu-blue cursor-pointer'
+                        : 'bg-white border-slate-200 hover:border-blue-300 hover:shadow-xs cursor-pointer'
+                    }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
@@ -263,9 +261,8 @@ export const TeamAssignmentPage = () => {
                           </p>
                         </div>
                       ) : (
-                        <span className={`text-xs font-bold px-3 py-1 rounded-xl transition-colors ${
-                          isSelected ? 'bg-diu-blue text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}>
+                        <span className={`text-xs font-bold px-3 py-1 rounded-xl transition-colors ${isSelected ? 'bg-diu-blue text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}>
                           {isSelected ? 'Selected' : 'Select Team'}
                         </span>
                       )}
