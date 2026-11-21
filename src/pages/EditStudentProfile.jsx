@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { DEPARTMENTS, SECTIONS, RESEARCH_DOMAINS, RESEARCH_SUBDOMAINS } from '../data/mockData';
+import { resolveSelectedDomainIds, toggleDomainId, buildPreferredDomainString } from '../utils/domainUtils';
 
 export const EditStudentProfile = () => {
   const navigate = useNavigate();
@@ -54,8 +55,9 @@ export const EditStudentProfile = () => {
           if (interestsRes.status === 'fulfilled' && Array.isArray(interestsRes.value) && interestsRes.value.length > 0) {
             list = interestsRes.value;
           } else {
-            list = RESEARCH_DOMAINS.map((d, idx) => ({
-              id: idx + 1,
+            // Fallback: use mockData with pre-assigned integer IDs matching the backend seed order
+            list = RESEARCH_DOMAINS.map(d => ({
+              id: d.id,       // already integers matching backend seed
               name: d.name,
               category: d.category
             }));
@@ -82,23 +84,8 @@ export const EditStudentProfile = () => {
               setSelectedSubdomains(subs);
             }
 
-            // Set current selected interest IDs
-            const current = data.interests || [];
-            let curIds = current.map(item => (typeof item === 'object' ? item.id : item)).filter(Boolean);
-
-            // If junction table has no records yet but preferred_domain exists, map domain names to interest IDs
-            if (curIds.length === 0 && data.preferred_domain) {
-              const prefNames = data.preferred_domain.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
-              const matched = list.filter(item => {
-                const itemNorm = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                return prefNames.some(p => p.length > 2 && (p.includes(itemNorm) || itemNorm.includes(p)));
-              }).map(item => item.id);
-              if (matched.length > 0) curIds = matched;
-            }
-
-            // CRITICAL: Keep only IDs that strictly exist in availableInterests list
-            // This prevents phantom orphan IDs from triggering "1 Selected" while 0 cards show active
-            const validIds = curIds.filter(cid => list.some(item => String(item.id) === String(cid)));
+            // Set current selected interest IDs safely using shared normalizer
+            const validIds = resolveSelectedDomainIds(data, list);
             setSelectedInterestIds(validIds);
           }
         }
@@ -114,23 +101,10 @@ export const EditStudentProfile = () => {
   }, [apiCall]);
 
   const toggleInterest = (interestOrId) => {
-    const targetId = typeof interestOrId === 'object' && interestOrId !== null
-      ? interestOrId.id
-      : interestOrId;
-    if (targetId === undefined || targetId === null) return;
-
     setSelectedInterestIds(prev => {
-      const isCurrentlySelected = prev.some(item => String(item) === String(targetId));
-      const updatedIds = isCurrentlySelected
-        ? prev.filter(item => String(item) !== String(targetId))
-        : [...prev, targetId];
-
-      // Update preferredDomain in formData with active domain names
-      const names = availableInterests
-        .filter(item => updatedIds.some(uid => String(uid) === String(item.id)))
-        .map(item => item.name);
-      setFormData(prevForm => ({ ...prevForm, preferredDomain: names.join(', ') }));
-
+      const updatedIds = toggleDomainId(prev, interestOrId, availableInterests);
+      const domainString = buildPreferredDomainString(updatedIds, availableInterests);
+      setFormData(prevForm => ({ ...prevForm, preferredDomain: domainString }));
       return updatedIds;
     });
   };
@@ -334,7 +308,7 @@ export const EditStudentProfile = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2">
             {availableInterests.map((interest) => {
-              const isSelected = selectedInterestIds.some(id => String(id) === String(interest.id));
+              const isSelected = selectedInterestIds.includes(Number(interest.id));
               return (
                 <button
                   type="button"

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Check, Sparkles, Save, ArrowLeft, CheckCircle2, Bookmark, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { RESEARCH_DOMAINS } from '../data/mockData';
+import { resolveSelectedDomainIds, toggleDomainId } from '../utils/domainUtils';
 
 export const ResearchInterestsPage = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export const ResearchInterestsPage = () => {
   const [saving, setSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  
+
   const [availableInterests, setAvailableInterests] = useState([]);
   const [selectedInterestIds, setSelectedInterestIds] = useState([]);
 
@@ -41,17 +42,8 @@ export const ResearchInterestsPage = () => {
           setAvailableInterests(interestsList);
 
           if (meRes.status === 'fulfilled' && meRes.value) {
-            const current = meRes.value.interests || [];
-            let currentIds = current.map(item => (typeof item === 'object' ? item.id : item)).filter(Boolean);
-            if (currentIds.length === 0 && meRes.value.preferred_domain) {
-              const prefNames = meRes.value.preferred_domain.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
-              const matched = interestsList.filter(item => {
-                const itemNorm = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                return prefNames.some(p => p.length > 2 && (p.includes(itemNorm) || itemNorm.includes(p)));
-              }).map(item => item.id);
-              if (matched.length > 0) currentIds = matched;
-            }
-            setSelectedInterestIds(currentIds.filter(cid => interestsList.some(item => String(item.id) === String(cid))));
+            const validIds = resolveSelectedDomainIds(meRes.value, interestsList);
+            setSelectedInterestIds(validIds);
           }
         }
       } catch (err) {
@@ -65,12 +57,7 @@ export const ResearchInterestsPage = () => {
   }, [apiCall]);
 
   const toggleInterest = (id) => {
-    setSelectedInterestIds(prev => {
-      const exists = prev.some(item => String(item) === String(id));
-      return exists
-        ? prev.filter(item => String(item) !== String(id))
-        : [...prev, id];
-    });
+    setSelectedInterestIds(prev => toggleDomainId(prev, id, availableInterests));
   };
 
   const handleSave = async () => {
@@ -177,17 +164,16 @@ export const ResearchInterestsPage = () => {
 
                 <div className="flex flex-wrap gap-2">
                   {items.map((item) => {
-                    const isSelected = selectedInterestIds.some(id => String(id) === String(item.id));
+                    const isSelected = selectedInterestIds.includes(Number(item.id));
                     return (
                       <button
                         key={item.id}
                         type="button"
                         onClick={() => toggleInterest(item.id)}
-                        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                          isSelected
+                        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${isSelected
                             ? 'bg-diu-blue text-white shadow-xs'
                             : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
-                        }`}
+                          }`}
                       >
                         {isSelected && <Check size={13} className="shrink-0 stroke-[3]" />}
                         <span>{item.name}</span>

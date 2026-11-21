@@ -73,3 +73,11 @@ ross_search.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+repomix-output.xml
+graphify-out/
+backend/scratch/
+backend/*.db
+backend/ross_search_backup_*.db
+.env
+node_modules/

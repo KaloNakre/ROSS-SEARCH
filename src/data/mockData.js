@@ -9,22 +9,20 @@ export const DEPARTMENTS = [
   "Department of Electrical and Electronic Engineering"
 ];
 
+// Canonical research domains matching backend/app/database/seed.py and ross_search.db
 export const RESEARCH_DOMAINS = [
-  { id: "cyber",      name: "Cybersecurity",               category: "Security & Privacy" },
-  { id: "ai",         name: "Artificial Intelligence",      category: "Intelligence & Cognition" },
-  { id: "ml",         name: "Machine Learning",             category: "Applied Algorithms" },
-  { id: "dl",         name: "Deep Learning",                category: "Neural Architectures" },
-  { id: "nlp",        name: "Natural Language Processing",  category: "Language & Linguistics" },
-  { id: "cv",         name: "Computer Vision",              category: "Perception & Imagery" },
-  { id: "iot",        name: "Internet of Things",           category: "Embedded & Edge" },
-  { id: "blockchain", name: "Blockchain",                   category: "Distributed Ledgers" },
-  { id: "cloud",      name: "Cloud Computing",              category: "Cloud & DevOps" },
-  { id: "se",         name: "Software Engineering",         category: "Systems & Architecture" },
-  { id: "ds",         name: "Data Science",                 category: "Data Analytics" },
-  { id: "robotics",   name: "Robotics",                     category: "Autonomous Systems" },
-  { id: "edge_ai",    name: "Edge AI",                      category: "Embedded & Edge" },
-  { id: "net_sec",    name: "Network Security",             category: "Security & Privacy" },
-  { id: "info_sec",   name: "Information Security",         category: "Security & Privacy" },
+  { id: 1, name: "Machine Learning", category: "Artificial Intelligence" },
+  { id: 2, name: "Data Science", category: "Data Analytics" },
+  { id: 3, name: "Cyber Security", category: "Security & Networks" },
+  { id: 4, name: "AI & Robotics", category: "Artificial Intelligence" },
+  { id: 5, name: "Natural Language Processing", category: "Artificial Intelligence" },
+  { id: 6, name: "Computer Vision", category: "Artificial Intelligence" },
+  { id: 7, name: "Internet of Things", category: "Embedded Systems" },
+  { id: 8, name: "Cloud Computing", category: "Distributed Systems" },
+  { id: 9, name: "Bioinformatics", category: "Interdisciplinary" },
+  { id: 10, name: "Blockchain", category: "Security & Networks" },
+  { id: 11, name: "Human-Computer Interaction", category: "Software Systems" },
+  { id: 12, name: "Others", category: "General" },
 ];
 
 export const RESEARCH_SUBDOMAINS = [

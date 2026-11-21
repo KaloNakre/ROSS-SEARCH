@@ -1,0 +1,48 @@
+{
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "parsableStyle": true,
+    "fileSummary": true,
+    "directoryStructure": true,
+    "removeComments": false,
+    "removeEmptyLines": true,
+    "topFilesLength": 10,
+    "showLineNumbers": false,
+    "compress": false
+  },
+  "include": [
+    "src/**/*.{js,jsx,ts,tsx,css}",
+    "backend/**/*.py",
+    "package.json",
+    "vite.config.js"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/.tools/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/__pycache__/**",
+      "**/*.db",
+      "**/*.sqlite",
+      "**/*.sqlite3",
+      "**/*.pdf",
+      "**/*.png",
+      "**/*.jpg",
+      "**/*.jpeg",
+      "**/*.drawio",
+      "**/*.zip",
+      "**/graphify-out/**",
+      "**/.env*",
+      "**/dataset*/**",
+      "**/coverage/**"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  }
+}

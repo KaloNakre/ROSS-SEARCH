@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NeutralAvatar from '../components/NeutralAvatar';
+import { resolveSelectedDomainIds } from '../utils/domainUtils';
+import { RESEARCH_DOMAINS } from '../data/mockData';
 
 export const StudentProfile = () => {
   const { currentUser, apiCall } = useAuth();
@@ -141,34 +143,29 @@ export const StudentProfile = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {interests.length > 0 ? (
-              interests.map((interest, idx) => {
-                const name = typeof interest === 'string' ? interest : interest.name;
-                return (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100"
-                  >
-                    <Sparkles size={12} />
-                    <span>{name}</span>
-                  </span>
-                );
-              })
-            ) : preferredDomain ? (
-              preferredDomain.split(',').map(s => s.trim()).filter(Boolean).map((domainName, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100"
-                >
-                  <Sparkles size={12} />
-                  <span>{domainName}</span>
-                </span>
-              ))
-            ) : (
-              <p className="text-xs text-slate-400 italic">
-                No research domains selected yet. Click "Update Preferences" to define your topics.
-              </p>
-            )}
+            {(() => {
+              const domainIds = resolveSelectedDomainIds(profile, RESEARCH_DOMAINS);
+              if (domainIds.length > 0) {
+                return domainIds.map((dId) => {
+                  const match = RESEARCH_DOMAINS.find(d => d.id === dId);
+                  const name = match ? match.name : `Domain #${dId}`;
+                  return (
+                    <span
+                      key={dId}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100"
+                    >
+                      <Sparkles size={12} />
+                      <span>{name}</span>
+                    </span>
+                  );
+                });
+              }
+              return (
+                <p className="text-xs text-slate-400 italic">
+                  No research domains selected yet. Click "Update Preferences" to define your topics.
+                </p>
+              );
+            })()}
           </div>
 
           {/* Subdomains & Specialized Paradigms */}

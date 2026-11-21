@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "filesystem": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "${workspaceFolder}"]
+    },
+    "graphify": {
+      "command": "uv",
+      "args": ["run", "--with", "graphifyy", "--with", "mcp", "-m", "graphify.serve", "${workspaceFolder}/graphify-out/graph.json"]
+    },
+    "serena": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/oraios/serena", "serena-mcp-server", "--project", "${workspaceFolder}"]
+    },
+    "context7": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@upstash/context7-mcp"]
+    },
+    "chrome-devtools": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@latest", "--no-usage-statistics"]
+    },
+    "playwright": {
+      "command": "cmd.exe",
+      "args": ["/c", "npx", "-y", "@playwright/mcp@latest"]
+    }
+  }
+}

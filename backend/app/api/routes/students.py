@@ -64,9 +64,8 @@ def update_my_interests(
     for item in valid_interests:
         db.add(StudentInterest(student_id=student.id, interest_id=item.id))
     
-    # Sync preferred_domain text if empty or requested
-    if valid_interests and not student.preferred_domain:
-        student.preferred_domain = ", ".join([i.name for i in valid_interests])
+    # Always synchronize preferred_domain with junction table interests
+    student.preferred_domain = ", ".join([i.name for i in valid_interests]) if valid_interests else ""
         
     db.commit()
     db.refresh(student)
