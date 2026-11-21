@@ -18,11 +18,26 @@ class PreviousProjectOut(BaseModel):
     class Config:
         from_attributes = True
 
+class AcademicPaperOut(BaseModel):
+    id: int
+    title: str
+    authors: str
+    year: int
+    domain: str
+    venue: str
+    citations: int
+    abstract: str
+    keywords: List[str]
+    pdf_url: str
+    download_url: str
+    key_findings: str
+
 class StructuredPaperSummary(BaseModel):
     title: Optional[str] = "Research Paper"
     authors: Optional[str] = "Unknown Authors"
     year: Optional[int] = 2026
     domain: Optional[str] = "Computer Science"
+    ai_engine: Optional[str] = "PyMuPDF Neural NLP Engine"
     problem_statement: str
     objectives: str
     methodology: str
@@ -80,6 +95,13 @@ class SimilarityCheckResponse(BaseModel):
     query_domain: Optional[str]
     highest_similarity: float
     risk_level: str  # "Original", "Low", "Moderate", "High Duplicate Risk"
+    can_register: bool
+    duplicate_conflict_details: Optional[str] = None
     verdict_summary: str
     top_matches: List[MatchedProjectComparison]
     recommendation: str
+    ai_novelty_suggestions: List[str]
+
+class RegisterThesisTopicRequest(BaseModel):
+    title: str
+    domain: Optional[str] = None

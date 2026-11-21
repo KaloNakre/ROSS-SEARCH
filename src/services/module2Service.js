@@ -3,7 +3,7 @@
  * 
  * Contributor Responsibilities:
  * 1. [Riya Saha - ID: 232-35-715]: Research domains, paper discovery & previous departmental projects archive
- * 2. [Robayet Islam - ID: 232-35-809]: AI Paper Summarizer Engine (PyMuPDF + 9-point structured summary)
+ * 2. [Robayet Islam - ID: 232-35-809]: AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq + 9-point structured summary)
  * 3. [Tamim Hasan Sami - ID: 232-35-313]: Topic similarity & duplicate FYP detector
  * 4. [Tamim Hasan Sami - ID: 232-35-313]: Shared paper knowledge repository
  */
@@ -11,6 +11,22 @@
 const API_BASE = '/api/research';
 
 export const module2Service = {
+  // ── [Riya Saha – ID: 715] Published Academic Papers Catalog ──────────────
+  async getAcademicPapers(filters = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (filters.domain && filters.domain !== 'All') params.append('domain', filters.domain);
+      if (filters.q) params.append('q', filters.q);
+
+      const res = await fetch(`${API_BASE}/academic-papers?${params.toString()}`);
+      if (!res.ok) throw new Error('Failed to fetch academic papers catalog');
+      return await res.json();
+    } catch (err) {
+      console.warn('Academic papers fetch failed:', err);
+      return [];
+    }
+  },
+
   // ── [Riya Saha – ID: 715] Previous Departmental Projects Archive ─────────
   async getPreviousProjects(filters = {}) {
     try {
@@ -47,8 +63,8 @@ export const module2Service = {
     }
   },
 
-  // ── [Robayet Islam – ID: 809] AI Paper Summarizer Engine (PyMuPDF) ────────
-  async summarizePaper({ file, rawText }) {
+  // ── [Robayet Islam – ID: 809] AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq) ──
+  async summarizePaper({ file, rawText, apiKey }) {
     const formData = new FormData();
     if (file) {
       formData.append('file', file);
@@ -56,6 +72,9 @@ export const module2Service = {
       formData.append('raw_text', rawText);
     } else {
       throw new Error('Please select a PDF file or paste research paper text.');
+    }
+    if (apiKey && apiKey.trim()) {
+      formData.append('api_key', apiKey.trim());
     }
 
     const res = await fetch(`${API_BASE}/summarize-pdf`, {
@@ -84,6 +103,23 @@ export const module2Service = {
       throw new Error(errData.detail || 'Failed to execute topic similarity check.');
     }
 
+    return await res.json();
+  },
+
+  async registerThesisTopic(title, token) {
+    const res = await fetch(`${API_BASE}/register-topic`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ title })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to register thesis topic.');
+    }
     return await res.json();
   },
 
