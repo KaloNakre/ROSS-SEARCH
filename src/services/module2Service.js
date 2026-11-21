@@ -245,6 +245,34 @@ export const module2Service = {
     }
   },
 
+  // ── Research Discovery Query History & Audit ──
+  async getQueryHistory(domain = null, limit = 25) {
+    try {
+      const params = new URLSearchParams();
+      if (domain && domain !== 'All') params.append('domain', domain);
+      if (limit) params.append('limit', limit);
+      const res = await fetch(`${API_BASE}/query-history?${params.toString()}`);
+      if (!res.ok) throw new Error('Failed to load query history');
+      return await res.json();
+    } catch (err) {
+      console.warn('Query history fetch error:', err);
+      return [];
+    }
+  },
+
+  async markPaperDownloaded(savedId, token) {
+    const res = await fetch(`${API_BASE}/library/${savedId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ is_downloaded: true })
+    });
+    if (!res.ok) throw new Error('Failed to update download status.');
+    return await res.json();
+  },
+
   // ── Browser Extension Domain Auditor ─────────────────────────────────────
   async auditDomain(urlOrDomain) {
     const res = await fetch('/api/extension/analyze-domain', {

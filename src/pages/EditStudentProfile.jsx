@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { 
-  Save, 
-  ArrowLeft, 
-  CheckCircle2, 
-  AlertCircle, 
-  Loader2, 
-  Sparkles, 
-  Check, 
-  Tag, 
-  Layers 
+import {
+  Save,
+  ArrowLeft,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  Check,
+  Tag,
+  Layers
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { DEPARTMENTS, SECTIONS, RESEARCH_DOMAINS, RESEARCH_SUBDOMAINS } from '../data/mockData';
@@ -17,7 +17,7 @@ import { DEPARTMENTS, SECTIONS, RESEARCH_DOMAINS, RESEARCH_SUBDOMAINS } from '..
 export const EditStudentProfile = () => {
   const navigate = useNavigate();
   const { apiCall, refreshUser } = useAuth();
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -88,11 +88,18 @@ export const EditStudentProfile = () => {
 
             // If junction table has no records yet but preferred_domain exists, map domain names to interest IDs
             if (curIds.length === 0 && data.preferred_domain) {
-              const prefNames = data.preferred_domain.split(',').map(s => s.trim().toLowerCase());
-              const matched = list.filter(item => prefNames.includes(item.name.toLowerCase())).map(item => item.id);
+              const prefNames = data.preferred_domain.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+              const matched = list.filter(item => {
+                const itemNorm = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                return prefNames.some(p => p.length > 2 && (p.includes(itemNorm) || itemNorm.includes(p)));
+              }).map(item => item.id);
               if (matched.length > 0) curIds = matched;
             }
-            setSelectedInterestIds(curIds);
+
+            // CRITICAL: Keep only IDs that strictly exist in availableInterests list
+            // This prevents phantom orphan IDs from triggering "1 Selected" while 0 cards show active
+            const validIds = curIds.filter(cid => list.some(item => String(item.id) === String(cid)));
+            setSelectedInterestIds(validIds);
           }
         }
       } catch (err) {
@@ -235,7 +242,7 @@ export const EditStudentProfile = () => {
 
       {/* Form Card */}
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-        
+
         {/* Academic Details Section */}
         <div className="space-y-4">
           <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
@@ -333,16 +340,14 @@ export const EditStudentProfile = () => {
                   type="button"
                   key={interest.id}
                   onClick={() => toggleInterest(interest)}
-                  className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between gap-2 ${
-                    isSelected
-                      ? 'bg-blue-50 border-diu-blue text-diu-blue shadow-xs ring-1 ring-diu-blue'
-                      : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
-                  }`}
+                  className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between gap-2 ${isSelected
+                    ? 'bg-blue-50 border-diu-blue text-diu-blue shadow-xs ring-1 ring-diu-blue'
+                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                    }`}
                 >
                   <span className="truncate">{interest.name}</span>
-                  <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${
-                    isSelected ? 'bg-diu-blue text-white' : 'border border-slate-300 bg-white'
-                  }`}>
+                  <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${isSelected ? 'bg-diu-blue text-white' : 'border border-slate-300 bg-white'
+                    }`}>
                     {isSelected && <Check size={11} strokeWidth={3} />}
                   </div>
                 </button>
@@ -374,11 +379,10 @@ export const EditStudentProfile = () => {
                   type="button"
                   key={sub}
                   onClick={() => toggleSubdomain(sub)}
-                  className={`px-3 py-1.5 rounded-full text-xs transition-all flex items-center gap-1.5 ${
-                    isSelected
-                      ? 'bg-emerald-600 text-white shadow-xs font-semibold'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-medium'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full text-xs transition-all flex items-center gap-1.5 ${isSelected
+                    ? 'bg-emerald-600 text-white shadow-xs font-semibold'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-medium'
+                    }`}
                 >
                   <span>{sub}</span>
                   {isSelected && <Check size={12} strokeWidth={3} />}

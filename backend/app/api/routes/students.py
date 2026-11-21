@@ -55,8 +55,19 @@ def update_my_interests(
     student = db.query(Student).filter(Student.user_id == current_user.id).first()
     if not student:
         raise HTTPException(404, "Student profile not found")
-    interests = db.query(ResearchInterest).filter(ResearchInterest.id.in_(payload.interest_ids)).all()
-    student.interests = interests
+    
+    # Clear existing interest relations
+    db.query(StudentInterest).filter(StudentInterest.student_id == student.id).delete()
+    
+    # Add new interest relations
+    valid_interests = db.query(ResearchInterest).filter(ResearchInterest.id.in_(payload.interest_ids)).all()
+    for item in valid_interests:
+        db.add(StudentInterest(student_id=student.id, interest_id=item.id))
+    
+    # Sync preferred_domain text if empty or requested
+    if valid_interests and not student.preferred_domain:
+        student.preferred_domain = ", ".join([i.name for i in valid_interests])
+        
     db.commit()
     db.refresh(student)
     result = StudentOut.model_validate(student)

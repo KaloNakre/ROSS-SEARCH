@@ -30,7 +30,10 @@ import {
   Check,
   Trash2,
   FileSpreadsheet,
-  Cpu
+  Cpu,
+  History,
+  Eye,
+  X
 } from 'lucide-react';
 import { module2Service } from '../../services/module2Service';
 import { useAuth } from '../../context/AuthContext';
@@ -65,15 +68,19 @@ export const ResearchDiscoveryPage = () => {
   const [projects, setProjects] = useState([]);
   const [libraryPapers, setLibraryPapers] = useState([]);
   const [suggestedTopics, setSuggestedTopics] = useState([]);
+  const [queryHistory, setQueryHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savedFeedback, setSavedFeedback] = useState({});
   const [selectedModalItem, setSelectedModalItem] = useState(null);
+  const [pdfModalUrl, setPdfModalUrl] = useState(null);
+  const [pdfModalTitle, setPdfModalTitle] = useState("");
+  const [summaryModalItem, setSummaryModalItem] = useState(null);
 
-  // Fetch academic papers, previous departmental projects, topic ideas, and personal library
+  // Fetch academic papers, previous departmental projects, topic ideas, personal library, and query history
   const loadData = async () => {
     setLoading(true);
     try {
-      const [papersData, projectsData, topicsData] = await Promise.all([
+      const [papersData, projectsData, topicsData, historyData] = await Promise.all([
         module2Service.getAcademicPapers({
           domain: selectedDomain,
           q: searchQuery,
@@ -86,11 +93,13 @@ export const ResearchDiscoveryPage = () => {
           batch: selectedBatch,
           q: searchQuery
         }),
-        module2Service.getSuggestedTopics(selectedDomain)
+        module2Service.getSuggestedTopics(selectedDomain),
+        module2Service.getQueryHistory(selectedDomain)
       ]);
       setAcademicPapers(papersData);
       setProjects(projectsData);
       setSuggestedTopics(topicsData);
+      setQueryHistory(historyData);
 
       if (token) {
         try {
@@ -121,6 +130,23 @@ export const ResearchDiscoveryPage = () => {
         student_id: user?.student_id || "DIU-STUDENT",
         student_name: user?.full_name || "DIU Researcher"
       });
+    }
+  };
+
+  const handleReadPdf = async (paper) => {
+    if (!paper.pdf_url) return;
+    setPdfModalUrl(paper.pdf_url);
+    setPdfModalTitle(paper.title || "Academic Research Paper");
+
+    // If this is a saved paper in library, mark as downloaded in backend
+    if (paper.id && token && libraryPapers.some(p => p.id === paper.id)) {
+      try {
+        await module2Service.markPaperDownloaded(paper.id, token);
+        const updatedLib = await module2Service.getLibrary(token);
+        setLibraryPapers(updatedLib);
+      } catch (err) {
+        console.warn("Could not update download status:", err);
+      }
     }
   };
 
@@ -359,6 +385,18 @@ export const ResearchDiscoveryPage = () => {
             <Bookmark className="w-4 h-4" />
             <span>My Research Library ({libraryPapers.length})</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === "history"
+                ? "bg-slate-800 text-white shadow-sm"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+            }`}
+          >
+            <History className="w-4 h-4" />
+            <span>Search History & Activity ({queryHistory.length})</span>
+          </button>
         </div>
 
         {activeTab === "archive" && (
@@ -497,17 +535,29 @@ export const ResearchDiscoveryPage = () => {
 
                     {/* Actions: Download PDF, Save to Library, AI Summarize, and Similarity */}
                     <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {/* Built-in PDF Reader Viewer */}
+                        {paper.pdf_url && (
+                          <button
+                            onClick={() => handleReadPdf(paper)}
+                            className="px-3 py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                            title="Read PDF in Built-in Reader"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Read PDF</span>
+                          </button>
+                        )}
+
                         {/* Direct PDF Stream Download */}
                         <a
                           href={paper.pdf_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-3 py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                          className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
                           title="Stream Authentic Open-Access PDF"
                         >
                           <FileDown className="w-3.5 h-3.5" />
-                          <span>Direct PDF</span>
+                          <span>Direct Link</span>
                         </a>
 
                         {/* Save to Library Button */}
@@ -689,9 +739,17 @@ export const ResearchDiscoveryPage = () => {
                       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                         {saved.domain || 'Computer Science'}
                       </span>
-                      <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded uppercase">
-                        Status: {saved.reading_status || 'Reading'}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {saved.is_downloaded && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-purple-700" />
+                            Downloaded
+                          </span>
+                        )}
+                        <span className="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded uppercase">
+                          Status: {saved.reading_status || 'Reading'}
+                        </span>
+                      </div>
                     </div>
 
                     <h3 className="font-bold text-slate-900 text-base leading-snug mb-2">
@@ -716,26 +774,35 @@ export const ResearchDiscoveryPage = () => {
                   </div>
 
                   <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {saved.pdf_url && (
-                        <a
-                          href={saved.pdf_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5"
-                        >
-                          <FileDown className="w-3.5 h-3.5" />
-                          <span>PDF</span>
-                        </a>
+                        <>
+                          <button
+                            onClick={() => handleReadPdf(saved)}
+                            className="px-3 py-1.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
+                            title="Read PDF in Built-in Viewer"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Read PDF</span>
+                          </button>
+                          <a
+                            href={saved.pdf_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
+                          >
+                            <FileDown className="w-3.5 h-3.5" />
+                            <span>Direct PDF</span>
+                          </a>
+                        </>
                       )}
                       <button
-                        onClick={() => {
-                          navigate(`/research/summarizer?paperUrl=${encodeURIComponent(saved.pdf_url || '')}&title=${encodeURIComponent(saved.title)}`);
-                        }}
+                        onClick={() => setSummaryModalItem(saved)}
                         className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold flex items-center gap-1"
+                        title="View Extracted AI Findings & Summary"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                        <span>AI Analysis</span>
+                        <span>AI Summary</span>
                       </button>
                     </div>
 
@@ -838,6 +905,188 @@ export const ResearchDiscoveryPage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── TAB 5: STUDENT SEARCH HISTORY & RESEARCH AUDIT TRAIL ── */}
+      {activeTab === "history" && (
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <History className="w-4 h-4 text-diu-blue" />
+                <span>Student Research Search & Discovery History</span>
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Real-time departmental query audit trail showing recent student searches across domains.
+              </p>
+            </div>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-50 text-diu-blue border border-blue-200 self-start sm:self-auto">
+              {queryHistory.length} Recorded Queries
+            </span>
+          </div>
+
+          {queryHistory.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
+              <History className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-slate-800 mb-1">No Search Queries Logged Yet</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Search queries submitted by students in the discovery search bar will appear here in chronological order.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[10px] tracking-wider">
+                    <tr>
+                      <th className="py-3 px-4">Student & ID</th>
+                      <th className="py-3 px-4">Research Domain</th>
+                      <th className="py-3 px-4">Search Query</th>
+                      <th className="py-3 px-4">Timestamp</th>
+                      <th className="py-3 px-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-700">
+                    {queryHistory.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="py-3.5 px-4 font-semibold text-slate-900">
+                          <div>{item.student_name || "DIU Student"}</div>
+                          <div className="text-[11px] text-slate-400 font-mono">{item.student_id || "DIU-STUDENT"}</div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-diu-blue border border-blue-100 inline-block">
+                            {item.domain || "General"}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 max-w-md">
+                          <span className="font-medium text-slate-800">{item.query_text}</span>
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-500 text-[11px] whitespace-nowrap">
+                          {item.created_at ? new Date(item.created_at).toLocaleString() : "Just now"}
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <button
+                            onClick={() => {
+                              setSearchQuery(item.query_text);
+                              if (item.domain && DOMAIN_OPTIONS.includes(item.domain)) {
+                                setSelectedDomain(item.domain);
+                              }
+                              setActiveTab("papers");
+                            }}
+                            className="px-2.5 py-1 text-[11px] font-semibold text-purple-700 hover:text-purple-800 bg-purple-50 hover:bg-purple-100 rounded-lg border border-purple-200 transition-colors"
+                          >
+                            Search Again
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Built-In PDF Reader Modal ── */}
+      {pdfModalUrl && (
+        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
+          <div className="bg-white rounded-2xl w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center gap-2.5 min-w-0 pr-4">
+                <FileText className="w-5 h-5 text-purple-700 shrink-0" />
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                  {pdfModalTitle}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={pdfModalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1.5 bg-purple-700 hover:bg-purple-800 text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span>Download File</span>
+                </a>
+                <button
+                  onClick={() => setPdfModalUrl(null)}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 bg-slate-100 relative">
+              <iframe
+                src={pdfModalUrl}
+                title={pdfModalTitle}
+                className="w-full h-full border-0"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── AI Summary & Findings Modal ── */}
+      {summaryModalItem && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+              <span className="text-xs font-bold text-indigo-700 px-2.5 py-0.5 bg-indigo-50 rounded-full border border-indigo-200 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>AI Research Breakdown & Findings</span>
+              </span>
+              <button
+                onClick={() => setSummaryModalItem(null)}
+                className="text-slate-400 hover:text-slate-700 text-sm font-bold p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <h2 className="text-base font-bold text-slate-900 mb-2 leading-snug">
+              {summaryModalItem.title}
+            </h2>
+            <div className="text-xs text-slate-500 mb-4">
+              {summaryModalItem.authors} ({summaryModalItem.year}) • <em>{summaryModalItem.venue || 'Academic Repository'}</em>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
+              <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                <strong className="text-slate-900 block mb-1">Abstract & Core Objective:</strong>
+                <p className="text-slate-600 leading-relaxed">{summaryModalItem.abstract || 'No abstract text available.'}</p>
+              </div>
+
+              {summaryModalItem.notes && (
+                <div className="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200">
+                  <strong className="text-amber-900 block mb-1">Notes & Key Findings:</strong>
+                  <p className="text-amber-800 leading-relaxed">{summaryModalItem.notes}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+              <button
+                onClick={() => {
+                  const url = summaryModalItem.pdf_url;
+                  const title = summaryModalItem.title;
+                  setSummaryModalItem(null);
+                  navigate(`/research/summarizer?paperUrl=${encodeURIComponent(url || '')}&title=${encodeURIComponent(title || '')}`);
+                }}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Open Full 20-Point AI Breakdown</span>
+              </button>
+              <button
+                onClick={() => setSummaryModalItem(null)}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

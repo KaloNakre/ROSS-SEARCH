@@ -182,17 +182,30 @@ class SavedPaperCreate(BaseModel):
     notes: Optional[str] = None
     reading_status: Optional[str] = "unread"  # unread, reading, completed
     tags: Optional[str] = None
+    is_downloaded: Optional[bool] = False
 
 class SavedPaperUpdate(BaseModel):
     notes: Optional[str] = None
     reading_status: Optional[str] = None
     tags: Optional[str] = None
+    is_downloaded: Optional[bool] = None
 
 class SavedPaperOut(SavedPaperCreate):
     id: int
     student_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class QueryLogOut(BaseModel):
+    id: int
+    student_name: Optional[str] = "Student Explorer"
+    student_id: Optional[str] = "DIU-STUDENT"
+    domain: Optional[str] = None
+    query_text: str
+    created_at: datetime
 
     class Config:
         from_attributes = True

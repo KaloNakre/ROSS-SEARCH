@@ -37,6 +37,7 @@ from app.schemas.research_knowledge import (
     SavedPaperCreate,
     SavedPaperUpdate,
     SavedPaperOut,
+    QueryLogOut,
     PublicChatRequest,
     PublicChatResponse,
     DomainAuditRequest,
@@ -264,6 +265,45 @@ def log_research_query(
     db.add(log_entry)
     db.commit()
     return {"message": "Query logged successfully", "id": log_entry.id}
+
+
+@router.get("/query-history", response_model=List[QueryLogOut])
+def get_research_query_history(
+    domain: Optional[str] = Query(None),
+    limit: int = Query(25, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieve audit trail of recent academic research searches and discoveries.
+    Enables supervisors and students to review research activity across domains.
+    """
+    # Seed realistic DIU initial query logs if table is completely empty
+    if db.query(ResearchQueryLog).count() == 0:
+        seed_queries = [
+            ("DeepLog anomaly detection for ICS SCADA", "Cyber Security", "201-15-101", "Tanvir Ahmed"),
+            ("Attention Is All You Need transformer architecture", "Natural Language Processing", "201-15-202", "Sadia Afrin"),
+            ("Skin cancer classification using deep CNN", "Healthcare AI", "201-15-303", "Farhana Yeasmin"),
+            ("YOLOv8 real-time object detection", "Computer Vision", "201-15-404", "Naimur Rahman"),
+            ("Federated learning communication efficiency", "Machine Learning", "201-15-505", "Mahmudul Hasan"),
+            ("Zero-trust cloud network security", "Cyber Security", "201-15-606", "Anika Tabassum"),
+            ("Smart contracts on private Ethereum consortium", "Blockchain", "201-15-707", "Rifat Hossain"),
+            ("Edge computing latency reduction on IoT nodes", "Internet of Things", "201-15-808", "Sumaiya Akter"),
+        ]
+        for q_text, q_domain, s_id, s_name in seed_queries:
+            db.add(ResearchQueryLog(
+                query_text=q_text,
+                domain=q_domain,
+                student_id=s_id,
+                student_name=s_name
+            ))
+        db.commit()
+
+    query = db.query(ResearchQueryLog)
+    if domain and domain.strip() and domain.lower() != "all":
+        query = query.filter(ResearchQueryLog.domain.ilike(f"%{domain.strip()}%"))
+
+    logs = query.order_by(ResearchQueryLog.created_at.desc()).limit(limit).all()
+    return logs
 
 
 # ==============================================================================
@@ -699,7 +739,8 @@ def save_paper_to_personal_library(
         pdf_url=payload.pdf_url,
         notes=payload.notes,
         reading_status=payload.reading_status or "unread",
-        tags=payload.tags
+        tags=payload.tags,
+        is_downloaded=payload.is_downloaded if payload.is_downloaded is not None else False
     )
     db.add(record)
     db.commit()
@@ -714,7 +755,7 @@ def update_saved_paper(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Update reading status, personal notes, or tags for a saved paper."""
+    """Update reading status, personal notes, download status, or tags for a saved paper."""
     student = db.query(Student).filter(Student.user_id == current_user.id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student profile not found.")
@@ -732,6 +773,8 @@ def update_saved_paper(
         record.reading_status = payload.reading_status
     if payload.tags is not None:
         record.tags = payload.tags
+    if payload.is_downloaded is not None:
+        record.is_downloaded = payload.is_downloaded
     record.updated_at = datetime.utcnow()
 
     db.commit()

@@ -42,9 +42,16 @@ export const ResearchInterestsPage = () => {
 
           if (meRes.status === 'fulfilled' && meRes.value) {
             const current = meRes.value.interests || [];
-            // Current interests can be objects with id or names
-            const currentIds = current.map(item => (typeof item === 'object' ? item.id : item));
-            setSelectedInterestIds(currentIds);
+            let currentIds = current.map(item => (typeof item === 'object' ? item.id : item)).filter(Boolean);
+            if (currentIds.length === 0 && meRes.value.preferred_domain) {
+              const prefNames = meRes.value.preferred_domain.split(',').map(s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+              const matched = interestsList.filter(item => {
+                const itemNorm = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                return prefNames.some(p => p.length > 2 && (p.includes(itemNorm) || itemNorm.includes(p)));
+              }).map(item => item.id);
+              if (matched.length > 0) currentIds = matched;
+            }
+            setSelectedInterestIds(currentIds.filter(cid => interestsList.some(item => String(item.id) === String(cid))));
           }
         }
       } catch (err) {
@@ -59,11 +66,10 @@ export const ResearchInterestsPage = () => {
 
   const toggleInterest = (id) => {
     setSelectedInterestIds(prev => {
-      if (prev.includes(id)) {
-        return prev.filter(item => item !== id);
-      } else {
-        return [...prev, id];
-      }
+      const exists = prev.some(item => String(item) === String(id));
+      return exists
+        ? prev.filter(item => String(item) !== String(id))
+        : [...prev, id];
     });
   };
 
@@ -171,7 +177,7 @@ export const ResearchInterestsPage = () => {
 
                 <div className="flex flex-wrap gap-2">
                   {items.map((item) => {
-                    const isSelected = selectedInterestIds.includes(item.id);
+                    const isSelected = selectedInterestIds.some(id => String(id) === String(item.id));
                     return (
                       <button
                         key={item.id}
