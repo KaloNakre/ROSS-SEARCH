@@ -57,32 +57,41 @@ export const ResearchDiscoveryPage = () => {
   const [selectedDomain, setSelectedDomain] = useState("All");
   const [selectedBatch, setSelectedBatch] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("papers"); // 'papers' | 'archive' | 'library'
+  const [yearFrom, setYearFrom] = useState("");
+  const [yearTo, setYearTo] = useState("");
+  const [authorQuery, setAuthorQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("papers"); // 'papers' | 'archive' | 'library' | 'topics'
 
   const [academicPapers, setAcademicPapers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [libraryPapers, setLibraryPapers] = useState([]);
+  const [suggestedTopics, setSuggestedTopics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savedFeedback, setSavedFeedback] = useState({});
   const [selectedModalItem, setSelectedModalItem] = useState(null);
 
-  // Fetch academic papers, previous departmental projects, and personal library
+  // Fetch academic papers, previous departmental projects, topic ideas, and personal library
   const loadData = async () => {
     setLoading(true);
     try {
-      const [papersData, projectsData] = await Promise.all([
+      const [papersData, projectsData, topicsData] = await Promise.all([
         module2Service.getAcademicPapers({
           domain: selectedDomain,
-          q: searchQuery
+          q: searchQuery,
+          year_from: yearFrom ? Number(yearFrom) : undefined,
+          year_to: yearTo ? Number(yearTo) : undefined,
+          author: authorQuery || undefined
         }),
         module2Service.getPreviousProjects({
           domain: selectedDomain,
           batch: selectedBatch,
           q: searchQuery
-        })
+        }),
+        module2Service.getSuggestedTopics(selectedDomain)
       ]);
       setAcademicPapers(papersData);
       setProjects(projectsData);
+      setSuggestedTopics(topicsData);
 
       if (token) {
         try {
@@ -250,11 +259,60 @@ export const ResearchDiscoveryPage = () => {
             );
           })}
         </div>
+
+        {/* Advanced Filters: Publication Year Range & Author */}
+        <div className="pt-3 mt-3 border-t border-slate-100 flex flex-wrap items-center gap-3 text-xs">
+          <div className="flex items-center gap-1.5 text-slate-600 font-semibold">
+            <span>Year:</span>
+            <input
+              type="number"
+              placeholder="From (2018)"
+              value={yearFrom}
+              onChange={(e) => setYearFrom(e.target.value)}
+              className="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-normal"
+            />
+            <span>–</span>
+            <input
+              type="number"
+              placeholder="To (2025)"
+              value={yearTo}
+              onChange={(e) => setYearTo(e.target.value)}
+              className="w-24 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-normal"
+            />
+          </div>
+
+          <div className="flex items-center gap-1.5 text-slate-600 font-semibold">
+            <span>Author:</span>
+            <input
+              type="text"
+              placeholder="e.g. Vaswani, LeCun"
+              value={authorQuery}
+              onChange={(e) => setAuthorQuery(e.target.value)}
+              className="w-36 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-normal"
+            />
+          </div>
+
+          <button
+            onClick={() => loadData()}
+            className="px-3 py-1 bg-diu-blue hover:bg-diu-dark text-white rounded-lg font-semibold text-xs transition-colors"
+          >
+            Apply Filters
+          </button>
+
+          {(yearFrom || yearTo || authorQuery) && (
+            <button
+              onClick={() => { setYearFrom(""); setYearTo(""); setAuthorQuery(""); }}
+              className="text-xs text-rose-600 hover:underline font-semibold"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Main Tabs Navigation */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setActiveTab("papers")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
@@ -268,6 +326,18 @@ export const ResearchDiscoveryPage = () => {
           </button>
 
           <button
+            onClick={() => setActiveTab("topics")}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              activeTab === "topics"
+                ? "bg-amber-600 text-white shadow-sm"
+                : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Novel Thesis Ideas ({suggestedTopics.length})</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("archive")}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === "archive"
@@ -276,7 +346,7 @@ export const ResearchDiscoveryPage = () => {
             }`}
           >
             <GraduationCap className="w-4 h-4" />
-            <span>DIU FYP/Thesis Archive ({projects.length})</span>
+            <span>DIU FYP Archive ({projects.length})</span>
           </button>
 
           <button
@@ -682,6 +752,94 @@ export const ResearchDiscoveryPage = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── TAB 4: NOVEL THESIS & TOPIC SUGGESTIONS ── */}
+      {activeTab === "topics" && (
+        <div className="space-y-4">
+          <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xs font-bold text-amber-950 uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span>Departmental Research Topic Intelligence</span>
+              </h3>
+              <p className="text-xs text-amber-900 mt-1">
+                Curated novel FYP topics formulated with specific methodology, public benchmark datasets, and innovation gaps.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/research/similarity')}
+              className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl text-xs shrink-0 shadow-xs transition-colors"
+            >
+              Test Custom Topic Duplicate Risk &rarr;
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {suggestedTopics.map((topic, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between hover:border-amber-300 transition-all"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-diu-blue border border-blue-200">
+                      {topic.domain}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                      {topic.difficulty_level || 'Moderate'}
+                    </span>
+                  </div>
+
+                  <h3 className="font-bold text-slate-900 text-base leading-snug mb-2">
+                    {topic.title}
+                  </h3>
+
+                  {topic.subdomain && (
+                    <div className="text-[11px] font-semibold text-slate-500 mb-3">
+                      Subdomain: <span className="text-slate-800">#{topic.subdomain}</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-2.5 text-xs text-slate-600 mb-4 bg-slate-50/60 p-3.5 rounded-xl border border-slate-100">
+                    <div>
+                      <strong className="text-slate-800">Novelty Angle:</strong> {topic.novelty_angle}
+                    </div>
+                    <div>
+                      <strong className="text-slate-800">Recommended Datasets:</strong> {topic.recommended_datasets}
+                    </div>
+                    <div>
+                      <strong className="text-slate-800">Suggested Methodology:</strong> {topic.suggested_methodology}
+                    </div>
+                    <div>
+                      <strong className="text-slate-800">Expected Contributions:</strong> {topic.expected_contributions}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    onClick={() => {
+                      navigate(`/research/chat`);
+                    }}
+                    className="text-xs text-diu-blue hover:underline font-semibold flex items-center gap-1"
+                  >
+                    <span>Discuss with AI Assistant</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate(`/research/similarity?topic=${encodeURIComponent(topic.title)}`);
+                    }}
+                    className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg text-xs font-semibold transition-colors"
+                  >
+                    Check Duplicate Risk
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

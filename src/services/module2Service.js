@@ -17,6 +17,9 @@ export const module2Service = {
       const params = new URLSearchParams();
       if (filters.domain && filters.domain !== 'All') params.append('domain', filters.domain);
       if (filters.q) params.append('q', filters.q);
+      if (filters.year_from) params.append('year_from', filters.year_from);
+      if (filters.year_to) params.append('year_to', filters.year_to);
+      if (filters.author) params.append('author', filters.author);
       if (filters.limit) params.append('limit', filters.limit);
 
       const res = await fetch(`${API_BASE}/academic-papers?${params.toString()}`);
@@ -225,6 +228,21 @@ export const module2Service = {
     const res = await fetch(`${API_BASE}/shared-knowledge/${itemId}`);
     if (!res.ok) throw new Error('Failed to fetch shared paper details.');
     return await res.json();
+  },
+
+  // ── Novel Thesis Topic Suggestions ───────────────────────────────────────
+  async getSuggestedTopics(domain) {
+    try {
+      const url = domain && domain !== 'All' 
+        ? `${API_BASE}/suggest-topics?domain=${encodeURIComponent(domain)}`
+        : `${API_BASE}/suggest-topics`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch topic suggestions');
+      return await res.json();
+    } catch (err) {
+      console.warn('Suggested topics fetch failed:', err);
+      return [];
+    }
   },
 
   // ── Browser Extension Domain Auditor ─────────────────────────────────────

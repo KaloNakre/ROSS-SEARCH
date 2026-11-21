@@ -12,7 +12,7 @@ import {
   Layers 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { DEPARTMENTS, SECTIONS, RESEARCH_DOMAINS } from '../data/mockData';
+import { DEPARTMENTS, SECTIONS, RESEARCH_DOMAINS, RESEARCH_SUBDOMAINS } from '../data/mockData';
 
 export const EditStudentProfile = () => {
   const navigate = useNavigate();
@@ -30,11 +30,14 @@ export const EditStudentProfile = () => {
     batch: '',
     phone: '',
     projectTitle: '',
-    bio: ''
+    bio: '',
+    preferredDomain: 'Cybersecurity',
+    subdomains: ''
   });
 
   const [availableInterests, setAvailableInterests] = useState([]);
   const [selectedInterestIds, setSelectedInterestIds] = useState([]);
+  const [selectedSubdomains, setSelectedSubdomains] = useState([]);
 
   useEffect(() => {
     let mounted = true;
@@ -56,8 +59,15 @@ export const EditStudentProfile = () => {
               batch: data.batch || '',
               phone: data.phone || '',
               projectTitle: data.project_title || '',
-              bio: data.bio || ''
+              bio: data.bio || '',
+              preferredDomain: data.preferred_domain || 'Cybersecurity',
+              subdomains: data.subdomains || ''
             });
+
+            if (data.subdomains) {
+              const subs = data.subdomains.split(',').map(s => s.trim()).filter(Boolean);
+              setSelectedSubdomains(subs);
+            }
 
             // Set current selected interest IDs
             const current = data.interests || [];
@@ -89,10 +99,31 @@ export const EditStudentProfile = () => {
     return () => { mounted = false; };
   }, [apiCall]);
 
-  const toggleInterest = (id) => {
-    setSelectedInterestIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+  const toggleInterest = (interest) => {
+    const id = interest.id;
+    const isCurrentlySelected = selectedInterestIds.includes(id);
+    const updatedIds = isCurrentlySelected
+      ? selectedInterestIds.filter(item => item !== id)
+      : [...selectedInterestIds, id];
+    setSelectedInterestIds(updatedIds);
+
+    // Also update preferredDomain string with active domain names
+    const names = availableInterests
+      .filter(item => updatedIds.includes(item.id))
+      .map(item => item.name);
+    if (names.length > 0) {
+      setFormData(prev => ({ ...prev, preferredDomain: names.join(', ') }));
+    }
+  };
+
+  const toggleSubdomain = (subName) => {
+    setSelectedSubdomains(prev => {
+      const updated = prev.includes(subName)
+        ? prev.filter(s => s !== subName)
+        : [...prev, subName];
+      setFormData(f => ({ ...f, subdomains: updated.join(', ') }));
+      return updated;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -100,7 +131,7 @@ export const EditStudentProfile = () => {
     setSaving(true);
     setErrorMsg('');
     try {
-      // 1. Update basic profile info
+      // 1. Update basic profile info + preferred_domain + subdomains
       await apiCall('/api/students/me', {
         method: 'PUT',
         body: JSON.stringify({
@@ -110,16 +141,20 @@ export const EditStudentProfile = () => {
           batch: formData.batch,
           phone: formData.phone,
           project_title: formData.projectTitle,
-          bio: formData.bio
+          bio: formData.bio,
+          preferred_domain: formData.preferredDomain,
+          subdomains: formData.subdomains
         })
       });
 
       // 2. Update research interests/domains in backend
       const numericIds = selectedInterestIds.map(id => Number(id)).filter(id => !isNaN(id));
-      await apiCall('/api/students/me/interests', {
-        method: 'PUT',
-        body: JSON.stringify({ interest_ids: numericIds })
-      });
+      if (numericIds.length > 0) {
+        await apiCall('/api/students/me/interests', {
+          method: 'PUT',
+          body: JSON.stringify({ interest_ids: numericIds })
+        });
+      }
 
       await refreshUser();
       setSuccess(true);
@@ -132,6 +167,7 @@ export const EditStudentProfile = () => {
       setSaving(false);
     }
   };
+
 
   if (loading) {
     return (

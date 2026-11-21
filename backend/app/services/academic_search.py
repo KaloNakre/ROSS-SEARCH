@@ -309,12 +309,20 @@ def search_crossref_papers(query: str, domain: Optional[str] = None, max_results
         print(f"[Crossref Search Note] {e}")
         return []
 
-def get_hybrid_academic_papers(query: Optional[str] = None, domain: Optional[str] = None, limit: int = 15) -> List[Dict[str, Any]]:
+def get_hybrid_academic_papers(
+    query: Optional[str] = None,
+    domain: Optional[str] = None,
+    year_from: Optional[int] = None,
+    year_to: Optional[int] = None,
+    author: Optional[str] = None,
+    limit: int = 15
+) -> List[Dict[str, Any]]:
     """
     Multi-source academic aggregator:
     1. Queries live arXiv API for open-access papers.
     2. Queries live Crossref API for peer-reviewed DOIs.
     3. Fills with verified landmark papers if network fails or results are sparse.
+    Filters by publication year range and author if provided.
     """
     results = []
     seen_titles = set()
@@ -349,7 +357,20 @@ def get_hybrid_academic_papers(query: Optional[str] = None, domain: Optional[str
             if not domain or domain == "All" or domain.lower() in p["domain"].lower():
                 results.append(p)
 
-    return results[:limit]
+    # Apply Year and Author Filters
+    filtered = []
+    for p in results:
+        y = p.get("year", 2024)
+        if year_from is not None and y < year_from:
+            continue
+        if year_to is not None and y > year_to:
+            continue
+        if author and author.strip():
+            if author.lower().strip() not in p.get("authors", "").lower():
+                continue
+        filtered.append(p)
+
+    return filtered[:limit]
 
 # Aliases for federated interface
 search_academic_papers_federated = get_hybrid_academic_papers

@@ -123,7 +123,11 @@ class ExtensionDomainAuditLog(Base):
     id = Column(Integer, primary_key=True, index=True)
     domain = Column(String(200), nullable=False, index=True)
     target_url = Column(String(500), nullable=False)
-    risk_level = Column(String(50), default="Low") # Low, Moderate, High, Informational
+    tls_active = Column(Boolean, default=True)
+    risk_level = Column(String(50), default="LOW") # LOW, MODERATE, HIGH, CRITICAL
+    security_score = Column(Integer, default=85)
+    missing_headers = Column(Text, nullable=True)
+    server_tech = Column(String(250), nullable=True)
     server_header = Column(String(150), nullable=True)
     hsts_enabled = Column(Boolean, default=False)
     csp_enabled = Column(Boolean, default=False)
@@ -131,3 +135,4 @@ class ExtensionDomainAuditLog(Base):
     findings_summary = Column(Text, nullable=True)
     ai_analysis_report = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+

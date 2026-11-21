@@ -40,7 +40,8 @@ from app.schemas.research_knowledge import (
     PublicChatRequest,
     PublicChatResponse,
     DomainAuditRequest,
-    DomainAuditResponse
+    DomainAuditResponse,
+    SuggestedTopicOut
 )
 from app.services.academic_search import search_academic_papers_federated, VERIFIED_LANDMARK_PAPERS
 from app.services.pdf_processor import (
@@ -65,6 +66,9 @@ def get_academic_papers(
     domain: Optional[str] = Query(None, description="Filter by domain"),
     q: Optional[str] = Query(None, description="Search keyword in title, abstract, or topic"),
     limit: int = Query(20, ge=1, le=50),
+    year_from: Optional[int] = Query(None, description="Filter papers published from this year (inclusive)"),
+    year_to: Optional[int] = Query(None, description="Filter papers published up to this year (inclusive)"),
+    author: Optional[str] = Query(None, description="Filter by author name (case-insensitive substring match)"),
     db: Session = Depends(get_db)
 ):
     """
@@ -72,6 +76,7 @@ def get_academic_papers(
     Explore authentic, peer-reviewed open-access academic papers (arXiv, Crossref, OpenAlex).
     Strict academic integrity: authentic authors, citations, DOIs, and direct open-access links.
     Results are cached in the database for speed and offline availability.
+    Supports filtering by year range and author name.
     """
     # 1. Fetch federated papers from arXiv, Crossref, and verified open-access archives
     federated_papers = search_academic_papers_federated(query=q, domain=domain, limit=limit)
@@ -118,6 +123,17 @@ def get_academic_papers(
                 paper_id = idx
         else:
             paper_id = cached.id if cached else idx
+
+        # Apply year and author filters
+        paper_year = p.get("year", 2024)
+        if year_from and paper_year < year_from:
+            continue
+        if year_to and paper_year > year_to:
+            continue
+        if author:
+            paper_authors = p.get("authors", "")
+            if author.lower() not in paper_authors.lower():
+                continue
 
         kw = p.get("keywords", [])
         if isinstance(kw, str):
@@ -799,6 +815,120 @@ def export_saved_library(
 
 
 # ==============================================================================
+# 8. [Robayet Islam – ID: 809] Novel Thesis Topic Suggestion Engine
+# ==============================================================================
+
+SUGGESTED_THESIS_TOPICS = [
+    SuggestedTopicOut(
+        title="Federated Learning for Privacy-Preserving Intrusion Detection in IoT Networks",
+        domain="Cybersecurity",
+        subdomain="Network Security",
+        novelty_angle="Combines federated learning with differential privacy to detect intrusions without sharing raw IoT traffic data.",
+        recommended_datasets="CICIDS2017, N-BaIoT, NSL-KDD",
+        suggested_methodology="Federated averaging (FedAvg) with LSTM anomaly detector; differential privacy via DP-SGD",
+        expected_contributions="Privacy-preserving IDS, reduced false positive rate by 15–20% over centralized baselines",
+        difficulty_level="Advanced"
+    ),
+    SuggestedTopicOut(
+        title="Graph Neural Network-Based Academic Collaboration Recommendation for DIU Researchers",
+        domain="Machine Learning",
+        subdomain="Graph Learning",
+        novelty_angle="Leverages co-authorship graphs and citation networks to recommend optimal research collaborators within university networks.",
+        recommended_datasets="DIU publication data, DBLP, Semantic Scholar API",
+        suggested_methodology="GraphSAGE / GAT with node feature embedding from BERT-encoded abstracts",
+        expected_contributions="30%+ improvement in collaboration discovery precision over keyword matching",
+        difficulty_level="Moderate"
+    ),
+    SuggestedTopicOut(
+        title="Explainable AI for Medical Diagnosis: Melanoma Detection with SHAP and Grad-CAM",
+        domain="Artificial Intelligence",
+        subdomain="Explainable AI",
+        novelty_angle="Addresses the black-box problem in CNN-based skin cancer diagnosis using SHAP values and Grad-CAM heatmaps for clinical interpretability.",
+        recommended_datasets="ISIC 2020 Melanoma Dataset, HAM10000",
+        suggested_methodology="EfficientNet-B4 backbone + SHAP TreeExplainer + Grad-CAM overlay visualization",
+        expected_contributions="Clinician-readable explanation layer, AUC > 0.92, interpretability score benchmark",
+        difficulty_level="Advanced"
+    ),
+    SuggestedTopicOut(
+        title="Low-Resource Bengali NLP: Named Entity Recognition Using Cross-Lingual Transfer Learning",
+        domain="Natural Language Processing",
+        subdomain="Low-Resource NLP",
+        novelty_angle="Transfers NER knowledge from high-resource languages (English/Hindi) to Bengali using multilingual BERT with minimal labeled Bengali data.",
+        recommended_datasets="WikiANN, BanglaLekha, BUET Bengali NER Corpus",
+        suggested_methodology="mBERT / XLM-R fine-tuning with cross-lingual consistency regularization",
+        expected_contributions="State-of-the-art Bengali NER F1 > 85% with < 1000 labeled examples",
+        difficulty_level="Moderate"
+    ),
+    SuggestedTopicOut(
+        title="Blockchain-Based Tamper-Proof Academic Credential Verification for Bangladeshi Universities",
+        domain="Blockchain",
+        subdomain="Credential Management",
+        novelty_angle="Proposes a permissioned Hyperledger Fabric chain for verifiable academic transcripts, eliminating certificate fraud in Bangladesh.",
+        recommended_datasets="UGC Bangladesh data (synthetic), DIU enrollment records",
+        suggested_methodology="Hyperledger Fabric + IPFS for document storage + Zero-Knowledge Proofs for privacy",
+        expected_contributions="Sub-second credential verification, 100% tamper-evidence, employer API integration",
+        difficulty_level="Advanced"
+    ),
+    SuggestedTopicOut(
+        title="Automated Traffic Congestion Prediction for Dhaka City Using Spatio-Temporal Graph CNNs",
+        domain="Computer Vision",
+        subdomain="Intelligent Transportation",
+        novelty_angle="Applies spatial-temporal graph convolutional networks to Dhaka's irregular road network for real-time congestion forecasting.",
+        recommended_datasets="Google Maps Traffic API (Dhaka), BTRC vehicle data, OpenStreetMap Dhaka",
+        suggested_methodology="STGCN with dynamic adjacency matrix computed from real-time GPS probe data",
+        expected_contributions="15-minute ahead prediction with MAE < 2.1 km/h on Dhaka corridors",
+        difficulty_level="Advanced"
+    ),
+    SuggestedTopicOut(
+        title="Parameter-Efficient Fine-Tuning of LLMs for Bangla Question Answering Using LoRA",
+        domain="Natural Language Processing",
+        subdomain="Large Language Models",
+        novelty_angle="Applies Low-Rank Adaptation (LoRA) to fine-tune LLaMA-2/Mistral for Bangla QA with < 1% of full fine-tuning compute.",
+        recommended_datasets="SQuAD-BN (translated), TyDi QA Bengali, BanglaQA",
+        suggested_methodology="LoRA rank-16 adapters on attention layers; 4-bit quantization (QLoRA); PEFT library",
+        expected_contributions="Competitive Bangla QA performance on consumer GPU, 10x faster training vs full fine-tune",
+        difficulty_level="Moderate"
+    ),
+    SuggestedTopicOut(
+        title="Deepfake Detection in Bangla Video Content Using Temporal Attention and Facial Inconsistency Analysis",
+        domain="Cybersecurity",
+        subdomain="Digital Forensics",
+        novelty_angle="Addresses the absence of Bangla deepfake datasets by creating a DIU-sourced corpus and training temporal attention models.",
+        recommended_datasets="FaceForensics++, DFDC (transfer), DIU-constructed Bangla Deepfake Corpus",
+        suggested_methodology="TimeSformer + facial landmark inconsistency analysis + contrastive learning",
+        expected_contributions="First Bangla deepfake detection benchmark, AUC > 0.90, real-time capable",
+        difficulty_level="Advanced"
+    ),
+    SuggestedTopicOut(
+        title="Smart Energy Management in DIU Campus Using Reinforcement Learning and IoT Sensor Fusion",
+        domain="Internet of Things",
+        subdomain="Smart Energy Systems",
+        novelty_angle="Uses multi-agent RL to optimize HVAC, lighting, and lab equipment scheduling in DIU campus buildings using live IoT sensor feeds.",
+        recommended_datasets="DIU campus energy meters (IoT), ASHRAE Building Energy Dataset",
+        suggested_methodology="Multi-agent PPO with shared critic; MQTT-based real-time sensor integration",
+        expected_contributions="15–25% energy cost reduction, real-time anomaly detection dashboard",
+        difficulty_level="Moderate"
+    ),
+]
+
+@router.get("/suggest-topics", response_model=List[SuggestedTopicOut])
+def get_suggested_thesis_topics(
+    domain: Optional[str] = Query(None, description="Filter by research domain")
+):
+    """
+    [Robayet Islam – ID: 809] Novel Thesis Topic Suggestion Engine.
+    Returns curated, academically rigorous thesis topic suggestions with methodology,
+    datasets, novelty angles, and expected contributions.
+    No login required. Filtered by domain if provided.
+    """
+    if domain:
+        domain_lower = domain.lower()
+        filtered = [t for t in SUGGESTED_THESIS_TOPICS if domain_lower in t.domain.lower() or (t.subdomain and domain_lower in t.subdomain.lower())]
+        return filtered if filtered else SUGGESTED_THESIS_TOPICS
+    return SUGGESTED_THESIS_TOPICS
+
+
+# ==============================================================================
 # 7. Browser Extension Domain Intelligence API (Public / No Auth Required)
 # ==============================================================================
 
@@ -929,18 +1059,41 @@ def analyze_domain_security_and_tech(
     try:
         audit_entry = ExtensionDomainAuditLog(
             domain=domain_host,
-            full_url=url,
+            target_url=url,
             tls_active=tls_active,
             risk_level=risk_level,
             security_score=score,
             missing_headers=",".join(missing_headers),
             server_tech=",".join(server_techs) if server_techs else "Undisclosed",
-            ai_summary=ai_summary
+            findings_summary=ai_summary,
+            ai_analysis_report=ai_summary
         )
         db.add(audit_entry)
         db.commit()
-    except Exception:
+    except Exception as e:
         db.rollback()
+
+
+    # Build 12-section structured audit report
+    audit_sections = {
+        "Domain Overview": f"Target: {domain_host} | URL: {url} | HTTP Status: {status_code or 'Unreachable'}",
+        "Website Purpose": f"Academic/Research domain under analysis. Response status indicates {'active' if status_code and status_code < 400 else 'restricted or unreachable'} service.",
+        "Tech Stack": ", ".join(server_techs) if server_techs else "No server technology headers disclosed.",
+        "Security Config": f"Security Score: {score}/100 | Risk Level: {risk_level} | Missing Headers: {len(missing_headers)}/6",
+        "Security Headers": f"Present: {', '.join([h for h in monitored_headers if h not in missing_headers]) or 'None'} | Missing: {', '.join(missing_headers) or 'None'}",
+        "HTTPS/TLS": f"TLS Active: {'Yes — HTTPS connection established' if tls_active else 'No — HTTP only, data transmitted in plaintext. High risk of interception.'}",
+        "Cookie Config": "Cookie security attributes (HttpOnly, Secure, SameSite) cannot be assessed via HEAD request. Recommend manual audit.",
+        "Misconfigurations": f"{'Missing ' + str(len(missing_headers)) + ' security headers: ' + ', '.join(missing_headers) + '.' if missing_headers else 'No obvious header misconfigurations detected.'}",
+        "Suspicious Indicators": f"{'Server technology disclosed: ' + ', '.join(server_techs) + '. Avoid exposing server version.' if server_techs else 'No suspicious indicators detected in response headers.'}",
+        "Risk Assessment": f"Overall Risk: {risk_level}. Score {score}/100. {'Immediate remediation recommended.' if risk_level in ('HIGH','CRITICAL') else 'Acceptable security posture with minor improvements possible.'}",
+        "Evidence": f"HTTP Status Code: {status_code}. TLS: {tls_active}. Headers Probed: {len(headers_found)}. Missing Security Headers: {missing_headers}.",
+        "Improvements": (
+            "Recommended Actions: "
+            + (f"Enable HTTPS/TLS immediately. " if not tls_active else "")
+            + (f"Add missing headers: {', '.join(missing_headers)}. " if missing_headers else "")
+            + "Implement HSTS, CSP, and X-Frame-Options for comprehensive protection."
+        )
+    }
 
     return DomainAuditResponse(
         domain=domain_host,
@@ -952,6 +1105,7 @@ def analyze_domain_security_and_tech(
         missing_headers=missing_headers,
         server_technologies=server_techs,
         ai_analysis_summary=ai_summary,
+        audit_sections=audit_sections,
         raw_status_code=status_code,
         audit_timestamp=datetime.utcnow()
     )

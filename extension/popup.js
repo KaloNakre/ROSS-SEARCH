@@ -161,6 +161,23 @@ function renderAuditResults(data) {
   }
 
   aiDomainInsight.textContent = data.ai_analysis_summary;
+
+  // 12-Point Technical Security Audit breakdown
+  const sectionsBox = document.getElementById("auditSectionsBox");
+  if (sectionsBox) {
+    sectionsBox.innerHTML = "";
+    if (data.audit_sections && typeof data.audit_sections === "object") {
+      Object.entries(data.audit_sections).forEach(([secTitle, secContent]) => {
+        const row = document.createElement("div");
+        row.className = "audit-section-row";
+        row.innerHTML = `<span class="audit-sec-label">${escapeHtml(secTitle)}:</span> <span class="audit-sec-val">${escapeHtml(secContent)}</span>`;
+        sectionsBox.appendChild(row);
+      });
+    } else {
+      sectionsBox.innerHTML = '<div style="font-size: 10.5px; color: #64748b;">Comprehensive domain audit complete.</div>';
+    }
+  }
+
   results.classList.remove("hidden");
 }
 

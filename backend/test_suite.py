@@ -77,7 +77,7 @@ def run_suite(iteration: int):
         student_email = f"student_{rand_id}@diu.edu.bd"
         student_payload = RegisterRequest(
             full_name=f"Robayet Student {rand_id}",
-            student_id=f"201-15-{random.randint(100, 999)}",
+            student_id=f"201-15-{os.urandom(3).hex()}",
             department="Department of Computer Science and Engineering",
             email=student_email,
             password="Password@123"
@@ -128,7 +128,7 @@ def run_suite(iteration: int):
         student_40_email = f"student_batch40_{rand_id}@diu.edu.bd"
         st_40_payload = RegisterRequest(
             full_name=f"Batch 40 Senior Student {rand_id}",
-            student_id=f"191-15-{random.randint(100, 999)}",
+            student_id=f"191-15-{os.urandom(3).hex()}",
             department="Department of Computer Science and Engineering",
             email=student_40_email,
             password="Password@123"

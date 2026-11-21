@@ -213,3 +213,24 @@ Module 2 provides a comprehensive, research-grade intelligence ecosystem for Daf
 
 
 
+
+---
+
+### ✅ Module 2 — Latest Improvements & Features (November 2026)
+
+This build added and verified the following production-grade features:
+
+| Feature | Endpoint / Component | Status |
+|---|---|---|
+| **Research Domain + Subdomain Selection with Profile Persistence** | `PUT /api/students/me` → `Student.preferred_domain` + `Student.subdomains` | ✅ Fully Implemented |
+| **Academic Paper Discovery with Year + Author Filters** | `GET /api/research/academic-papers?year_from=&year_to=&author=` | ✅ Fully Implemented |
+| **Novel Thesis Topic Suggestion Engine (9 curated topics)** | `GET /api/research/suggest-topics?domain=` | ✅ Fully Implemented |
+| **12-Section Browser Extension Domain Intelligence Audit** | `POST /api/extension/analyze-domain` → `audit_sections` dict (12 keys) | ✅ Fully Implemented |
+| **Public AI Research Chatbot with Rate Limiting** | `POST /api/research/chat` (100 req/min sliding window) | ✅ Fully Implemented |
+| **Personal Research Library with BibTeX Export** | `GET/POST /api/research/library`, `GET /api/research/library/export` | ✅ Fully Implemented |
+| **20-Point AI Paper Analysis (Gemini / Groq / Neural NLP)** | `POST /api/research/summarize-pdf` | ✅ Fully Implemented |
+| **Topic Duplicate Detection (>70% threshold)** | `POST /api/research/check-similarity` + `POST /api/research/register-topic` | ✅ Fully Implemented |
+| **Core System Verification — 3 Iterations** | `backend/test_suite.py` → 9/9 steps × 3 iterations = **27/27 PASS** | ✅ Fully Verified |
+| **Module 2 Master Test Suite** | `backend/test_module2_master.py` → **9/9 tests PASS** | ✅ Fully Verified |
+
+> **Academic Integrity Commitment:** All academic papers sourced from authentic open-access repositories (arXiv, Crossref, OpenAlex). Zero fabricated citations, authors, or AI-generated research results. PDF downloads stream authentic original documents only.

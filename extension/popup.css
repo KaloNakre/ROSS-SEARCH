@@ -277,6 +277,38 @@ body {
   border-left: 3px solid #00a8cc;
 }
 
+.audit-sections-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.audit-section-row {
+  font-size: 10.5px;
+  line-height: 1.4;
+  border-bottom: 1px dashed #f1f5f9;
+  padding-bottom: 4px;
+}
+
+.audit-section-row:last-child {
+  border-bottom: none;
+}
+
+.audit-sec-label {
+  font-weight: 700;
+  color: #002b49;
+}
+
+.audit-sec-val {
+  color: #334155;
+}
+
 /* Chat Styling */
 .chat-intro {
   font-size: 11px;

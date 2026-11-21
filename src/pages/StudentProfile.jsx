@@ -52,6 +52,8 @@ export const StudentProfile = () => {
   const bio = profile?.bio || 'Undergraduate student at Daffodil International University pursuing FYP / Thesis.';
   const projectTitle = profile?.project_title || 'No formal thesis title registered yet.';
   const interests = profile?.interests || [];
+  const preferredDomain = profile?.preferred_domain || '';
+  const subdomains = profile?.subdomains ? profile.subdomains.split(',').map(s => s.trim()).filter(Boolean) : [];
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fadeIn">
@@ -145,19 +147,43 @@ export const StudentProfile = () => {
                 return (
                   <span
                     key={idx}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-medium border border-blue-100"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100"
                   >
                     <Sparkles size={12} />
                     <span>{name}</span>
                   </span>
                 );
               })
+            ) : preferredDomain ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-diu-blue text-xs font-semibold border border-blue-100">
+                <Sparkles size={12} />
+                <span>{preferredDomain}</span>
+              </span>
             ) : (
               <p className="text-xs text-slate-400 italic">
                 No research domains selected yet. Click "Update Preferences" to define your topics.
               </p>
             )}
           </div>
+
+          {/* Subdomains & Specialized Paradigms */}
+          {subdomains.length > 0 && (
+            <div className="pt-2">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                Specialized Methodologies & Subdomains:
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {subdomains.map((sub, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-[11px] font-medium border border-slate-200"
+                  >
+                    #{sub}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Project Title & Bio */}

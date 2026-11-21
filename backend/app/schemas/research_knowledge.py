@@ -158,6 +158,16 @@ class RegisterThesisTopicRequest(BaseModel):
     title: str
     domain: Optional[str] = None
 
+class SuggestedTopicOut(BaseModel):
+    title: str
+    domain: str
+    subdomain: Optional[str] = None
+    novelty_angle: str
+    recommended_datasets: str
+    suggested_methodology: str
+    expected_contributions: str
+    difficulty_level: str = "Moderate"
+
 # --- Personal Reading List / Library Schemas ---
 class SavedPaperCreate(BaseModel):
     title: str
@@ -217,5 +227,6 @@ class DomainAuditResponse(BaseModel):
     missing_headers: List[str]
     server_technologies: List[str]
     ai_analysis_summary: str
+    audit_sections: Optional[Dict[str, str]] = None
     raw_status_code: Optional[int] = None
     audit_timestamp: datetime = datetime.utcnow()

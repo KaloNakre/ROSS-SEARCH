@@ -10,19 +10,38 @@ export const DEPARTMENTS = [
 ];
 
 export const RESEARCH_DOMAINS = [
-  { id: "ml",         name: "Machine Learning",            category: "Artificial Intelligence" },
-  { id: "ds",         name: "Data Science",                category: "Data Analytics" },
-  { id: "cyber",      name: "Cyber Security",              category: "Security & Networks" },
-  { id: "robotics",   name: "AI & Robotics",               category: "Artificial Intelligence" },
-  { id: "nlp",        name: "Natural Language Processing", category: "Artificial Intelligence" },
-  { id: "cv",         name: "Computer Vision",             category: "Artificial Intelligence" },
-  { id: "iot",        name: "Internet of Things",          category: "Embedded Systems" },
-  { id: "cloud",      name: "Cloud Computing",             category: "Distributed Systems" },
-  { id: "bio",        name: "Bioinformatics",              category: "Interdisciplinary" },
-  { id: "blockchain", name: "Blockchain",                  category: "Security & Networks" },
-  { id: "hci",        name: "Human-Computer Interaction",  category: "Software Systems" },
-  { id: "others",     name: "Others",                      category: "General" },
+  { id: "cyber",      name: "Cybersecurity",               category: "Security & Privacy" },
+  { id: "ai",         name: "Artificial Intelligence",      category: "Intelligence & Cognition" },
+  { id: "ml",         name: "Machine Learning",             category: "Applied Algorithms" },
+  { id: "dl",         name: "Deep Learning",                category: "Neural Architectures" },
+  { id: "nlp",        name: "Natural Language Processing",  category: "Language & Linguistics" },
+  { id: "cv",         name: "Computer Vision",              category: "Perception & Imagery" },
+  { id: "iot",        name: "Internet of Things",           category: "Embedded & Edge" },
+  { id: "blockchain", name: "Blockchain",                   category: "Distributed Ledgers" },
+  { id: "cloud",      name: "Cloud Computing",              category: "Cloud & DevOps" },
+  { id: "se",         name: "Software Engineering",         category: "Systems & Architecture" },
+  { id: "ds",         name: "Data Science",                 category: "Data Analytics" },
+  { id: "robotics",   name: "Robotics",                     category: "Autonomous Systems" },
+  { id: "edge_ai",    name: "Edge AI",                      category: "Embedded & Edge" },
+  { id: "net_sec",    name: "Network Security",             category: "Security & Privacy" },
+  { id: "info_sec",   name: "Information Security",         category: "Security & Privacy" },
 ];
+
+export const RESEARCH_SUBDOMAINS = [
+  "SCADA & Industrial Control Security",
+  "Zero-Trust Cloud Architecture",
+  "Large Language Models & Transformers",
+  "Low-Resource Bengali NLP",
+  "Real-Time Object Detection (YOLO)",
+  "Medical Image Segmentation (U-Net)",
+  "Federated Learning & Differential Privacy",
+  "Edge Quantization (INT8) on IoT Devices",
+  "Smart Contracts & Decentralized Storage (IPFS)",
+  "Explainable AI (XAI) & Attribution",
+  "Autonomous Robotic Navigation",
+  "Time-Series Telemetry Anomaly Detection"
+];
+
 
 export const SECTIONS = [
   "40_A", "40_B", "40_C",
