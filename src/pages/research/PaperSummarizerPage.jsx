@@ -1,10 +1,10 @@
 /**
- * ROSS-SEARCH: Module 2 — AI Research Paper PDF Summarizer
+ * ROSS-SEARCH: Module 2 — AI Research Paper PDF Summarizer & Intelligence Engine
  * Contributor: Md. Robayet Islam (ID: 232-35-809)
- * Description: Extracts text from uploaded research paper PDFs using PyMuPDF and AI
- * (Google Gemini / Groq / Neural NLP) to generate a 9-point structured summary:
- * Problem, Objectives, Methodology, Dataset, Model/Technology, Findings,
- * Limitations, Research Gap, and Future Work.
+ * Description: Extracts and analyzes research paper PDFs using PyMuPDF and multi-model AI
+ * (Google Gemini 1.5 Flash/Pro, Groq Llama 3.3, and offline Neural NLP) to produce
+ * a rigorous 20-Point Academic Research Breakdown.
+ * Enforces strict academic honesty: unstated metrics are explicitly flagged as 'Not reported in the paper'.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -30,136 +30,22 @@ import {
   FileText,
   Share2,
   Key,
+  ShieldCheck,
+  Globe,
+  ExternalLink,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Download
 } from 'lucide-react';
 import { module2Service } from '../../services/module2Service';
 import { useAuth } from '../../context/AuthContext';
 
-const PRELOADED_PAPERS = [
-  {
-    id: 1,
-    title: "Deep Autoencoder and Random Forest Ensembles for SCADA Cyber-Physical Threat Detection",
-    domain: "Cyber Security",
-    authors: "Dr. Sheak Rashed Haider Noori, Farzana Akter, Mehedi Hasan",
-    text: `Deep Autoencoder and Random Forest Ensembles for SCADA Cyber-Physical Threat Detection
-Authors: Dr. Sheak Rashed Haider Noori, Farzana Akter, Mehedi Hasan
-Published in: IEEE Transactions on Industrial Informatics (2024)
-
-Abstract:
-Industrial Control Systems (ICS) and SCADA environments are increasingly targeted by sophisticated zero-day cyber-physical attacks. This paper develops a semi-supervised pipeline employing deep variational autoencoders for network anomaly synthesis coupled with a cost-sensitive Random Forest classifier.
-
-1. Problem Statement:
-Industrial SCADA networks controlling critical power grids face high-frequency multi-stage injection attacks. Traditional signature-based firewalls fail against zero-day packet mutations, while static threshold rules yield unacceptable false positive rates that cause severe operational downtime.
-
-2. Objectives:
-1. Design an unsupervised deep autoencoder capable of reconstructing normal telemetry states.
-2. Formulate an ensemble Random Forest classifier to categorize attack vectors (e.g. DoS, MitM, data manipulation).
-3. Achieve sub-second packet classification with an overall detection rate exceeding 95% on realistic industrial benchmarks.
-
-3. Methodology:
-We deploy a two-stage hybrid pipeline. Stage 1 utilizes a 5-layer Deep Variational Autoencoder (VAE) trained exclusively on benign Modbus/DNP3 telemetry to generate reconstruction error vectors. Stage 2 feeds the reconstruction deviations alongside statistical packet flow metrics into a 200-tree cost-sensitive Random Forest ensemble with 10-fold stratified cross-validation.
-
-4. Dataset:
-Evaluated on the benchmark Tennessee Eastman Process SCADA dataset combined with the Mississippi State University Industrial Control Systems telemetry corpus comprising 125,000 multi-variable flow and pressure sensor readings.
-
-5. Model / Technology:
-Deep Variational Autoencoders (VAE) with LeakyReLU activations, Scikit-learn Cost-Sensitive Random Forest, PyTorch 2.2, Snort network packet inspection, and Python 3.12.
-
-6. Findings:
-Achieved 97.4% overall attack detection accuracy, 96.8% Macro F1-score, and reduced false alarms by 40% compared to standard one-class SVM baselines. Mean packet inspection latency is 14.2 milliseconds.
-
-7. Limitations:
-Requires high initial memory overhead for autoencoder latent space projections during peak network burst traffic, and sensitivity to noisy sensor telemetry during cold system boot.
-
-8. Research Gap:
-Absence of dynamic online continual learning to adapt to evolving attacker strategies without full model retraining, and lack of hardware explainability (XAI) on embedded programmable logic controllers (PLCs).
-
-9. Future Work:
-Deployment on edge hardware microcontrollers (e.g. Raspberry Pi 4, Jetson Orin Nano) with INT8 quantization, and exploring federated learning across isolated municipal utility grids.`
-  },
-  {
-    id: 2,
-    title: "BanglaBERT: Language Model Pretraining for Low-Resource Bengali Natural Language Processing",
-    domain: "Natural Language Processing",
-    authors: "Md. Robayet Islam, Sakib Hasan, Prof. Dr. Syed Akhter Hossain",
-    text: `BanglaBERT: Language Model Pretraining for Low-Resource Bengali Natural Language Processing
-Authors: Md. Robayet Islam, Sakib Hasan, Prof. Dr. Syed Akhter Hossain
-Published in: Findings of the Association for Computational Linguistics (ACL 2024)
-
-Abstract:
-Pretrained language models have revolutionized NLP, but morphologically rich languages like Bengali suffer from sub-optimal vocabularies in multilingual models. We propose BanglaBERT, pretrained on 45GB of curated clean Bengali text using dedicated morphological tokenization.
-
-1. Problem Statement:
-Multilingual language models such as mBERT and XLM-RoBERTa allocate less than 2% of their vocabulary to Bengali tokens, resulting in excessive subword fragmentation, degraded contextual embeddings, and severe out-of-vocabulary penalties in complex syntactic sentences.
-
-2. Objectives:
-1. Build a high-quality 45GB clean Bengali corpus spanning news, literature, Wikipedia, and social forums.
-2. Train a monolingual 110M parameter Bidirectional Transformer with a dedicated 32,000 Bengali WordPiece vocabulary.
-3. Benchmark across 8 downstream tasks: Sentiment Analysis, Named Entity Recognition, POS Tagging, Natural Language Inference, and Question Answering.
-
-3. Methodology:
-Masked Language Modeling (MLM) with 15% dynamic token masking and Next Sentence Prediction. Model training was conducted on 8 NVIDIA A100 GPUs using mixed precision FP16 and AdamW optimizer over 1 million steps.
-
-4. Dataset:
-45GB text corpus (approx. 4.8 billion tokens) curated from 15 online portals, evaluated on Bengali GLUE, SentNoB sentiment dataset, and DIU Bengali NER corpus.
-
-5. Model / Technology:
-12-layer Transformer Encoder (110M params), PyTorch, Hugging Face Transformers, Tokenizers library, CUDA 12.1.
-
-6. Findings:
-Established new state-of-the-art results across all 8 benchmarks with an average Macro F1 of 86.4%, outperforming mBERT by 6.8% and XLM-RoBERTa by 4.2% while reducing inference token length by 32%.
-
-7. Limitations:
-Pretraining requires substantial compute infrastructure (over 180 GPU hours), and performance remains susceptible to Romanized phonetic Bengali (Banglish) slang in informal conversational text.
-
-8. Research Gap:
-Lack of robust parameter-efficient adapters (LoRA) for low-resource Bengali dialects and lack of instruction-tuned generative models for abstractive summarization.
-
-9. Future Work:
-Extend to instruction-following conversational agents (BanglaGPT) and develop parameter-efficient PEFT adapters for lightweight edge deployment on mobile devices.`
-  },
-  {
-    id: 3,
-    title: "Zero-Trust Architecture and Micro-Segmentation for Kubernetes Cloud Workloads",
-    domain: "Cyber Security",
-    authors: "Tariqul Islam, Dr. S. M. Aminul Haque, Nusrat Jahan",
-    text: `Zero-Trust Architecture and Micro-Segmentation for Kubernetes Cloud Workloads
-Authors: Tariqul Islam, Dr. S. M. Aminul Haque, Nusrat Jahan
-Published in: ACM CCS 2025
-
-Abstract:
-Cloud-native microservices rely on flat internal network routing, which facilitates lateral cyber-attack movement when an edge pod is breached. We present an eBPF-driven zero-trust kernel policy enforcement engine that dynamically synthesizes micro-segmentation rules based on cryptographic pod identity.
-
-1. Problem Statement:
-Traditional perimeter firewalls are blind to east-west internal container traffic. Once an attacker gains a reverse shell in a frontend container, flat Kubernetes networking permits unfettered lateral traversal to backend databases and secret stores.
-
-2. Objectives:
-1. Eliminate IP-based security policies in favor of cryptographic SPIFFE/SPIRE workload identities.
-2. Implement eBPF kernel hooks to inspect and filter Layer 4 and Layer 7 network packets with zero userspace context switching.
-3. Automatically generate least-privilege network policies using dynamic traffic discovery.
-
-3. Methodology:
-eBPF bytecode programs injected into the Linux kernel socket layer intercept connect() and accept() syscalls. Workload cryptographic identities are validated via mTLS x509 SVID certificates issued by a local SPIRE agent. Unregistered network flows are dropped at the kernel boundary before reaching userspace.
-
-4. Dataset:
-Simulated multi-tier e-commerce microservices benchmark running across a 50-node Kubernetes cluster under automated Red-Team lateral movement penetration attacks.
-
-5. Model / Technology:
-Linux eBPF (Cilium kernel runtime), SPIFFE/SPIRE, Golang control plane, Kubernetes v1.28, Prometheus metrics.
-
-6. Findings:
-Completely prevented 100% of simulated lateral movement and credential theft attacks with less than 2.1% CPU overhead and an added packet latency of under 0.4 milliseconds.
-
-7. Limitations:
-Requires modern Linux kernel versions (5.10+) with BPF CO-RE support, and complex initial policy bootstrapping for legacy stateful services.
-
-8. Research Gap:
-Absence of automated zero-trust anomaly detection based on runtime system call sequences within the eBPF kernel boundary.
-
-9. Future Work:
-Incorporate lightweight anomaly detection autoencoders directly into BPF maps to detect zero-day syscall anomalies without control-plane roundtrips.`
-  }
+const MODEL_OPTIONS = [
+  { id: "auto", name: "Auto Select (Cloud Gemini / Groq / Neural NLP)", desc: "Optimal balance of latency and reasoning depth" },
+  { id: "gemini-1.5-flash", name: "Google Gemini 1.5 Flash (Cloud AI)", desc: "1,000,000 token context window, multimodal reasoning" },
+  { id: "gemini-1.5-pro", name: "Google Gemini 1.5 Pro (Deep Academic Reasoning)", desc: "2,000,000 token window, high-precision mathematical extraction" },
+  { id: "groq-llama-3.3-70b", name: "Groq Cloud (Llama-3.3-70B Versatile)", desc: "Ultra-fast low-latency token inference" },
+  { id: "neural-nlp-offline", name: "PyMuPDF Academic Neural NLP Engine (Offline)", desc: "100% resilient deterministic offline extraction, zero API keys required" }
 ];
 
 export const PaperSummarizerPage = () => {
@@ -167,533 +53,657 @@ export const PaperSummarizerPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [inputMode, setInputMode] = useState('select'); // 'select' | 'upload' | 'text'
-  const [selectedPreloadedId, setSelectedPreloadedId] = useState(1);
-  const [pdfFile, setPdfFile] = useState(null);
+  const [inputMode, setInputMode] = useState('upload'); // 'upload' | 'url' | 'text'
+  const [file, setFile] = useState(null);
+  const [paperUrl, setPaperUrl] = useState('');
   const [rawText, setRawText] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [showAiSettings, setShowAiSettings] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('auto');
+  const [customApiKey, setCustomApiKey] = useState('');
+  const [showKeyInput, setShowKeyInput] = useState(false);
 
-  const [analyzing, setAnalyzing] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
-  const [summaryData, setSummaryData] = useState(null);
-  const [copied, setCopied] = useState(false);
-  const [savedToDb, setSavedToDb] = useState(false);
-  const [savingLoading, setSavingLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState(null);
+  const [error, setError] = useState(null);
+  const [copiedKey, setCopiedKey] = useState(null);
+  const [savedToShared, setSavedToShared] = useState(false);
 
-  // Check URL parameters if redirected from Research Discovery
+  // Check if routed with a paper URL or title from Research Discovery
   useEffect(() => {
-    const paperId = searchParams.get('paperId');
-    const title = searchParams.get('title');
-    if (paperId) {
-      const match = PRELOADED_PAPERS.find(p => p.id === Number(paperId));
-      if (match) {
-        setSelectedPreloadedId(match.id);
-        setInputMode('select');
-      }
-    } else if (title) {
-      setInputMode('text');
-      setRawText(`Title: ${decodeURIComponent(title)}\n\nAbstract:\nThis academic research paper investigates key methodologies, experimental benchmarks, and empirical validations in the chosen academic domain.`);
+    const urlParam = searchParams.get('paperUrl');
+    const titleParam = searchParams.get('title');
+    if (urlParam) {
+      setPaperUrl(urlParam);
+      setInputMode('url');
     }
   }, [searchParams]);
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-        setErrorMsg('Please upload a valid PDF document.');
+    const selected = e.target.files[0];
+    if (selected) {
+      if (!selected.name.toLowerCase().endsWith('.pdf')) {
+        setError('Please select an authentic PDF file (.pdf).');
         return;
       }
-      setPdfFile(file);
-      setErrorMsg('');
+      setFile(selected);
+      setError(null);
     }
   };
 
-  const handleAnalyze = async () => {
-    setErrorMsg('');
-    setSummaryData(null);
-    setSavedToDb(false);
+  const handleAnalyze = async (e) => {
+    if (e) e.preventDefault();
+    setError(null);
+    setLoading(true);
+    setSummary(null);
+    setSavedToShared(false);
 
-    let textToSend = null;
-    let fileToSend = null;
-
-    if (inputMode === 'select') {
-      const paper = PRELOADED_PAPERS.find(p => p.id === Number(selectedPreloadedId));
-      if (!paper) {
-        setErrorMsg('Please select a paper from the list.');
-        return;
-      }
-      textToSend = paper.text;
-    } else if (inputMode === 'upload') {
-      if (!pdfFile) {
-        setErrorMsg('Please select a PDF file to analyze.');
-        return;
-      }
-      fileToSend = pdfFile;
-    } else if (inputMode === 'text') {
-      if (!rawText.trim()) {
-        setErrorMsg('Please enter or paste research paper text.');
-        return;
-      }
-      textToSend = rawText;
-    }
-
-    setAnalyzing(true);
     try {
-      const result = await module2Service.summarizePaper({
-        file: fileToSend,
-        rawText: textToSend,
-        apiKey: apiKey.trim() || null
-      });
-      setSummaryData(result);
+      let payload = {
+        modelChoice: selectedModel,
+        apiKey: customApiKey
+      };
+
+      if (inputMode === 'upload') {
+        if (!file) throw new Error('Please select a research paper PDF file to upload.');
+        payload.file = file;
+      } else if (inputMode === 'url') {
+        if (!paperUrl.trim()) throw new Error('Please enter a valid open-access paper URL.');
+        payload.paperUrl = paperUrl.trim();
+      } else {
+        if (!rawText.trim() || rawText.trim().length < 80) {
+          throw new Error('Please enter at least 80 characters of academic paper text.');
+        }
+        payload.rawText = rawText.trim();
+      }
+
+      const res = await module2Service.summarizePaper(payload);
+      setSummary(res);
     } catch (err) {
-      setErrorMsg(err.message || 'Error occurred while analyzing the paper.');
+      setError(err.message || 'Failed to analyze paper.');
     } finally {
-      setAnalyzing(false);
+      setLoading(false);
     }
+  };
+
+  const handleCopy = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
   const handleSaveToShared = async () => {
-    if (!summaryData) return;
-    setSavingLoading(true);
+    if (!summary) return;
     try {
       await module2Service.saveToSharedKnowledge({
-        title: summaryData.title || 'Analyzed Research Paper',
-        authors: summaryData.authors || 'Document Authors',
-        year: summaryData.year || 2026,
-        domain: summaryData.domain || 'Machine Learning',
-        uploaded_by_name: user?.full_name || 'Md. Robayet Islam',
-        uploaded_by_id: user?.student_id || '232-35-809',
-        file_name: pdfFile ? pdfFile.name : `${summaryData.title.slice(0, 30)}.pdf`,
-        problem_statement: summaryData.problem_statement,
-        objectives: summaryData.objectives,
-        methodology: summaryData.methodology,
-        dataset: summaryData.dataset,
-        model_technology: summaryData.model_technology,
-        findings: summaryData.findings,
-        limitations: summaryData.limitations,
-        research_gap: summaryData.research_gap,
-        future_work: summaryData.future_work
+        title: summary.title || "Academic Research Paper",
+        authors: summary.authors || "Identified in Document Metadata",
+        year: summary.year || 2026,
+        domain: summary.domain || "Computer Science",
+        uploaded_by_name: user?.full_name || "DIU Student",
+        uploaded_by_id: user?.student_id || "232-35-809",
+        file_name: file ? file.name : (inputMode === 'url' ? paperUrl : 'text_submission.txt'),
+        abstract: summary.abstract || summary.research_problem,
+        // 20 Academic points
+        research_objective: summary.research_objective,
+        research_problem: summary.research_problem,
+        research_gap: summary.research_gap,
+        research_motivation: summary.research_motivation,
+        proposed_methodology: summary.proposed_methodology,
+        dataset_description: summary.dataset_description,
+        dataset_size: summary.dataset_size,
+        features_parameters: summary.features_parameters,
+        models_algorithms: summary.models_algorithms,
+        experimental_setup: summary.experimental_setup,
+        evaluation_metrics: summary.evaluation_metrics,
+        experimental_results: summary.experimental_results,
+        accuracy_performance: summary.accuracy_performance,
+        strengths: summary.strengths,
+        limitations: summary.limitations,
+        future_directions: summary.future_directions,
+        novel_contributions: summary.novel_contributions,
+        related_work: summary.related_work,
+        important_findings: summary.important_findings,
+        research_opportunities: summary.research_opportunities,
+        // Legacy fields
+        problem_statement: summary.research_problem,
+        objectives: summary.research_objective,
+        methodology: summary.proposed_methodology,
+        dataset: summary.dataset_description,
+        model_technology: summary.models_algorithms,
+        findings: summary.experimental_results,
+        future_work: summary.future_directions
       });
-      setSavedToDb(true);
+      setSavedToShared(true);
     } catch (err) {
-      alert(err.message || 'Could not save to shared database.');
-    } finally {
-      setSavingLoading(false);
+      alert("Failed to save to shared knowledge: " + err.message);
     }
-  };
-
-  const handleCopySummary = () => {
-    if (!summaryData) return;
-    const text = `
-=== ROSS-SEARCH 9-POINT STRUCTURED PAPER SUMMARY ===
-Paper: ${summaryData.title}
-Domain: ${summaryData.domain}
-AI Engine: ${summaryData.ai_engine || 'AI Engine'}
-
-1. Problem Statement:
-${summaryData.problem_statement}
-
-2. Objectives:
-${summaryData.objectives}
-
-3. Methodology:
-${summaryData.methodology}
-
-4. Dataset:
-${summaryData.dataset}
-
-5. Model / Technology:
-${summaryData.model_technology}
-
-6. Findings:
-${summaryData.findings}
-
-7. Limitations:
-${summaryData.limitations}
-
-8. Research Gap:
-${summaryData.research_gap}
-
-9. Future Work:
-${summaryData.future_work}
-    `.trim();
-
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <div className="space-y-6 pb-16">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-purple-800 to-indigo-900 rounded-2xl p-6 lg:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-r from-diu-blue via-diu-dark to-slate-900 rounded-2xl p-6 lg:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-xs mb-3 border border-white/20">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>AI Research Paper Analyzer — PyMuPDF & Gemini/Groq LLM</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/20 text-cyan-200 text-xs font-semibold mb-3 border border-cyan-400/30">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+            <span>Module 2: [Robayet Islam – ID: 809] AI Paper Summarizer Engine</span>
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">
-            Automated 9-Point Structured Paper Summarizer
+            20-Point AI Research Paper Breakdown
           </h1>
-          <p className="text-purple-200 text-sm leading-relaxed">
-            Select an academic paper, upload a PDF, or paste text to instantly extract the fundamental research pillars: 
-            <strong> Problem Statement, Objectives, Methodology, Dataset, Model, Findings, Limitations, Research Gap, and Future Scope</strong>.
+          <p className="text-slate-300 text-sm leading-relaxed mb-4">
+            Upload an authentic research paper PDF or enter an arXiv link. The engine extracts true academic sections using PyMuPDF and synthesizes a comprehensive 20-point analysis covering objectives, datasets, architectures, quantitative metrics, and research gaps.
           </p>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
+            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/15">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Strict Academic Honesty (Zero Fabrications)
+            </span>
+            <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/15">
+              <Cpu className="w-3.5 h-3.5 text-cyan-400" /> Google Gemini 1.5 • Groq Llama 3.3 • Neural NLP
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Input Selection Card */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs">
-        <div className="flex flex-wrap items-center justify-between border-b border-slate-200 pb-3 mb-5 gap-3">
-          <div className="flex gap-4">
-            <button
-              onClick={() => setInputMode('select')}
-              className={`text-xs font-bold pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
-                inputMode === 'select'
-                  ? 'border-purple-600 text-purple-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Select Discovered Paper</span>
-            </button>
-            <button
-              onClick={() => setInputMode('upload')}
-              className={`text-xs font-bold pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
-                inputMode === 'upload'
-                  ? 'border-purple-600 text-purple-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <FileUp className="w-4 h-4" />
-              <span>Upload PDF Document</span>
-            </button>
-            <button
-              onClick={() => setInputMode('text')}
-              className={`text-xs font-bold pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
-                inputMode === 'text'
-                  ? 'border-purple-600 text-purple-700'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>Paste Paper Text</span>
-            </button>
-          </div>
-
-          {/* AI Settings Toggle */}
+      {/* Input Selector Card */}
+      <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        {/* Mode Selector Tabs */}
+        <div className="flex gap-2 border-b border-slate-200 pb-4 mb-5">
           <button
-            onClick={() => setShowAiSettings(!showAiSettings)}
-            className="text-xs text-purple-700 hover:text-purple-900 font-semibold flex items-center gap-1 bg-purple-50 px-3 py-1.5 rounded-lg border border-purple-200"
+            type="button"
+            onClick={() => setInputMode('upload')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              inputMode === 'upload'
+                ? "bg-diu-blue text-white shadow-sm"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
           >
-            <Key className="w-3.5 h-3.5 text-purple-600" />
-            <span>AI Model & Key Settings</span>
-            {showAiSettings ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            <FileUp className="w-4 h-4" />
+            <span>Upload PDF File</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setInputMode('url')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              inputMode === 'url'
+                ? "bg-diu-blue text-white shadow-sm"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            <Globe className="w-4 h-4" />
+            <span>Open-Access PDF URL (arXiv)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setInputMode('text')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+              inputMode === 'text'
+                ? "bg-diu-blue text-white shadow-sm"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Paste Paper Text</span>
           </button>
         </div>
 
-        {/* Collapsible AI API Key Settings */}
-        {showAiSettings && (
-          <div className="mb-5 p-4 bg-purple-50/50 rounded-xl border border-purple-200 text-xs space-y-2 animate-fadeIn">
-            <div className="flex items-center gap-2 font-bold text-purple-900">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              <span>Configure AI Engine (Google Gemini / Groq Cloud / Local Neural NLP)</span>
+        {/* Input Controls */}
+        <form onSubmit={handleAnalyze} className="space-y-4">
+          {inputMode === 'upload' && (
+            <div className="border-2 border-dashed border-slate-300 hover:border-diu-blue rounded-xl p-8 text-center transition-all bg-slate-50/50">
+              <FileUp className="w-10 h-10 text-slate-400 mx-auto mb-2" />
+              <p className="text-sm font-semibold text-slate-700 mb-1">
+                {file ? file.name : "Select an authentic academic research paper PDF"}
+              </p>
+              <p className="text-xs text-slate-400 mb-4">Supported format: .pdf (Max 25MB)</p>
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-diu-blue hover:bg-diu-dark text-white rounded-lg text-xs font-bold transition-all shadow-xs">
+                <span>Browse Local PDF</span>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </label>
             </div>
-            <p className="text-slate-600">
-              By default, the platform uses our built-in <strong>PyMuPDF Neural NLP Engine</strong> (100% resilient & offline).
-              If you have a <strong>Google Gemini API Key</strong> or <strong>Groq API Key</strong>, you can paste it below to enable live cloud LLM reasoning!
-            </p>
-            <div className="flex gap-2 pt-1">
+          )}
+
+          {inputMode === 'url' && (
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Direct Open-Access PDF URL
+              </label>
+              <input
+                type="url"
+                value={paperUrl}
+                onChange={(e) => setPaperUrl(e.target.value)}
+                placeholder="https://arxiv.org/pdf/1706.03762.pdf"
+                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-diu-blue"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                Supports arXiv, Crossref, and verified open-access URLs with strict SSRF protection.
+              </p>
+            </div>
+          )}
+
+          {inputMode === 'text' && (
+            <div>
+              <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                Raw Academic Paper Content
+              </label>
+              <textarea
+                rows={6}
+                value={rawText}
+                onChange={(e) => setRawText(e.target.value)}
+                placeholder="Paste the title, abstract, methodology, dataset, and experimental results here..."
+                className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-diu-blue font-mono"
+              />
+            </div>
+          )}
+
+          {/* AI Model Configuration Row */}
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-diu-blue" />
+              <span className="font-bold text-slate-700">AI Model:</span>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-800 font-medium focus:outline-none focus:ring-1 focus:ring-diu-blue"
+              >
+                {MODEL_OPTIONS.map(opt => (
+                  <option key={opt.id} value={opt.id}>{opt.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowKeyInput(!showKeyInput)}
+              className="text-xs text-slate-600 hover:text-diu-blue font-semibold flex items-center gap-1"
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span>{showKeyInput ? "Hide Custom API Key" : "Add Custom API Key (Optional)"}</span>
+              {showKeyInput ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+
+          {showKeyInput && (
+            <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200 text-xs">
+              <label className="block font-semibold text-amber-900 mb-1">
+                Custom Gemini or Groq API Key (Optional)
+              </label>
               <input
                 type="password"
-                placeholder="Paste optional Gemini (AIzaSy...) or Groq (gsk_...) API key here"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="flex-1 px-3.5 py-2 bg-white border border-purple-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-purple-600"
+                value={customApiKey}
+                onChange={(e) => setCustomApiKey(e.target.value)}
+                placeholder="AIzaSy... or gsk_..."
+                className="w-full bg-white border border-amber-300 rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
               />
-              <button
-                type="button"
-                onClick={() => alert(apiKey ? 'AI API Key attached for analysis!' : 'Cleared. Will use built-in Neural NLP Engine.')}
-                className="px-4 py-2 bg-purple-700 text-white font-bold rounded-lg text-xs hover:bg-purple-600"
-              >
-                Apply Key
-              </button>
+              <p className="text-[10.5px] text-amber-700 mt-1">
+                Key remains securely in memory during this request. If omitted, ROSS-SEARCH uses configured server credentials or PyMuPDF Neural NLP engine.
+              </p>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Mode 1: Select Discovered Paper */}
-        {inputMode === 'select' && (
-          <div className="space-y-4">
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-              Choose from Published Repository Papers:
-            </label>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {PRELOADED_PAPERS.map((p) => (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedPreloadedId(p.id)}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
-                    selectedPreloadedId === p.id
-                      ? 'border-purple-600 bg-purple-50/60 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  }`}
-                >
-                  <div>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-800 mb-2 inline-block">
-                      {p.domain}
-                    </span>
-                    <h4 className="text-xs font-bold text-slate-900 leading-snug mb-1">
-                      {p.title}
-                    </h4>
-                    <p className="text-[11px] text-slate-500">
-                      {p.authors}
-                    </p>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] font-semibold text-purple-700">
-                    <span>{selectedPreloadedId === p.id ? '✓ Selected for AI Analysis' : 'Click to Select'}</span>
-                  </div>
-                </div>
-              ))}
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+              <span>{error}</span>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Mode 2: Upload PDF */}
-        {inputMode === 'upload' && (
-          <div className="border-2 border-dashed border-purple-200 hover:border-purple-400 bg-purple-50/30 rounded-xl p-8 text-center transition-all">
-            <input
-              type="file"
-              id="paper-file-upload"
-              accept=".pdf,application/pdf"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <label
-              htmlFor="paper-file-upload"
-              className="cursor-pointer flex flex-col items-center justify-center space-y-3"
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-3 bg-diu-blue hover:bg-diu-dark text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
             >
-              <div className="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shadow-xs">
-                <FileUp className="w-7 h-7" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-slate-800">
-                  {pdfFile ? pdfFile.name : 'Click to upload research paper PDF'}
-                </p>
-                <p className="text-xs text-slate-500 mt-1">
-                  PyMuPDF will extract text and map all 9 academic sections automatically
-                </p>
-              </div>
-            </label>
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Extracting & Synthesizing 20-Point Analysis...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-cyan-300" />
+                  <span>Execute 20-Point AI Research Breakdown</span>
+                </>
+              )}
+            </button>
           </div>
-        )}
-
-        {/* Mode 3: Paste Text */}
-        {inputMode === 'text' && (
-          <div>
-            <textarea
-              rows={8}
-              placeholder="Paste research paper abstract, methodology, results, or full content here..."
-              value={rawText}
-              onChange={(e) => setRawText(e.target.value)}
-              className="w-full p-4 border border-slate-200 rounded-xl text-xs font-mono text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-purple-600"
-            />
-          </div>
-        )}
-
-        {/* Error Notification */}
-        {errorMsg && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {/* Submit Button */}
-        <div className="mt-5 flex justify-end">
-          <button
-            onClick={handleAnalyze}
-            disabled={analyzing}
-            className="px-6 py-3 bg-purple-700 hover:bg-purple-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center gap-2"
-          >
-            {analyzing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Extracting Text via PyMuPDF & Running AI Analysis...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Generate 9-Point Structured Summary with AI</span>
-              </>
-            )}
-          </button>
-        </div>
+        </form>
       </div>
 
-      {/* ── 9-POINT STRUCTURED SUMMARY RESULTS ── */}
-      {summaryData && (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 lg:p-8 space-y-6 animate-fadeIn">
-          {/* Header & Meta */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800">
-                  {summaryData.domain}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  <span>Engine: {summaryData.ai_engine || 'AI Engine'}</span>
-                </span>
+      {/* ── 20-POINT STRUCTURED RESEARCH ANALYSIS RESULTS ── */}
+      {summary && (
+        <div className="space-y-6">
+          {/* Paper Metadata & Engine Header */}
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                    {summary.domain || "Computer Science"}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span>Academic Integrity Grounded</span>
+                  </span>
+                </div>
+                <h2 className="text-xl font-bold text-slate-900 leading-snug">
+                  {summary.title || "Analyzed Academic Paper"}
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Authors: {summary.authors || "Identified in Document Metadata"} ({summary.year || 2026})
+                </p>
               </div>
 
-              <h2 className="text-xl font-bold text-slate-900">
-                {summaryData.title}
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Academic 9-Section Evaluation • {summaryData.authors}
-              </p>
+              <div className="text-right">
+                <div className="text-[11px] font-bold text-cyan-700 bg-cyan-50 px-3 py-1 rounded-lg border border-cyan-200 inline-block mb-2">
+                  Engine: {summary.ai_engine || "Google Gemini 1.5 Flash"}
+                </div>
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={handleSaveToShared}
+                    disabled={savedToShared}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs ${
+                      savedToShared
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                        : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                    }`}
+                  >
+                    {savedToShared ? (
+                      <>
+                        <BookmarkCheck className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>Saved to Shared Knowledge</span>
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="w-3.5 h-3.5" />
+                        <span>Share with Students</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigate(`/research/similarity?topic=${encodeURIComponent(summary.title || '')}`);
+                    }}
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-200"
+                  >
+                    Check Similarity
+                  </button>
+                </div>
+              </div>
             </div>
 
-            {/* Actions Bar */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={handleCopySummary}
-                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5"
-              >
-                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? 'Copied!' : 'Copy Summary'}</span>
-              </button>
-              <button
-                onClick={handleSaveToShared}
-                disabled={savedToDb || savingLoading}
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                  savedToDb
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-300'
-                    : 'bg-diu-blue hover:bg-diu-dark text-white shadow-xs'
-                }`}
-              >
-                {savingLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : savedToDb ? (
-                  <>
-                    <BookmarkCheck className="w-4 h-4 text-emerald-600" />
-                    <span>Saved to Shared DB</span>
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="w-4 h-4" />
-                    <span>Save to Shared Knowledge DB</span>
-                  </>
-                )}
-              </button>
+            {/* Academic Honesty Notice */}
+            <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 leading-relaxed flex items-start gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div>
+                <strong>Academic Honesty Verification:</strong> All quantitative findings are grounded strictly in the document text. Missing benchmarks, dataset sample counts, or ablation parameters are explicitly marked as <em>"Not reported in the paper"</em> to prevent hallucination.
+              </div>
             </div>
           </div>
 
-          {/* 9 Structured Section Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* 1. Problem Statement */}
-            <div className="bg-red-50/50 border border-red-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-red-800 uppercase tracking-wider mb-2">
-                <Target className="w-4 h-4 text-red-600" />
-                <span>1. Problem Statement</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.problem_statement}
-              </p>
-            </div>
+          {/* The 20 Analysis Dimension Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* 1. Research Objective */}
+            <AnalysisCard
+              title="1. Research Objective & Goals"
+              icon={<Target className="w-4 h-4 text-blue-600" />}
+              content={summary.research_objective || summary.objectives}
+              badge="Goal Formulation"
+              onCopy={() => handleCopy(summary.research_objective || summary.objectives, 'obj')}
+              copied={copiedKey === 'obj'}
+            />
 
-            {/* 2. Objectives */}
-            <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-800 uppercase tracking-wider mb-2">
-                <Compass className="w-4 h-4 text-blue-600" />
-                <span>2. Objectives</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.objectives}
-              </p>
-            </div>
+            {/* 2. Research Problem */}
+            <AnalysisCard
+              title="2. Problem Statement & Bottlenecks"
+              icon={<AlertCircle className="w-4 h-4 text-red-600" />}
+              content={summary.research_problem || summary.problem_statement}
+              badge="Bottleneck"
+              onCopy={() => handleCopy(summary.research_problem || summary.problem_statement, 'prob')}
+              copied={copiedKey === 'prob'}
+            />
 
-            {/* 3. Methodology */}
-            <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2">
-                <Layers className="w-4 h-4 text-emerald-600" />
-                <span>3. Methodology</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.methodology}
-              </p>
-            </div>
+            {/* 3. Research Gap */}
+            <AnalysisCard
+              title="3. Unaddressed Research Gap"
+              icon={<Compass className="w-4 h-4 text-amber-600" />}
+              content={summary.research_gap}
+              badge="Literature Gap"
+              highlight="border-amber-200 bg-amber-50/20"
+              onCopy={() => handleCopy(summary.research_gap, 'gap')}
+              copied={copiedKey === 'gap'}
+            />
 
-            {/* 4. Dataset */}
-            <div className="bg-cyan-50/50 border border-cyan-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-cyan-800 uppercase tracking-wider mb-2">
-                <Database className="w-4 h-4 text-cyan-600" />
-                <span>4. Dataset</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.dataset}
-              </p>
-            </div>
+            {/* 4. Research Motivation */}
+            <AnalysisCard
+              title="4. Research Motivation & Significance"
+              icon={<TrendingUp className="w-4 h-4 text-indigo-600" />}
+              content={summary.research_motivation}
+              badge="Theoretical Impact"
+              onCopy={() => handleCopy(summary.research_motivation, 'mot')}
+              copied={copiedKey === 'mot'}
+            />
 
-            {/* 5. Model / Technology */}
-            <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-indigo-800 uppercase tracking-wider mb-2">
-                <Cpu className="w-4 h-4 text-indigo-600" />
-                <span>5. Model / Technology</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.model_technology}
-              </p>
-            </div>
+            {/* 5. Proposed Methodology */}
+            <AnalysisCard
+              title="5. Proposed Methodology & Pipeline"
+              icon={<Layers className="w-4 h-4 text-purple-600" />}
+              content={summary.proposed_methodology || summary.methodology}
+              badge="System Architecture"
+              onCopy={() => handleCopy(summary.proposed_methodology || summary.methodology, 'meth')}
+              copied={copiedKey === 'meth'}
+            />
 
-            {/* 6. Findings */}
-            <div className="bg-teal-50/50 border border-teal-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-teal-800 uppercase tracking-wider mb-2">
-                <TrendingUp className="w-4 h-4 text-teal-600" />
-                <span>6. Findings & Results</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.findings}
-              </p>
-            </div>
+            {/* 6. Dataset Description */}
+            <AnalysisCard
+              title="6. Dataset Provenance & Benchmarks"
+              icon={<Database className="w-4 h-4 text-emerald-600" />}
+              content={summary.dataset_description || summary.dataset}
+              badge="Corpus"
+              onCopy={() => handleCopy(summary.dataset_description || summary.dataset, 'data')}
+              copied={copiedKey === 'data'}
+            />
 
-            {/* 7. Limitations */}
-            <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-4">
-              <div className="flex items-center gap-2 text-xs font-bold text-orange-800 uppercase tracking-wider mb-2">
-                <AlertCircle className="w-4 h-4 text-orange-600" />
-                <span>7. Limitations</span>
-              </div>
-              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                {summaryData.limitations}
-              </p>
-            </div>
+            {/* 7. Dataset Size */}
+            <AnalysisCard
+              title="7. Dataset Size & Sample Volume"
+              icon={<Database className="w-4 h-4 text-emerald-700" />}
+              content={summary.dataset_size}
+              badge="Metrics"
+              onCopy={() => handleCopy(summary.dataset_size, 'dsize')}
+              copied={copiedKey === 'dsize'}
+            />
 
-            {/* 8. Research Gap (Highlighted in Amber/Gold) */}
-            <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-4 shadow-xs">
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">
-                <HelpCircle className="w-4 h-4 text-amber-600" />
-                <span>8. Research Gap (Opportunity for DIU Thesis)</span>
-              </div>
-              <p className="text-xs text-slate-900 font-medium leading-relaxed whitespace-pre-line">
-                {summaryData.research_gap}
-              </p>
-            </div>
-          </div>
+            {/* 8. Features & Parameters */}
+            <AnalysisCard
+              title="8. Feature Representation & Parameters"
+              icon={<Cpu className="w-4 h-4 text-cyan-600" />}
+              content={summary.features_parameters}
+              badge="Hyperparameters"
+              onCopy={() => handleCopy(summary.features_parameters, 'feat')}
+              copied={copiedKey === 'feat'}
+            />
 
-          {/* 9. Future Work */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              <span>9. Future Work & Next Steps</span>
-            </div>
-            <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-              {summaryData.future_work}
-            </p>
+            {/* 9. Models & Algorithms */}
+            <AnalysisCard
+              title="9. Models, Classifiers & Algorithms"
+              icon={<Cpu className="w-4 h-4 text-cyan-700" />}
+              content={summary.models_algorithms || summary.model_technology}
+              badge="Technology Stack"
+              onCopy={() => handleCopy(summary.models_algorithms || summary.model_technology, 'mod')}
+              copied={copiedKey === 'mod'}
+            />
+
+            {/* 10. Experimental Setup */}
+            <AnalysisCard
+              title="10. Experimental Setup & Hardware"
+              icon={<Layers className="w-4 h-4 text-slate-600" />}
+              content={summary.experimental_setup}
+              badge="Environment"
+              onCopy={() => handleCopy(summary.experimental_setup, 'exp')}
+              copied={copiedKey === 'exp'}
+            />
+
+            {/* 11. Evaluation Metrics */}
+            <AnalysisCard
+              title="11. Evaluation Metrics"
+              icon={<CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+              content={summary.evaluation_metrics}
+              badge="Measurement"
+              onCopy={() => handleCopy(summary.evaluation_metrics, 'eval')}
+              copied={copiedKey === 'eval'}
+            />
+
+            {/* 12. Experimental Results */}
+            <AnalysisCard
+              title="12. Quantitative Experimental Results"
+              icon={<CheckCircle2 className="w-4 h-4 text-emerald-700" />}
+              content={summary.experimental_results || summary.findings}
+              badge="Numerical Outcomes"
+              highlight="border-emerald-200 bg-emerald-50/20"
+              onCopy={() => handleCopy(summary.experimental_results || summary.findings, 'res')}
+              copied={copiedKey === 'res'}
+            />
+
+            {/* 13. Accuracy & Baseline Performance */}
+            <AnalysisCard
+              title="13. Accuracy & Baseline Comparison"
+              icon={<TrendingUp className="w-4 h-4 text-teal-600" />}
+              content={summary.accuracy_performance}
+              badge="Convergence"
+              onCopy={() => handleCopy(summary.accuracy_performance, 'acc')}
+              copied={copiedKey === 'acc'}
+            />
+
+            {/* 14. Strengths */}
+            <AnalysisCard
+              title="14. Methodological & Empirical Strengths"
+              icon={<CheckCircle2 className="w-4 h-4 text-blue-600" />}
+              content={summary.strengths}
+              badge="Strengths"
+              onCopy={() => handleCopy(summary.strengths, 'str')}
+              copied={copiedKey === 'str'}
+            />
+
+            {/* 15. Limitations */}
+            <AnalysisCard
+              title="15. Limitations & Constraints"
+              icon={<AlertCircle className="w-4 h-4 text-orange-600" />}
+              content={summary.limitations}
+              badge="Constraints"
+              onCopy={() => handleCopy(summary.limitations, 'lim')}
+              copied={copiedKey === 'lim'}
+            />
+
+            {/* 16. Future Directions */}
+            <AnalysisCard
+              title="16. Future Research Directions"
+              icon={<Compass className="w-4 h-4 text-indigo-600" />}
+              content={summary.future_directions || summary.future_work}
+              badge="Roadmap"
+              onCopy={() => handleCopy(summary.future_directions || summary.future_work, 'fut')}
+              copied={copiedKey === 'fut'}
+            />
+
+            {/* 17. Novel Scientific Contributions */}
+            <AnalysisCard
+              title="17. Novel Scientific Contributions"
+              icon={<Sparkles className="w-4 h-4 text-amber-500" />}
+              content={summary.novel_contributions}
+              badge="Originality"
+              onCopy={() => handleCopy(summary.novel_contributions, 'nov')}
+              copied={copiedKey === 'nov'}
+            />
+
+            {/* 18. Prior & Related Work */}
+            <AnalysisCard
+              title="18. Prior Literature & Baselines"
+              icon={<BookOpen className="w-4 h-4 text-slate-700" />}
+              content={summary.related_work}
+              badge="Related Work"
+              onCopy={() => handleCopy(summary.related_work, 'rel')}
+              copied={copiedKey === 'rel'}
+            />
+
+            {/* 19. Important Findings */}
+            <AnalysisCard
+              title="19. Key Findings & Theoretical Insights"
+              icon={<BookmarkCheck className="w-4 h-4 text-purple-600" />}
+              content={summary.important_findings || summary.findings}
+              badge="Takeaways"
+              onCopy={() => handleCopy(summary.important_findings || summary.findings, 'find')}
+              copied={copiedKey === 'find'}
+            />
+
+            {/* 20. Student Thesis / FYP Opportunities */}
+            <AnalysisCard
+              title="20. Student Thesis & FYP Opportunities"
+              icon={<Target className="w-4 h-4 text-emerald-600" />}
+              content={summary.research_opportunities || summary.research_gap}
+              badge="DIU Thesis Extension"
+              highlight="border-cyan-300 bg-cyan-50/20"
+              onCopy={() => handleCopy(summary.research_opportunities || summary.research_gap, 'opp')}
+              copied={copiedKey === 'opp'}
+            />
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const AnalysisCard = ({ title, icon, content, badge, highlight, onCopy, copied }) => {
+  const isNotReported = content && content.toLowerCase().includes("not reported");
+
+  return (
+    <div className={`bg-white rounded-2xl border p-5 shadow-xs flex flex-col justify-between transition-all hover:shadow-md ${highlight || 'border-slate-200'}`}>
+      <div>
+        <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            {icon}
+            <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider">{title}</h3>
+          </div>
+          {badge && (
+            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+              isNotReported ? 'bg-slate-100 text-slate-500' : 'bg-slate-100 text-slate-700'
+            }`}>
+              {badge}
+            </span>
+          )}
+        </div>
+
+        <div className={`text-xs leading-relaxed whitespace-pre-wrap ${
+          isNotReported ? 'text-slate-400 italic' : 'text-slate-700'
+        }`}>
+          {content || "Not reported in the paper."}
+        </div>
+      </div>
+
+      <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-end">
+        <button
+          onClick={onCopy}
+          className="text-[11px] text-slate-500 hover:text-diu-blue flex items-center gap-1 font-semibold transition-colors"
+        >
+          {copied ? (
+            <>
+              <Check className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="text-emerald-600">Copied</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-3.5 h-3.5" />
+              <span>Copy Section</span>
+            </>
+          )}
+        </button>
+      </div>
     </div>
   );
 };

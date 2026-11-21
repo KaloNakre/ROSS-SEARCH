@@ -33,6 +33,7 @@ class Student(Base):
     bio = Column(Text, nullable=True)
     project_title = Column(String(500), nullable=True)
     preferred_domain = Column(String(200), nullable=True, index=True)
+    subdomains = Column(Text, nullable=True) # JSON or comma-separated list of granular subdomains & specific interests
     profile_image_url = Column(String(500), nullable=True)
     team_status = Column(String(50), default="Looking for Team", index=True)
 

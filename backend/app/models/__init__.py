@@ -4,7 +4,14 @@ from app.models.supervisor import Supervisor, SupervisorExpertise, SupervisorPub
 from app.models.research_interest import ResearchInterest
 from app.models.team import Team, TeamMember, TeamStatus, MemberRole
 from app.models.revoked_token import RevokedToken
-from app.models.research_knowledge import PreviousProject, SharedPaperKnowledge, ResearchQueryLog
+from app.models.research_knowledge import (
+    PreviousProject,
+    SharedPaperKnowledge,
+    ResearchQueryLog,
+    AcademicPaperCache,
+    StudentSavedPaper,
+    ExtensionDomainAuditLog
+)
 
 __all__ = [
     "User",
@@ -23,4 +30,7 @@ __all__ = [
     "PreviousProject",
     "SharedPaperKnowledge",
     "ResearchQueryLog",
+    "AcademicPaperCache",
+    "StudentSavedPaper",
+    "ExtensionDomainAuditLog",
 ]

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROSS-SEARCH Intelligence</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="extension-header">
+    <div class="brand">
+      <div class="brand-logo">RS</div>
+      <div>
+        <div class="brand-title">ROSS-SEARCH</div>
+        <div class="brand-subtitle">AI Research & Domain Intelligence • DIU</div>
+      </div>
+    </div>
+    <div class="status-indicator" id="backendStatus" title="Connecting...">●</div>
+  </div>
+
+  <div class="tabs-nav">
+    <button class="tab-btn active" data-tab="tab-domain">🛡️ Security Audit</button>
+    <button class="tab-btn" data-tab="tab-chat">🤖 Research AI</button>
+    <button class="tab-btn" data-tab="tab-search">📚 Papers</button>
+  </div>
+
+  <!-- TAB 1: DOMAIN INTELLIGENCE -->
+  <div class="tab-content active" id="tab-domain">
+    <div class="card current-page-card">
+      <div class="card-label">Active Target Domain</div>
+      <div class="domain-host" id="activeDomainDisplay">Detecting active tab...</div>
+      <button class="btn-primary" id="btnAuditDomain">Audit Current Domain</button>
+    </div>
+
+    <div id="auditLoading" class="loader-box hidden">
+      <div class="spinner"></div>
+      <div class="loader-text">Probing HTTP security headers, TLS & technology stack...</div>
+    </div>
+
+    <div id="auditResults" class="audit-results hidden">
+      <div class="risk-meter-box">
+        <div class="risk-score-circle" id="riskScore">--</div>
+        <div class="risk-details">
+          <div class="risk-level-badge" id="riskBadge">ASSESSING</div>
+          <div class="tls-status" id="tlsStatus">TLS: Unknown</div>
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-title">Server Technologies</div>
+        <div class="tech-pills" id="techPills">
+          <span class="pill">Analyzing...</span>
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-title">Missing Security Headers</div>
+        <div class="missing-headers-list" id="missingHeadersList">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <div class="info-group">
+        <div class="info-title">AI Security Insight</div>
+        <div class="ai-box" id="aiDomainInsight">
+          AI security synthesis will appear here.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: PUBLIC AI RESEARCH CHAT -->
+  <div class="tab-content" id="tab-chat">
+    <div class="chat-intro">
+      <span>💡 Ask questions about research methodology, datasets, baselines, and thesis gaps (No login needed).</span>
+    </div>
+    <div class="chat-container" id="chatContainer">
+      <div class="chat-message bot">
+        <strong>ROSS-SEARCH AI:</strong> Hello! Ask me about academic research methods, low-resource NLP datasets, zero-trust architectures, or thesis proposal topics.
+      </div>
+    </div>
+    <form class="chat-input-row" id="chatForm">
+      <input type="text" id="chatInput" placeholder="Ask research question..." autocomplete="off" required>
+      <button type="submit" class="btn-send">Send</button>
+    </form>
+  </div>
+
+  <!-- TAB 3: PAPERS SEARCH -->
+  <div class="tab-content" id="tab-search">
+    <div class="search-row">
+      <input type="text" id="paperSearchInput" placeholder="Search arXiv & verified papers...">
+      <button class="btn-search" id="btnSearchPapers">Search</button>
+    </div>
+    <div id="paperList" class="paper-list">
+      <div class="paper-placeholder">Enter a research keyword (e.g., "SCADA", "Transformer", "BanglaBERT").</div>
+    </div>
+  </div>
+
+  <div class="extension-footer">
+    <span>ROSS-SEARCH v2.0 • Daffodil International University</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

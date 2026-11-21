@@ -259,36 +259,36 @@ export const SharedKnowledgeRepositoryPage = () => {
               </p>
             </div>
 
-            {/* 9 Structured Sections inside Modal */}
+            {/* 9 Structured Sections inside Modal + 20-Point Extended Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">1. Problem Statement:</strong>
-                <p className="text-slate-600">{selectedPaperModal.problem_statement}</p>
+                <p className="text-slate-600">{selectedPaperModal.problem_statement || selectedPaperModal.research_problem}</p>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">2. Objectives:</strong>
-                <p className="text-slate-600 whitespace-pre-line">{selectedPaperModal.objectives}</p>
+                <p className="text-slate-600 whitespace-pre-line">{selectedPaperModal.objectives || selectedPaperModal.research_objective}</p>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">3. Methodology:</strong>
-                <p className="text-slate-600">{selectedPaperModal.methodology}</p>
+                <p className="text-slate-600">{selectedPaperModal.methodology || selectedPaperModal.proposed_methodology}</p>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">4. Dataset:</strong>
-                <p className="text-slate-600">{selectedPaperModal.dataset}</p>
+                <p className="text-slate-600">{selectedPaperModal.dataset || selectedPaperModal.dataset_description}</p>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">5. Model / Technology:</strong>
-                <p className="text-slate-600">{selectedPaperModal.model_technology}</p>
+                <p className="text-slate-600">{selectedPaperModal.model_technology || selectedPaperModal.models_algorithms}</p>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">6. Findings & Results:</strong>
-                <p className="text-slate-600">{selectedPaperModal.findings}</p>
+                <p className="text-slate-600">{selectedPaperModal.findings || selectedPaperModal.experimental_results}</p>
               </div>
 
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
@@ -300,12 +300,27 @@ export const SharedKnowledgeRepositoryPage = () => {
                 <strong className="block text-amber-900 font-bold mb-1">8. Research Gap:</strong>
                 <p className="text-slate-800 font-medium">{selectedPaperModal.research_gap}</p>
               </div>
+
+              {selectedPaperModal.accuracy_performance && (
+                <div className="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                  <strong className="block text-emerald-900 font-bold mb-1">Accuracy & Convergence:</strong>
+                  <p className="text-slate-700">{selectedPaperModal.accuracy_performance}</p>
+                </div>
+              )}
+
+              {selectedPaperModal.research_opportunities && (
+                <div className="bg-cyan-50 p-3 rounded-xl border border-cyan-200">
+                  <strong className="block text-cyan-900 font-bold mb-1">DIU Thesis Opportunity:</strong>
+                  <p className="text-slate-700">{selectedPaperModal.research_opportunities}</p>
+                </div>
+              )}
             </div>
 
             <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
               <strong className="block text-slate-800 font-bold mb-1">9. Future Work:</strong>
-              <p className="text-slate-600">{selectedPaperModal.future_work}</p>
+              <p className="text-slate-600">{selectedPaperModal.future_work || selectedPaperModal.future_directions}</p>
             </div>
+
 
             <div className="flex justify-end gap-3 pt-3 border-t border-slate-100">
               <button

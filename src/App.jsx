@@ -53,6 +53,8 @@ import ResearchDiscoveryPage from './pages/research/ResearchDiscoveryPage';
 import PaperSummarizerPage from './pages/research/PaperSummarizerPage';
 import TopicSimilarityPage from './pages/research/TopicSimilarityPage';
 import SharedKnowledgeRepositoryPage from './pages/research/SharedKnowledgeRepositoryPage';
+import PublicResearchChatPage from './pages/research/PublicResearchChatPage';
+
 
 // Shared
 import ResourcesPage from './pages/ResourcesPage';
@@ -70,6 +72,8 @@ function App() {
           <Route path="/register/supervisor" element={<SupervisorRegistrationPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/research/chat" element={<PublicResearchChatPage />} />
+
 
           {/* ── Authenticated Dashboard Wrapper ─────────────────────────── */}
           <Route element={<DashboardLayout />}>

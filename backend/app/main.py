@@ -149,7 +149,9 @@ app.include_router(teams.router)
 app.include_router(admin.router)
 app.include_router(research.router)
 app.include_router(research_module2.router)
+app.include_router(research_module2.extension_router)
 app.include_router(supervision_requests.router)
+
 
 
 @app.get("/", tags=["Health"], summary="API Root")

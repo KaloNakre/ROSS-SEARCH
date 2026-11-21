@@ -19,6 +19,7 @@ class StudentProfileUpdate(BaseModel):
     bio: Optional[str] = None
     project_title: Optional[str] = None
     preferred_domain: Optional[str] = None
+    subdomains: Optional[str] = None
     team_status: Optional[str] = None
 
 
@@ -34,6 +35,7 @@ class StudentOut(BaseModel):
     bio: Optional[str] = None
     project_title: Optional[str] = None
     preferred_domain: Optional[str] = None
+    subdomains: Optional[str] = None
     profile_image_url: Optional[str] = None
     team_status: Optional[str] = None
     email: Optional[str] = None

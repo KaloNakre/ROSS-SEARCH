@@ -3,7 +3,7 @@
  * 
  * Contributor Responsibilities:
  * 1. [Riya Saha - ID: 232-35-715]: Research domains, paper discovery & previous departmental projects archive
- * 2. [Robayet Islam - ID: 232-35-809]: AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq + 9-point structured summary)
+ * 2. [Robayet Islam - ID: 232-35-809]: AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq + 20-point analysis)
  * 3. [Tamim Hasan Sami - ID: 232-35-313]: Topic similarity & duplicate FYP detector
  * 4. [Tamim Hasan Sami - ID: 232-35-313]: Shared paper knowledge repository
  */
@@ -11,12 +11,13 @@
 const API_BASE = '/api/research';
 
 export const module2Service = {
-  // ── [Riya Saha – ID: 715] Published Academic Papers Catalog ──────────────
+  // ── [Riya Saha – ID: 715] Published Academic Papers Catalog (arXiv, Crossref) ──
   async getAcademicPapers(filters = {}) {
     try {
       const params = new URLSearchParams();
       if (filters.domain && filters.domain !== 'All') params.append('domain', filters.domain);
       if (filters.q) params.append('q', filters.q);
+      if (filters.limit) params.append('limit', filters.limit);
 
       const res = await fetch(`${API_BASE}/academic-papers?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to fetch academic papers catalog');
@@ -63,16 +64,20 @@ export const module2Service = {
     }
   },
 
-  // ── [Robayet Islam – ID: 809] AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq) ──
-  async summarizePaper({ file, rawText, apiKey }) {
+  // ── [Robayet Islam – ID: 809] 20-Point AI Paper Summarizer Engine (Gemini / Groq / Neural NLP) ──
+  async summarizePaper({ file, paperUrl, rawText, modelChoice = 'auto', apiKey }) {
     const formData = new FormData();
     if (file) {
       formData.append('file', file);
+    } else if (paperUrl) {
+      formData.append('paper_url', paperUrl.trim());
     } else if (rawText) {
       formData.append('raw_text', rawText);
     } else {
-      throw new Error('Please select a PDF file or paste research paper text.');
+      throw new Error('Please select a PDF file, provide an open-access PDF URL, or paste research paper text.');
     }
+
+    formData.append('model_choice', modelChoice);
     if (apiKey && apiKey.trim()) {
       formData.append('api_key', apiKey.trim());
     }
@@ -88,6 +93,68 @@ export const module2Service = {
     }
 
     return await res.json();
+  },
+
+  // ── [Public Access] AI Research Chatbot (No Login Required) ───────────────
+  async sendChatMessage({ message, history = [], modelChoice = 'auto' }) {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        history,
+        model_choice: modelChoice
+      })
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Research Assistant chatbot unavailable.');
+    }
+
+    return await res.json();
+  },
+
+  // ── Personal Research Library & Reading List ─────────────────────────────
+  async getLibrary(token) {
+    const res = await fetch(`${API_BASE}/library`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to fetch personal research library.');
+    return await res.json();
+  },
+
+  async saveToLibrary(paperPayload, token) {
+    const res = await fetch(`${API_BASE}/library/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(paperPayload)
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Failed to save paper to reading library.');
+    }
+    return await res.json();
+  },
+
+  async deleteFromLibrary(savedId, token) {
+    const res = await fetch(`${API_BASE}/library/${savedId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to delete paper from library.');
+    return await res.json();
+  },
+
+  async exportLibrary(format = 'bibtex', token) {
+    const res = await fetch(`${API_BASE}/library/export?format=${format}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error('Failed to export library.');
+    return res;
   },
 
   // ── [Tamim Hasan Sami – ID: 313] Topic Similarity & Duplicate Check ───────
@@ -106,14 +173,14 @@ export const module2Service = {
     return await res.json();
   },
 
-  async registerThesisTopic(title, token) {
+  async registerThesisTopic(title, token, domain = null) {
     const res = await fetch(`${API_BASE}/register-topic`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ title })
+      body: JSON.stringify({ title, domain })
     });
 
     if (!res.ok) {
@@ -148,15 +215,29 @@ export const module2Service = {
 
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.detail || 'Failed to save paper to shared repository.');
+      throw new Error(errData.detail || 'Failed to store structured analysis in shared repository.');
     }
 
     return await res.json();
   },
 
-  async getSharedPaperDetail(id) {
-    const res = await fetch(`${API_BASE}/shared-knowledge/${id}`);
-    if (!res.ok) throw new Error('Paper not found');
+  async getSharedPaperDetail(itemId) {
+    const res = await fetch(`${API_BASE}/shared-knowledge/${itemId}`);
+    if (!res.ok) throw new Error('Failed to fetch shared paper details.');
+    return await res.json();
+  },
+
+  // ── Browser Extension Domain Auditor ─────────────────────────────────────
+  async auditDomain(urlOrDomain) {
+    const res = await fetch('/api/extension/analyze-domain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url_or_domain: urlOrDomain })
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Failed to audit domain.');
+    }
     return await res.json();
   }
 };

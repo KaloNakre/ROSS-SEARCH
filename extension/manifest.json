@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "ROSS-SEARCH AI Intelligence & Domain Auditor",
+  "version": "2.0.0",
+  "description": "AI Academic Research Discovery, Domain Security Intelligence & Thesis Methodology Assistant for Daffodil International University.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ROSS-SEARCH Research Intelligence"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

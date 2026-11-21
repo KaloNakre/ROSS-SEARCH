@@ -173,29 +173,43 @@ This section provides direct GitHub source code links for faculty evaluation. Ea
 
 ---
 
-## Module 2 Source Code Directory: Research Discovery and Shared Paper Knowledge
+## 🔬 Module 2: Complete AI Research Discovery, Intelligence & Shared Paper Knowledge
 
-### 1. 👩‍💻 Riya Saha (ID: 232-35-715) — Research Discovery & Departmental Thesis Archive
-*Primary Responsibilities:* Domain Selection, Student Research Query Exploration, and Previous Departmental FYP/Thesis Search.
-* **Research Discovery & Previous Projects Archive Page:** [`src/pages/research/ResearchDiscoveryPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/ResearchDiscoveryPage.jsx)
-* **Previous Projects & Query Log REST API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
-* **Previous Project Database Model:** [`backend/app/models/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_knowledge.py)
+Module 2 provides a comprehensive, research-grade intelligence ecosystem for Daffodil International University (DIU) undergraduate and graduate students preparing Final Year Projects (FYP) and Master's Theses.
 
-### 2. 👨‍💻 Md. Robayet Islam (ID: 232-35-809) — AI Paper Summarizer Engine (PyMuPDF & 9-Point NLP)
-*Primary Responsibilities:* AI-Assisted Research Paper PDF Extraction (PyMuPDF), 9-Point Structured Summary Generation (Problem, Objectives, Methodology, Dataset, Model, Findings, Limitations, Research Gap, Future Work).
-* **AI Paper Summarizer Page:** [`src/pages/research/PaperSummarizerPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/PaperSummarizerPage.jsx)
-* **PyMuPDF Extraction & 9-Point NLP Summarizer API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
-* **Pydantic Validation Schemas:** [`backend/app/schemas/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/schemas/research_knowledge.py)
-* **Shared Knowledge Persistence Engine:** [`src/services/module2Service.js`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/services/module2Service.js)
+### 👥 Module 2 Project Team & Contributor Direct Links
 
-### 3. 👨‍💻 Tamim Hasan Sami (ID: 232-35-313) — Topic Similarity & Shared Knowledge Repository
-*Primary Responsibilities:* Duplicate FYP Detection, TF-IDF/Cosine Semantic Similarity Scoring, and Persistent Shared Paper Knowledge Database.
+| Contributor | ID | Assigned Module 2 Scope | GitHub Profile |
+|---|---|---|---|
+| **Riya Saha** | 232-35-715 | **Academic Paper Discovery & Departmental Thesis Archive**<br>• Research Domain & Subdomain Persistence (`Student.preferred_domain`, `Student.subdomains`)<br>• Federated Academic Discovery (arXiv API, Crossref API, OpenAlex verified open access)<br>• Personal Reading Library & Reading List with 1-Click BibTeX Export<br>• Historical DIU FYP/Thesis Project Archive Search | [![GitHub](https://img.shields.io/badge/GitHub-suronjonaSahA-181717?style=flat&logo=github)](https://github.com/suronjonaSahA) |
+| **Md. Robayet Islam** | 232-35-809 | **20-Point AI Research Breakdown & Multi-Model Engine**<br>• 20-Point Academic Research Analyzer (Strict Academic Honesty, Zero Hallucinations)<br>• Multi-Model Provider Abstraction Layer (Google Gemini 1.5 Flash/Pro, Groq Llama 3.3, PyMuPDF Neural NLP)<br>• Authentic PDF Streaming & Ingestion with SSRF Protection & `%PDF-` Header Verification<br>• Public AI Research Assistant Chatbot (Free Open Access, No Login Required) | [![GitHub](https://img.shields.io/badge/GitHub-KaloNakre-181717?style=flat&logo=github)](https://github.com/KaloNakre) |
+| **Tamim Hasan Sami** | 232-35-313 | **Topic Similarity, Duplicate FYP Rejection & Shared Knowledge**<br>• Multi-Criteria Topic Similarity & Duplicate Rejection Engine (>70% Duplicate Threshold)<br>• Concurrency-Safe Novel Thesis Topic Registration (`POST /api/research/register-topic`)<br>• Collective Shared Paper Knowledge Repository Storing 20 Dimensions (`SharedPaperKnowledge`)<br>• Departmental Analytics & Student Research Query Logging | [![GitHub](https://img.shields.io/badge/GitHub-TamimWhos-181717?style=flat&logo=github)](https://github.com/TamimWhos) |
+
+---
+
+### 📂 Module 2 Source Code Directory & Direct Contribution Links
+
+#### 1. 👩‍💻 Riya Saha (ID: 232-35-715) — Paper Discovery, Personal Library & Archive
+* **Research Discovery & Library Page:** [`src/pages/research/ResearchDiscoveryPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/ResearchDiscoveryPage.jsx)
+* **Student Profile Domain Selection & Persistence:** [`src/pages/EditStudentProfile.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/EditStudentProfile.jsx)
+* **Federated Academic Search Engine (arXiv + Crossref):** [`backend/app/services/academic_search.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/services/academic_search.py)
+* **Academic Papers & Library REST API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
+* **Academic Paper Cache & Library Database Models:** [`backend/app/models/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_knowledge.py)
+
+#### 2. 👨‍💻 Md. Robayet Islam (ID: 232-35-809) — 20-Point AI Paper Summarizer & Public Assistant
+* **20-Point AI Paper Summarizer Page:** [`src/pages/research/PaperSummarizerPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/PaperSummarizerPage.jsx)
+* **Public AI Research Chatbot Page (No Login Required):** [`src/pages/research/PublicResearchChatPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/PublicResearchChatPage.jsx)
+* **Multi-Model Provider Abstraction (Gemini, Groq, PyMuPDF NLP):** [`backend/app/services/ai_provider.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/services/ai_provider.py)
+* **SSRF-Safe PDF Engine & `%PDF-` Header Validator:** [`backend/app/services/pdf_processor.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/services/pdf_processor.py)
+* **Chromium Extension (Manifest V3):** [`extension/manifest.json`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/extension/manifest.json) • [`extension/popup.html`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/extension/popup.html) • [`extension/popup.js`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/extension/popup.js)
+
+#### 3. 👨‍💻 Tamim Hasan Sami (ID: 232-35-313) — Topic Similarity & Shared Knowledge Database
 * **Topic Similarity & Duplicate FYP Detector Page:** [`src/pages/research/TopicSimilarityPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/TopicSimilarityPage.jsx)
 * **Shared Paper Knowledge Repository Page:** [`src/pages/research/SharedKnowledgeRepositoryPage.jsx`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/src/pages/research/SharedKnowledgeRepositoryPage.jsx)
-* **Topic Similarity & Shared Knowledge REST API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
-* **Shared Paper Knowledge Database Model:** [`backend/app/models/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_knowledge.py)
-* **Departmental Demo Seeder:** [`backend/app/database/demo_seeder_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/database/demo_seeder_module2.py)
-* **Automated Verification Test Suite:** [`backend/test_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/test_module2.py)
+* **Similarity & Shared Knowledge REST API:** [`backend/app/api/routes/research_module2.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/api/routes/research_module2.py)
+* **Shared Paper Knowledge Database Model (20 Dimensions):** [`backend/app/models/research_knowledge.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/app/models/research_knowledge.py)
+* **Module 2 Master Test Suite (100% Passing):** [`backend/test_module2_master.py`](https://github.com/KaloNakre/ROSS-SEARCH/blob/main/backend/test_module2_master.py)
+
 
 
 
