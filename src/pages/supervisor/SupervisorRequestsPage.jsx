@@ -1,7 +1,7 @@
 /**
  * ROSS-SEARCH — Supervision Requests & Review Pipeline
- * Module 1: Supervisor Management & Research Allocation
- * Author: Md. Robayet Islam (ID: 232-35-809)
+ * Supervisor Management & Research Coordination
+ * ROSS-SEARCH Academic Research Platform
  */
 
 import React, { useState, useEffect } from 'react';

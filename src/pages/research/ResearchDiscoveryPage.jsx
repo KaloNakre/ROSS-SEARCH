@@ -1,6 +1,5 @@
 /**
- * ROSS-SEARCH: Module 2 — Research Discovery & Previous Projects Archive
- * Contributor: Riya Saha (ID: 232-35-715)
+ * ROSS-SEARCH: Academic Research Discovery & Departmental Archive
  * Description: Allows students to select research domains, submit research queries,
  * explore authentic open-access papers (arXiv, Crossref) with verified DOIs, save papers
  * to a personal reading library with BibTeX export, and search departmental FYP/Thesis projects.
@@ -119,8 +118,8 @@ export const ResearchDiscoveryPage = () => {
       module2Service.logResearchQuery({
         query_text: searchQuery,
         domain: selectedDomain !== "All" ? selectedDomain : "General",
-        student_id: user?.student_id || "232-35-715",
-        student_name: user?.full_name || "Riya Saha"
+        student_id: user?.student_id || "DIU-STUDENT",
+        student_name: user?.full_name || "DIU Researcher"
       });
     }
   };
@@ -191,7 +190,7 @@ export const ResearchDiscoveryPage = () => {
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-xs mb-3 border border-white/20">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Module 2: Research Discovery & Shared Paper Knowledge</span>
+            <span>Academic Research Discovery</span>
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">
             Academic Research Discovery & Departmental Archive
@@ -540,7 +539,7 @@ export const ResearchDiscoveryPage = () => {
                             navigate(`/research/summarizer?paperUrl=${encodeURIComponent(paper.pdf_url)}&title=${encodeURIComponent(paper.title)}`);
                           }}
                           className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1"
-                          title="Generate 20-point AI analysis"
+                          title="Generate AI Research Breakdown"
                         >
                           <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                           <span>Analyze</span>

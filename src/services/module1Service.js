@@ -1,4 +1,4 @@
-// module1Service.js — Centralized client service for Robayet Islam's Module 1 responsibilities.
+// researchService.js � Centralized client service for supervisor research management.
 // Manages: Opportunities, Research Interests, Requests, Individual/Team Assignments, and Matching.
 // Uses reactive localStorage caching for seamless frontend interactions without mutating the database.
 
@@ -78,9 +78,9 @@ const DEFAULT_EXPERTISE = [
 const DEFAULT_REQUESTS = [
   {
     id: 1,
-    studentId: "232-35-313",
-    studentName: "Tamim Hasan Sami",
-    studentEmail: "sami.cse@diu.edu.bd",
+    studentId: "201-15-204",
+    studentName: "Nabila Chowdhury",
+    studentEmail: "nabila.cse@diu.edu.bd",
     department: "Department of Computer Science and Engineering",
     cgpa: "3.84",
     researchInterests: ["Natural Language Processing", "Machine Learning"],
@@ -94,9 +94,9 @@ const DEFAULT_REQUESTS = [
   },
   {
     id: 2,
-    studentId: "232-35-715",
-    studentName: "Riya Saha",
-    studentEmail: "riya.cse@diu.edu.bd",
+    studentId: "201-15-205",
+    studentName: "Farhan Islam",
+    studentEmail: "farhan.cse@diu.edu.bd",
     department: "Department of Computer Science and Engineering",
     cgpa: "3.92",
     researchInterests: ["Cyber Security", "Cloud Security"],
@@ -114,8 +114,8 @@ const DEFAULT_ASSIGNMENTS = [
   {
     id: 1,
     type: "individual", // "individual" | "team"
-    targetId: "232-35-809",
-    targetName: "Robayet Islam",
+    targetId: "201-15-101",
+    targetName: "Arif Hossain",
     department: "Department of Computer Science and Engineering",
     opportunityId: 1,
     opportunityTitle: "Deep Learning for Bengali Natural Language Processing",
@@ -330,7 +330,7 @@ export const module1Service = {
     const newId = list.length > 0 ? Math.max(...list.map(r => r.id)) + 1 : 1;
     const item = {
       id: newId,
-      studentId: payload.studentId || "232-35-809",
+      studentId: payload.studentId || "DIU-STUDENT",
       studentName: payload.studentName || "Current Student",
       studentEmail: payload.studentEmail || "student@diu.edu.bd",
       department: payload.department || "Department of CSE",

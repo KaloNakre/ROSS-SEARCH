@@ -16,16 +16,16 @@ export const RoleManagementPage = () => {
   const { currentUserRole } = useAuth();
 
   const permissionsMatrix = [
-    { module: "Browse & Search Supervisors", student: true, supervisor: true, admin: true },
-    { module: "Edit Own Student Profile & Credentials", student: true, supervisor: false, admin: true },
-    { module: "Manage Research Interests & Domains", student: true, supervisor: false, admin: true },
-    { module: "Search Classmates by Section", student: true, supervisor: true, admin: true },
-    { module: "Create & Disband Research Teams", student: true, supervisor: false, admin: true },
-    { module: "Invite / Remove Team Members", student: true, supervisor: false, admin: true },
-    { module: "Accept / Reject Supervision Requests", student: false, supervisor: true, admin: true },
-    { module: "Update Faculty Supervision Quotas", student: false, supervisor: true, admin: true },
-    { module: "Manage Student Accounts & Enrolment", student: false, supervisor: false, admin: true },
-    { module: "Configure System Roles & Access", student: false, supervisor: false, admin: true }
+    { capability: "Browse & Search Supervisors", student: true, supervisor: true, admin: true },
+    { capability: "Edit Own Student Profile & Credentials", student: true, supervisor: false, admin: true },
+    { capability: "Manage Research Interests & Domains", student: true, supervisor: false, admin: true },
+    { capability: "Search Classmates by Section", student: true, supervisor: true, admin: true },
+    { capability: "Create & Disband Research Teams", student: true, supervisor: false, admin: true },
+    { capability: "Invite / Remove Team Members", student: true, supervisor: false, admin: true },
+    { capability: "Accept / Reject Supervision Requests", student: false, supervisor: true, admin: true },
+    { capability: "Update Faculty Supervision Quotas", student: false, supervisor: true, admin: true },
+    { capability: "Manage Student Accounts & Enrolment", student: false, supervisor: false, admin: true },
+    { capability: "Configure System Roles & Access", student: false, supervisor: false, admin: true }
   ];
 
   return (
@@ -183,7 +183,7 @@ export const RoleManagementPage = () => {
             RBAC Feature Permission Matrix
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Module 1 functional capabilities partitioned by user role
+            Platform functional capabilities partitioned by user role
           </p>
         </div>
 
@@ -201,7 +201,7 @@ export const RoleManagementPage = () => {
               {permissionsMatrix.map((item, idx) => (
                 <tr key={idx} className="hover:bg-slate-50/70 transition-colors">
                   <td className="py-3.5 px-6 font-semibold text-slate-800">
-                    {item.module}
+                    {item.capability}
                   </td>
                   <td className="py-3.5 px-6 text-center">
                     {item.student ? (

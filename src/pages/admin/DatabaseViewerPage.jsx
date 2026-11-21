@@ -606,11 +606,11 @@ function renderTableCell(key, value) {
 function getRealisticDemoCohort(tableId) {
   if (tableId === 'students') {
     return [
-      { id: 1, student_id: "232-35-809", full_name: "Robayet Islam", email: "robayet.cse@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Natural Language Processing", status: "Active (Looking for Team)", registered_at: "2026-11-12 10:15:00" },
+      { id: 1, student_id: "201-15-101", full_name: "Arif Hossain", email: "arif.hossain@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Natural Language Processing", status: "Active (Looking for Team)", registered_at: "2026-11-12 10:15:00" },
       { id: 2, student_id: "201-15-102", full_name: "Kamal Hossain", email: "kamal.hossain@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Machine Learning", status: "Active (Looking for Team)", registered_at: "2026-11-12 11:30:00" },
       { id: 3, student_id: "201-15-103", full_name: "Jamal Uddin", email: "jamal.uddin@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Cyber Security", status: "Active (Looking for Team)", registered_at: "2026-11-12 14:45:00" },
-      { id: 4, student_id: "232-35-313", full_name: "Tamim Hasan Sami", email: "tamim.sami@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Machine Learning", status: "Assigned (Team Leader)", registered_at: "2026-11-12 16:00:00" },
-      { id: 5, student_id: "232-35-715", full_name: "Riya Saha", email: "riya.saha@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Cyber Security", status: "Assigned (Member)", registered_at: "2026-11-13 09:20:00" },
+      { id: 4, student_id: "201-15-204", full_name: "Nabila Chowdhury", email: "nabila.chowdhury@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Machine Learning", status: "Assigned (Team Leader)", registered_at: "2026-11-12 16:00:00" },
+      { id: 5, student_id: "201-15-205", full_name: "Farhan Islam", email: "farhan.islam@diu.edu.bd", department: "Department of CSE", section: "60_A", preferred_domain: "Cyber Security", status: "Assigned (Member)", registered_at: "2026-11-13 09:20:00" },
       { id: 6, student_id: "201-15-204", full_name: "Tanvir Ahmed", email: "tanvir.ahmed@diu.edu.bd", department: "Department of Software Engineering", section: "60_B", preferred_domain: "Cloud Computing & DevOps", status: "Active (Looking for Team)", registered_at: "2026-11-13 11:40:00" },
       { id: 7, student_id: "201-15-205", full_name: "Mehedi Hasan", email: "mehedi.hasan@diu.edu.bd", department: "Department of CSE", section: "60_B", preferred_domain: "Computer Vision", status: "Active (Looking for Team)", registered_at: "2026-11-13 15:10:00" },
       { id: 8, student_id: "201-15-306", full_name: "Sadia Afrin", email: "sadia.afrin@diu.edu.bd", department: "Department of CSE", section: "61_A", preferred_domain: "Data Science & Big Data", status: "Active (Looking for Team)", registered_at: "2026-11-14 10:05:00" },
@@ -628,8 +628,8 @@ function getRealisticDemoCohort(tableId) {
   }
   if (tableId === 'teams') {
     return [
-      { id: 1, team_name: "Cognitive Systems Research Group", project_title: "Deep Learning for Low-Resource Bengali NLP", domain: "Natural Language Processing", department: "Department of CSE", section: "60_A", status: "FORMING", leader: "Robayet Islam", supervisor: "Dr. Syed Tareq", members_count: 3 },
-      { id: 2, team_name: "CyberShield Security Lab", project_title: "Smart Grid SCADA Anomaly Detection", domain: "Cyber Security", department: "Department of CSE", section: "60_A", status: "APPROVED", leader: "Tamim Hasan Sami", supervisor: "Prof. Dr. Ashraf Ali", members_count: 4 },
+      { id: 1, team_name: "Cognitive Systems Research Group", project_title: "Deep Learning for Low-Resource Bengali NLP", domain: "Natural Language Processing", department: "Department of CSE", section: "60_A", status: "FORMING", leader: "Arif Hossain", supervisor: "Dr. Syed Tareq", members_count: 3 },
+      { id: 2, team_name: "CyberShield Security Lab", project_title: "Smart Grid SCADA Anomaly Detection", domain: "Cyber Security", department: "Department of CSE", section: "60_A", status: "APPROVED", leader: "Nabila Chowdhury", supervisor: "Prof. Dr. Ashraf Ali", members_count: 4 },
     ];
   }
   if (tableId === 'users') {
@@ -639,24 +639,24 @@ function getRealisticDemoCohort(tableId) {
       { id: 3, email: "dr.ashraf.ali@diu.edu.bd", role: "supervisor", is_active: "Active", created_at: "2026-11-05 11:15:00" },
       { id: 4, email: "dr.rokibul.hasan@diu.edu.bd", role: "supervisor", is_active: "Active", created_at: "2026-11-07 14:00:00" },
       { id: 5, email: "dr.nusrat.jahan@diu.edu.bd", role: "supervisor", is_active: "Active", created_at: "2026-11-09 10:30:00" },
-      { id: 6, email: "robayet.cse@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-12 10:15:00" },
+      { id: 6, email: "arif.hossain@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-12 10:15:00" },
       { id: 7, email: "kamal.hossain@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-12 11:30:00" },
       { id: 8, email: "jamal.uddin@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-12 14:45:00" },
-      { id: 9, email: "tamim.sami@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-12 16:00:00" },
-      { id: 10, email: "riya.saha@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-13 09:20:00" },
+      { id: 9, email: "nabila.chowdhury@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-12 16:00:00" },
+      { id: 10, email: "farhan.islam@diu.edu.bd", role: "student", is_active: "Active", created_at: "2026-11-13 09:20:00" },
     ];
   }
   if (tableId === 'supervision_requests') {
     return [
-      { id: 1, student_name: "Robayet Islam", supervisor_name: "Dr. Syed Tareq", topic: "Bengali Transformer Architectures", message: "Respected Sir, we would like to conduct our thesis on Bengali NLP under your mentorship.", status: "APPROVED", submitted_at: "2026-11-12 16:00:00" },
-      { id: 2, student_name: "Tamim Hasan Sami", supervisor_name: "Prof. Dr. Ashraf Ali", topic: "SCADA Zero-Trust Intrusion Mitigations", message: "We request your expert guidance in SCADA security testing.", status: "PENDING", submitted_at: "2026-11-13 11:30:00" },
+      { id: 1, student_name: "Arif Hossain", supervisor_name: "Dr. Syed Tareq", topic: "Bengali Transformer Architectures", message: "Respected Sir, we would like to conduct our thesis on Bengali NLP under your mentorship.", status: "APPROVED", submitted_at: "2026-11-12 16:00:00" },
+      { id: 2, student_name: "Nabila Chowdhury", supervisor_name: "Prof. Dr. Ashraf Ali", topic: "SCADA Zero-Trust Intrusion Mitigations", message: "We request your expert guidance in SCADA security testing.", status: "PENDING", submitted_at: "2026-11-13 11:30:00" },
     ];
   }
   if (tableId === 'team_members') {
     return [
-      { id: 1, team_id: 1, team_name: "Cognitive Systems Research Group", student_name: "Robayet Islam", student_id: "232-35-809", role: "Leader", joined_at: "2026-11-12 15:00:00" },
+      { id: 1, team_id: 1, team_name: "Cognitive Systems Research Group", student_name: "Arif Hossain", student_id: "201-15-101", role: "Leader", joined_at: "2026-11-12 15:00:00" },
       { id: 2, team_id: 1, team_name: "Cognitive Systems Research Group", student_name: "Kamal Hossain", student_id: "201-15-102", role: "Member", joined_at: "2026-11-12 15:30:00" },
-      { id: 3, team_id: 2, team_name: "CyberShield Security Lab", student_name: "Tamim Hasan Sami", student_id: "232-35-313", role: "Leader", joined_at: "2026-11-13 11:20:00" },
+      { id: 3, team_id: 2, team_name: "CyberShield Security Lab", student_name: "Nabila Chowdhury", student_id: "201-15-204", role: "Leader", joined_at: "2026-11-13 11:20:00" },
     ];
   }
   if (tableId === 'research_interests') {

@@ -1,8 +1,7 @@
 /**
- * ROSS-SEARCH: Module 2 — Shared Paper Knowledge Repository
- * Contributor: Tamim Hasan Sami (ID: 232-35-313)
+ * ROSS-SEARCH: Departmental Research Knowledge Repository
  * Description: Centralized shared database where research queries, paper details,
- * AI-generated 9-point summaries, research gaps, and findings are stored for future students.
+ * AI-generated summaries, research gaps, and findings are stored for future students.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -259,7 +258,7 @@ export const SharedKnowledgeRepositoryPage = () => {
               </p>
             </div>
 
-            {/* 9 Structured Sections inside Modal + 20-Point Extended Fields */}
+            {/* Structured Research Analysis Sections */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
               <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <strong className="block text-slate-800 font-bold mb-1">1. Problem Statement:</strong>

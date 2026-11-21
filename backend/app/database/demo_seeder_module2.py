@@ -93,10 +93,10 @@ DEMO_PREVIOUS_PROJECTS = [
         "batch": "Batch 44",
         "year": 2026,
         "supervisor_name": "Dr. Imran Mahmud",
-        "team_members": "Md. Robayet Islam, Riya Saha, Tamim Hasan Sami",
+        "team_members": "Arif Hossain, Nabila Chowdhury, Farhan Islam",
         "keywords": "Bengali NLP, mT5, Abstractive Summarization, Transformer, Deep Learning",
         "grade": "A+",
-        "github_or_paper_url": "https://github.com/KaloNakre/ROSS-SEARCH"
+        "github_or_paper_url": "https://github.com/diu-research/academic-nlp"
     }
 ]
 
@@ -107,8 +107,8 @@ DEMO_SHARED_PAPERS = [
         "year": 2017,
         "journal_or_conference": "NeurIPS 2017",
         "domain": "Natural Language Processing",
-        "uploaded_by_name": "Md. Robayet Islam",
-        "uploaded_by_id": "232-35-809",
+        "uploaded_by_name": "Arif Hossain",
+        "uploaded_by_id": "201-15-101",
         "file_name": "Attention_Is_All_You_Need.pdf",
         "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose the Transformer, a model architecture eschewing recurrence and relying entirely on an attention mechanism to draw global dependencies between input and output.",
         "problem_statement": "Recurrent neural networks (RNNs/LSTMs) suffer from sequential computation bottlenecks, preventing parallel training across long sequence lengths and failing to preserve long-range dependencies.",
@@ -127,8 +127,8 @@ DEMO_SHARED_PAPERS = [
         "year": 2019,
         "journal_or_conference": "NAACL-HLT 2019",
         "domain": "Natural Language Processing",
-        "uploaded_by_name": "Tamim Hasan Sami",
-        "uploaded_by_id": "232-35-313",
+        "uploaded_by_name": "Nabila Chowdhury",
+        "uploaded_by_id": "201-15-204",
         "file_name": "BERT_Pretraining_Language_Understanding.pdf",
         "abstract": "We introduce BERT (Bidirectional Encoder Representations from Transformers). Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.",
         "problem_statement": "Standard language models are strictly unidirectional (left-to-right), which severely limits context fusion during pre-training for token-level and sentence-level question answering tasks.",
@@ -147,8 +147,8 @@ DEMO_SHARED_PAPERS = [
         "year": 2016,
         "journal_or_conference": "CVPR 2016",
         "domain": "Computer Vision",
-        "uploaded_by_name": "Riya Saha",
-        "uploaded_by_id": "232-35-715",
+        "uploaded_by_name": "Farhan Islam",
+        "uploaded_by_id": "201-15-205",
         "file_name": "Deep_Residual_Learning_ResNet.pdf",
         "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs.",
         "problem_statement": "When deeper networks start converging, a degradation problem is exposed: with network depth increasing, accuracy gets saturated and then degrades rapidly due to vanishing/exploding gradients.",

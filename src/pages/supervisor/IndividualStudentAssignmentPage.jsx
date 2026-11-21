@@ -1,7 +1,7 @@
 /**
  * ROSS-SEARCH — Individual Student Thesis Supervision Assignment
- * Module 1: Supervisor Management & Research Allocation
- * Author: Md. Robayet Islam (ID: 232-35-809)
+ * Supervisor Management & Research Coordination
+ * ROSS-SEARCH Academic Research Platform
  */
 
 import React, { useState, useEffect } from 'react';
@@ -61,9 +61,9 @@ export const IndividualStudentAssignmentPage = () => {
 
     // Fallback demonstration students
     setStudents([
-      { id: 1, student_id: '201-15-809', full_name: 'Robayet Islam', department: 'Department of CSE', cgpa: '3.88', preferred_domain: 'Natural Language Processing' },
-      { id: 2, student_id: '201-15-313', full_name: 'Tamim Hasan Sami', department: 'Department of CSE', cgpa: '3.84', preferred_domain: 'Machine Learning' },
-      { id: 3, student_id: '201-15-715', full_name: 'Riya Saha', department: 'Department of CSE', cgpa: '3.92', preferred_domain: 'Cyber Security' },
+      { id: 1, student_id: '201-15-101', full_name: 'Arif Hossain', department: 'Department of CSE', cgpa: '3.88', preferred_domain: 'Natural Language Processing' },
+      { id: 2, student_id: '201-15-204', full_name: 'Nabila Chowdhury', department: 'Department of CSE', cgpa: '3.84', preferred_domain: 'Machine Learning' },
+      { id: 3, student_id: '201-15-205', full_name: 'Farhan Islam', department: 'Department of CSE', cgpa: '3.92', preferred_domain: 'Cyber Security' },
       { id: 4, student_id: '201-15-101', full_name: 'Tanvir Ahmed', department: 'Department of Software Eng.', cgpa: '3.76', preferred_domain: 'Data Science' },
       { id: 5, student_id: '201-15-102', full_name: 'Farhana Yasmin', department: 'Department of CSE', cgpa: '3.82', preferred_domain: 'Computer Vision' },
     ]);

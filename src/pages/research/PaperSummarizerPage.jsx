@@ -1,9 +1,8 @@
 /**
- * ROSS-SEARCH: Module 2 — AI Research Paper PDF Summarizer & Intelligence Engine
- * Contributor: Md. Robayet Islam (ID: 232-35-809)
+ * ROSS-SEARCH: AI Research Breakdown — PDF Ingestion & Multi-Model Analysis Engine
  * Description: Extracts and analyzes research paper PDFs using PyMuPDF and multi-model AI
  * (Google Gemini 1.5 Flash/Pro, Groq Llama 3.3, and offline Neural NLP) to produce
- * a rigorous 20-Point Academic Research Breakdown.
+ * a comprehensive AI Research Breakdown.
  * Enforces strict academic honesty: unstated metrics are explicitly flagged as 'Not reported in the paper'.
  */
 
@@ -139,7 +138,7 @@ export const PaperSummarizerPage = () => {
         year: summary.year || 2026,
         domain: summary.domain || "Computer Science",
         uploaded_by_name: user?.full_name || "DIU Student",
-        uploaded_by_id: user?.student_id || "232-35-809",
+        uploaded_by_id: user?.student_id || "201-15-101",
         file_name: file ? file.name : (inputMode === 'url' ? paperUrl : 'text_submission.txt'),
         abstract: summary.abstract || summary.research_problem,
         // 20 Academic points
@@ -185,13 +184,13 @@ export const PaperSummarizerPage = () => {
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/20 text-cyan-200 text-xs font-semibold mb-3 border border-cyan-400/30">
             <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-            <span>Module 2: [Robayet Islam – ID: 809] AI Paper Summarizer Engine</span>
+            <span>AI Research Breakdown</span>
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">
-            20-Point AI Research Paper Breakdown
+            AI Research Breakdown
           </h1>
           <p className="text-slate-300 text-sm leading-relaxed mb-4">
-            Upload an authentic research paper PDF or enter an arXiv link. The engine extracts true academic sections using PyMuPDF and synthesizes a comprehensive 20-point analysis covering objectives, datasets, architectures, quantitative metrics, and research gaps.
+            Upload an authentic research paper PDF or enter an arXiv link. The AI engine extracts true academic sections and synthesizes a comprehensive research breakdown covering objectives, datasets, model architectures, quantitative metrics, and research gaps.
           </p>
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
             <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full border border-white/15">
@@ -363,12 +362,12 @@ export const PaperSummarizerPage = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Extracting & Synthesizing 20-Point Analysis...</span>
+                  <span>Generating AI Research Breakdown...</span>
                 </>
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 text-cyan-300" />
-                  <span>Execute 20-Point AI Research Breakdown</span>
+                  <span>Generate AI Research Breakdown</span>
                 </>
               )}
             </button>
@@ -376,7 +375,7 @@ export const PaperSummarizerPage = () => {
         </form>
       </div>
 
-      {/* ── 20-POINT STRUCTURED RESEARCH ANALYSIS RESULTS ── */}
+      {/* ── AI RESEARCH BREAKDOWN RESULTS ── */}
       {summary && (
         <div className="space-y-6">
           {/* Paper Metadata & Engine Header */}

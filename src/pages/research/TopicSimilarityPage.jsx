@@ -1,6 +1,5 @@
 /**
- * ROSS-SEARCH: Module 2 — Topic Similarity & Duplicate FYP Detector
- * Contributor: Tamim Hasan Sami (ID: 232-35-313)
+ * ROSS-SEARCH: Research Topic Similarity & Duplicate Thesis Detection
  * Description: Compares a proposed project topic and abstract against the department's
  * past FYP/Thesis archive and current batch student registrations to reject duplicate topics,
  * calculate similarity scores, and allow registering verified novel topics.
@@ -121,7 +120,7 @@ export const TopicSimilarityPage = () => {
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-xs mb-3 border border-white/20">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
-            <span>Module 2: Duplicate FYP Topic & Similarity Engine</span>
+            <span>Research Topic Similarity</span>
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">
             Topic Similarity & Duplicate FYP/Thesis Detection

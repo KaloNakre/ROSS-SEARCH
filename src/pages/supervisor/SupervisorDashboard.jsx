@@ -1,22 +1,22 @@
 /**
  * ROSS-SEARCH — Supervisor Central Operations Hub
- * Module 1: Supervisor Management & Thesis Allocation
- * Author: Md. Robayet Islam (ID: 232-35-809)
+ * Supervisor Management & Research Coordination
+ * ROSS-SEARCH Academic Research Platform
  */
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Tag, 
-  BookOpen, 
-  Briefcase, 
-  Inbox, 
-  Users, 
-  UserPlus, 
-  FolderKanban, 
-  CheckCircle2, 
-  Clock, 
+import {
+  LayoutDashboard,
+  Tag,
+  BookOpen,
+  Briefcase,
+  Inbox,
+  Users,
+  UserPlus,
+  FolderKanban,
+  CheckCircle2,
+  Clock,
   ArrowRight,
   Sparkles,
   User,
@@ -135,11 +135,11 @@ export const SupervisorDashboard = () => {
         </div>
       </div>
 
-      {/* 10 Module 1 Responsibilities Control Grid */}
+      {/* Supervisor Management Control Grid */}
       <div>
         <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
           <LayoutDashboard size={20} className="text-diu-blue" />
-          Supervisor Management Modules (Robayet Islam — ID: 809)
+          Supervisor Management
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

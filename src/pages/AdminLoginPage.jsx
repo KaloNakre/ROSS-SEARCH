@@ -28,7 +28,7 @@ export const AdminLoginPage = () => {
 
   const handleQuickFill = () => {
     setFormData({
-      adminId: 'ADM-809',
+      adminId: 'ADM-101',
       gmailAddress: 'admin@diu.edu.bd',
       password: 'Admin@12345',
     });
@@ -180,7 +180,7 @@ export const AdminLoginPage = () => {
                   id="admin-id"
                   name="adminId"
                   type="text"
-                  placeholder="e.g. ADM-809"
+                  placeholder="e.g. ADM-101"
                   value={formData.adminId}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"

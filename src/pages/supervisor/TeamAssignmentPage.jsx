@@ -1,7 +1,7 @@
 /**
  * ROSS-SEARCH — Team Thesis Supervision Allocation & Management
- * Module 1: Supervisor Management & Research Allocation
- * Author: Md. Robayet Islam (ID: 232-35-809)
+ * Supervisor Management & Research Coordination
+ * ROSS-SEARCH Academic Research Platform
  */
 
 import React, { useState, useEffect } from 'react';
@@ -66,7 +66,7 @@ export const TeamAssignmentPage = () => {
         department: "Department of CSE",
         research_interest: "Natural Language Processing",
         members: [
-          { name: "Tamim Hasan Sami", student_id: "201-15-313", role: "Leader" },
+          { name: "Nabila Chowdhury", student_id: "201-15-204", role: "Leader" },
           { name: "Tanvir Ahmed", student_id: "201-15-101", role: "Member" },
           { name: "Farhana Yasmin", student_id: "201-15-102", role: "Member" }
         ]
@@ -78,7 +78,7 @@ export const TeamAssignmentPage = () => {
         department: "Department of CSE",
         research_interest: "Cyber Security",
         members: [
-          { name: "Riya Saha", student_id: "201-15-715", role: "Leader" },
+          { name: "Farhan Islam", student_id: "201-15-205", role: "Leader" },
           { name: "Tahmid Hossain", student_id: "201-15-202", role: "Member" },
           { name: "Sadia Afrin", student_id: "201-15-203", role: "Member" }
         ]
@@ -330,7 +330,7 @@ export const TeamAssignmentPage = () => {
 
               <div className="p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500 flex items-start gap-2">
                 <ShieldAlert size={15} className="text-amber-500 shrink-0 mt-0.5" />
-                <span>Reuses Tamim Hasan Sami's existing team management data without duplicating team creation.</span>
+                <span>Synchronizes with existing team management data without duplicating team creation.</span>
               </div>
 
               <button

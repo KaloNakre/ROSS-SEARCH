@@ -200,12 +200,12 @@ def health_check():
 @app.get(
     "/api/database/overview",
     tags=["Health"],
-    summary="Module 1 Database Tables & Status Overview",
-    response_description="Summary of all Module 1 database tables and row counts"
+    summary="Database Tables & Status Overview",
+    response_description="Summary of all core database tables and row counts"
 )
 def database_overview():
     """
-    Provides a live, public overview of all Module 1 tables and records.
+    Provides a live, public overview of all database tables and records.
     Allows easy verification of system database state from any browser.
     """
     from app.models.user import User
@@ -257,7 +257,7 @@ def database_overview():
         }
         return {
             "status": "online",
-            "module": "Module 1: User, Supervisor and Team Management",
+            "system": "User, Supervisor and Team Management",
             "database_type": "postgresql" if "postgres" in settings.DATABASE_URL else "sqlite",
             "total_tables": len(tables),
             "tables": tables,

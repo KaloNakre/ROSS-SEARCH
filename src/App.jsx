@@ -22,7 +22,7 @@ import ResearchInterestsPage from './pages/ResearchInterestsPage';
 import SearchStudentsSection from './pages/SearchStudentsSection';
 import ResearchMatchingPage from './pages/student/ResearchMatchingPage';
 
-// Supervisor Pages & Robayet Islam's Modules
+// Supervisor Management Pages
 import FindSupervisorPage from './pages/FindSupervisorPage';
 import SupervisorProfile from './pages/SupervisorProfile';
 import EditSupervisorProfile from './pages/EditSupervisorProfile';
@@ -35,20 +35,20 @@ import IndividualStudentAssignmentPage from './pages/supervisor/IndividualStuden
 import TeamAssignmentPage from './pages/supervisor/TeamAssignmentPage';
 import AssignedStudentsTeamsPage from './pages/supervisor/AssignedStudentsTeamsPage';
 
-// Team Pages (Tamim Hasan Sami integration)
+// Team Management Pages
 import TeamSearchPage from './pages/TeamSearchPage';
 import CreateTeamPage from './pages/CreateTeamPage';
 import TeamDetailsPage from './pages/TeamDetailsPage';
 import MyTeamsPage from './pages/MyTeamsPage';
 
-// Admin Pages (Riya Saha / System Admin)
+// Admin Pages
 import AdminDashboard from './pages/AdminDashboard';
 import ManageUsersPage from './pages/ManageUsersPage';
 import ManageSupervisorsPage from './pages/ManageSupervisorsPage';
 import RoleManagementPage from './pages/RoleManagementPage';
 import DatabaseViewerPage from './pages/admin/DatabaseViewerPage';
 
-// Module 2: Research Discovery & Shared Paper Knowledge
+// Academic Research Discovery & Intelligence
 import ResearchDiscoveryPage from './pages/research/ResearchDiscoveryPage';
 import PaperSummarizerPage from './pages/research/PaperSummarizerPage';
 import TopicSimilarityPage from './pages/research/TopicSimilarityPage';
@@ -122,7 +122,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* ── ROBAYET ISLAM'S 10 MODULE 1 SUPERVISOR AREAS ─────────── */}
+            {/* ── Supervisor Management Areas ─────────── */}
             <Route path="/supervisor/dashboard" element={
               <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
                 <SupervisorDashboard />
@@ -174,7 +174,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* ── TEAM ROUTES (Tamim Hasan Sami Integration) ─────────────── */}
+            {/* ── TEAM MANAGEMENT ROUTES ─────────────────────────────── */}
             <Route path="/teams/search" element={
               <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <TeamSearchPage />
@@ -196,7 +196,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* ── ADMIN ROUTES (Riya Saha Integration) ───────────────────── */}
+            {/* ── ADMIN ROUTES ─────────────────────────────────────────── */}
             <Route path="/admin/dashboard" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
@@ -223,7 +223,7 @@ function App() {
               </ProtectedRoute>
             } />
 
-            {/* ── MODULE 2: RESEARCH DISCOVERY & SHARED PAPER KNOWLEDGE ── */}
+            {/* ── Academic Research Discovery & Knowledge ── */}
             <Route path="/research/discovery" element={
               <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <ResearchDiscoveryPage />

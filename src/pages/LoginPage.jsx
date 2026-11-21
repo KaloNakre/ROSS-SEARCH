@@ -84,7 +84,7 @@ export const LoginPage = () => {
             <Link to="/" className="inline-flex items-center gap-1 hover:text-diu-blue font-medium">
               <ArrowLeft size={13} /> Back to Home
             </Link>
-            <span>v1.0 Module 1</span>
+            <span>ROSS-SEARCH v1.0</span>
           </div>
           <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-blue-200/30 rounded-full blur-2xl pointer-events-none" />
           <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-emerald-200/30 rounded-full blur-2xl pointer-events-none" />

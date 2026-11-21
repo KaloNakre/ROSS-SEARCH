@@ -54,11 +54,11 @@ from app.services.ai_provider import (
     chat_research_assistant
 )
 
-router = APIRouter(prefix="/api/research", tags=["Module 2: Research Discovery & Shared Paper Knowledge"])
+router = APIRouter(prefix="/api/research", tags=["Research Discovery & Academic Intelligence"])
 
 
 # ==============================================================================
-# 1. [Riya Saha – ID: 715] Real Scholarly Papers & Academic Discovery Engine
+# 1. Academic Paper Discovery Engine
 # ==============================================================================
 
 @router.get("/academic-papers", response_model=List[AcademicPaperOut])
@@ -72,7 +72,7 @@ def get_academic_papers(
     db: Session = Depends(get_db)
 ):
     """
-    [Riya Saha - ID: 715]
+    [Paper Discovery]
     Explore authentic, peer-reviewed open-access academic papers (arXiv, Crossref, OpenAlex).
     Strict academic integrity: authentic authors, citations, DOIs, and direct open-access links.
     Results are cached in the database for speed and offline availability.
@@ -258,7 +258,7 @@ def log_research_query(
     log_entry = ResearchQueryLog(
         query_text=query_text.strip(),
         domain=domain,
-        student_id=student_id or "232-35-715",
+        student_id=student_id or "DIU-STUDENT",
         student_name=student_name or "Student Explorer"
     )
     db.add(log_entry)
@@ -267,7 +267,7 @@ def log_research_query(
 
 
 # ==============================================================================
-# 2. [Robayet Islam – ID: 809] 20-Point AI Research Paper Summarizer Engine
+# 2. AI Research Breakdown Engine
 # ==============================================================================
 
 @router.post("/summarize-pdf", response_model=TwentyPointPaperAnalysis)
@@ -279,8 +279,8 @@ async def summarize_uploaded_or_linked_pdf(
     api_key: Optional[str] = Form(None)
 ):
     """
-    [Robayet Islam - ID: 809]
-    20-Point Academic Research Paper Analyzer:
+    [AI Analysis Engine]
+    AI Research Breakdown Engine:
     Processes real PDF files or verified URLs via PyMuPDF and produces research-grade
     analysis using Gemini (1.5 Flash/Pro), Groq (Llama-3.3-70B), or PyMuPDF Neural NLP fallback.
     Adheres strictly to academic honesty: unstated metrics are explicitly flagged as 'Not reported'.
@@ -327,7 +327,7 @@ async def summarize_uploaded_or_linked_pdf(
             detail="Extracted text is insufficient for academic analysis (less than 80 characters)."
         )
 
-    # Execute Multi-Model 20-Point Analysis
+    # Execute Multi-Model AI Research Analysis
     analysis = analyze_research_paper_multi_model(
         text=extracted_text,
         sections=doc_sections,
@@ -368,7 +368,7 @@ def public_ai_research_chat(payload: PublicChatRequest):
 
 
 # ==============================================================================
-# 4. [Tamim Hasan Sami – ID: 313] Topic Similarity & Duplicate Detection Engine
+# 4. Topic Similarity & Duplicate Detection Engine
 # ==============================================================================
 
 def compute_text_similarity(text1: str, text2: str) -> float:
@@ -396,7 +396,7 @@ def check_topic_similarity(
     db: Session = Depends(get_db)
 ):
     """
-    [Tamim Hasan Sami - ID: 313]
+    [Topic Intelligence]
     Multi-criteria Topic Similarity & Duplicate FYP Detection:
     1. Compares proposed topic and abstract against the departmental FYP Archive.
     2. Compares against active registered topics across the current student cohort.
@@ -552,7 +552,7 @@ def register_approved_thesis_topic(
 
 
 # ==============================================================================
-# 5. [Tamim Hasan Sami – ID: 313] Shared Paper Knowledge Database
+# 5. Shared Research Knowledge Database
 # ==============================================================================
 
 @router.get("/shared-knowledge", response_model=List[SharedPaperKnowledgeOut])
@@ -562,7 +562,7 @@ def list_shared_paper_knowledge(
     db: Session = Depends(get_db)
 ):
     """
-    [Tamim Hasan Sami - ID: 313]
+    [Topic Intelligence]
     Retrieve all research papers, AI summaries, research gaps, and findings
     stored in the shared database for current and future students.
     """
@@ -588,7 +588,7 @@ def save_paper_to_shared_knowledge(
     db: Session = Depends(get_db)
 ):
     """
-    Save an analyzed paper with its complete 20-point AI summary and research gap
+    Save an analyzed paper with its complete AI-generated summary and research gap
     into the shared repository so future students can benefit.
     """
     record = SharedPaperKnowledge(
@@ -598,7 +598,7 @@ def save_paper_to_shared_knowledge(
         journal_or_conference=payload.journal_or_conference,
         domain=payload.domain,
         uploaded_by_name=payload.uploaded_by_name or "DIU Student",
-        uploaded_by_id=payload.uploaded_by_id or "232-35-809",
+        uploaded_by_id=payload.uploaded_by_id or "DIU-STUDENT",
         file_name=payload.file_name,
         abstract=payload.abstract,
         # 20 Academic dimensions
@@ -815,7 +815,7 @@ def export_saved_library(
 
 
 # ==============================================================================
-# 8. [Robayet Islam – ID: 809] Novel Thesis Topic Suggestion Engine
+# 8. Novel Thesis Topic Suggestion Engine
 # ==============================================================================
 
 SUGGESTED_THESIS_TOPICS = [
@@ -916,7 +916,7 @@ def get_suggested_thesis_topics(
     domain: Optional[str] = Query(None, description="Filter by research domain")
 ):
     """
-    [Robayet Islam – ID: 809] Novel Thesis Topic Suggestion Engine.
+    Novel Thesis Topic Suggestion Engine.
     Returns curated, academically rigorous thesis topic suggestions with methodology,
     datasets, novelty angles, and expected contributions.
     No login required. Filtered by domain if provided.

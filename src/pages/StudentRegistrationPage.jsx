@@ -141,7 +141,7 @@ export const StudentRegistrationPage = () => {
     } else if (trimmedId.length > 15) {
       newErrors.studentId = 'Student ID cannot exceed 15 characters.';
     } else if (!/^[a-zA-Z0-9-]+$/.test(trimmedId)) {
-      newErrors.studentId = 'Student ID contains invalid characters. Use alphanumeric and hyphens (e.g. 201-15-809).';
+      newErrors.studentId = 'Student ID contains invalid characters. Use alphanumeric and hyphens (e.g. 201-15-101).';
     }
 
     // 3. Department: required, max 30 chars
@@ -282,7 +282,7 @@ export const StudentRegistrationPage = () => {
               id="student-full-name"
               name="fullName"
               label="Full Name"
-              placeholder="e.g. Robayet Islam"
+              placeholder="e.g. Arif Hossain"
               value={formData.fullName}
               onChange={handleChange}
               maxLength={32}
@@ -296,7 +296,7 @@ export const StudentRegistrationPage = () => {
               id="student-id-field"
               name="studentId"
               label="Student ID"
-              placeholder="e.g. 232-35-809"
+              placeholder="e.g. 201-15-101"
               value={formData.studentId}
               onChange={handleChange}
               maxLength={15}
@@ -349,7 +349,7 @@ export const StudentRegistrationPage = () => {
               name="email"
               type="email"
               label="Email Address"
-              placeholder="e.g. robayet.cse@diu.edu.bd"
+              placeholder="e.g. arif.cse@diu.edu.bd"
               value={formData.email}
               onChange={handleChange}
               maxLength={254}

@@ -260,7 +260,7 @@ def get_database_table_data(
                 "department": t.department,
                 "section": t.section or "Section 60_A",
                 "status": t.status.value.upper() if hasattr(t.status, 'value') else str(t.status).upper(),
-                "leader": t.leader.full_name if t.leader else "Robayet Islam",
+                "leader": t.leader.full_name if t.leader else "Unassigned",
                 "supervisor": t.supervisor.full_name if t.supervisor else "Assign Later",
                 "members_count": len(t.members),
             }

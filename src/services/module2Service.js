@@ -1,17 +1,17 @@
 /**
- * Module 2 Service: Research Discovery and Shared Paper Knowledge
+ * Research & Academic Intelligence Service
  * 
  * Contributor Responsibilities:
- * 1. [Riya Saha - ID: 232-35-715]: Research domains, paper discovery & previous departmental projects archive
- * 2. [Robayet Islam - ID: 232-35-809]: AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq + 20-point analysis)
- * 3. [Tamim Hasan Sami - ID: 232-35-313]: Topic similarity & duplicate FYP detector
- * 4. [Tamim Hasan Sami - ID: 232-35-313]: Shared paper knowledge repository
+ * 1. [Paper Discovery]: Research domains, paper discovery & previous departmental projects archive
+ * 2. [AI Analysis]: AI Paper Summarizer Engine (PyMuPDF + Gemini/Groq + AI research analysis)
+ * 3. [Topic Intelligence]: Topic similarity & duplicate FYP detector
+ * 4. [Topic Intelligence]: Shared paper knowledge repository
  */
 
 const API_BASE = '/api/research';
 
 export const module2Service = {
-  // ── [Riya Saha – ID: 715] Published Academic Papers Catalog (arXiv, Crossref) ──
+  // ── Published Academic Papers Catalog (arXiv, Crossref) ──
   async getAcademicPapers(filters = {}) {
     try {
       const params = new URLSearchParams();
@@ -31,7 +31,7 @@ export const module2Service = {
     }
   },
 
-  // ── [Riya Saha – ID: 715] Previous Departmental Projects Archive ─────────
+  // ── Previous Departmental Projects Archive ─────────
   async getPreviousProjects(filters = {}) {
     try {
       const params = new URLSearchParams();
@@ -67,7 +67,7 @@ export const module2Service = {
     }
   },
 
-  // ── [Robayet Islam – ID: 809] 20-Point AI Paper Summarizer Engine (Gemini / Groq / Neural NLP) ──
+  // ── AI Research Breakdown Engine (Gemini / Groq / Neural NLP) ──
   async summarizePaper({ file, paperUrl, rawText, modelChoice = 'auto', apiKey }) {
     const formData = new FormData();
     if (file) {
@@ -160,7 +160,7 @@ export const module2Service = {
     return res;
   },
 
-  // ── [Tamim Hasan Sami – ID: 313] Topic Similarity & Duplicate Check ───────
+  // ── Topic Similarity & Duplicate Check ───────
   async checkSimilarity({ title, abstract, domain }) {
     const res = await fetch(`${API_BASE}/check-similarity`, {
       method: 'POST',
@@ -193,7 +193,7 @@ export const module2Service = {
     return await res.json();
   },
 
-  // ── [Tamim Hasan Sami – ID: 313] Shared Paper Knowledge Repository ────────
+  // ── Shared Paper Knowledge Repository ────────
   async getSharedPaperKnowledge(filters = {}) {
     try {
       const params = new URLSearchParams();
