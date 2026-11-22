@@ -102,7 +102,7 @@ DEMO_STUDENTS = [
     {
         "email": "nabila.chowdhury@diu.edu.bd",
         "full_name": "Nabila Chowdhury",
-        "student_id": "201-15-204",
+        "student_id": "201-15-104",
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Machine Learning",
@@ -112,7 +112,7 @@ DEMO_STUDENTS = [
     {
         "email": "farhan.islam@diu.edu.bd",
         "full_name": "Farhan Islam",
-        "student_id": "201-15-205",
+        "student_id": "201-15-105",
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Cyber Security",
@@ -211,8 +211,9 @@ def run_demo_seeder(db: Session):
 
     # 2. Seed Students
     for st_data in DEMO_STUDENTS:
-        user = db.query(User).filter(User.email == st_data["email"]).first()
-        if not user:
+        existing_user = db.query(User).filter(User.email == st_data["email"]).first()
+        existing_matric = db.query(Student).filter(Student.student_id == st_data["student_id"]).first()
+        if not existing_user and not existing_matric:
             created_time = now - timedelta(days=st_data["created_days_ago"], hours=2)
             user = User(
                 email=st_data["email"],

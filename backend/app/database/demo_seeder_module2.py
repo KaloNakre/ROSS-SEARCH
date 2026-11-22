@@ -111,15 +111,15 @@ DEMO_SHARED_PAPERS = [
         "uploaded_by_id": "201-15-101",
         "file_name": "Attention_Is_All_You_Need.pdf",
         "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose the Transformer, a model architecture eschewing recurrence and relying entirely on an attention mechanism to draw global dependencies between input and output.",
-        "problem_statement": "Recurrent neural networks (RNNs/LSTMs) suffer from sequential computation bottlenecks, preventing parallel training across long sequence lengths and failing to preserve long-range dependencies.",
-        "objectives": "1. Replace sequential recurrence entirely with Multi-Head Self-Attention.\n2. Enable constant-time path length between arbitrary sequence positions.\n3. Drastically reduce training time while improving translation BLEU scores.",
-        "methodology": "Encoder-Decoder structure with stacked Multi-Head Attention and Position-Wise Feed-Forward networks, sinusoidal positional encodings, and residual normalization.",
-        "dataset": "WMT 2014 English-to-German (4.5 million sentence pairs) and WMT 2014 English-to-French (36 million pairs).",
-        "model_technology": "Transformer Big (65M parameters), Multi-Head Scaled Dot-Product Attention, Adam Optimizer with warm-up schedule.",
-        "findings": "Established state-of-the-art BLEU score of 28.4 on English-to-German and 41.8 on English-to-French, training over 3.5 days on 8 GPUs (orders of magnitude faster than ConvS2S and GNMT).",
+        "research_problem": "Recurrent neural networks (RNNs/LSTMs) suffer from sequential computation bottlenecks, preventing parallel training across long sequence lengths and failing to preserve long-range dependencies.",
+        "research_objective": "1. Replace sequential recurrence entirely with Multi-Head Self-Attention.\n2. Enable constant-time path length between arbitrary sequence positions.\n3. Drastically reduce training time while improving translation BLEU scores.",
+        "proposed_methodology": "Encoder-Decoder structure with stacked Multi-Head Attention and Position-Wise Feed-Forward networks, sinusoidal positional encodings, and residual normalization.",
+        "dataset_description": "WMT 2014 English-to-German (4.5 million sentence pairs) and WMT 2014 English-to-French (36 million pairs).",
+        "models_algorithms": "Transformer Big (65M parameters), Multi-Head Scaled Dot-Product Attention, Adam Optimizer with warm-up schedule.",
+        "important_findings": "Established state-of-the-art BLEU score of 28.4 on English-to-German and 41.8 on English-to-French, training over 3.5 days on 8 GPUs (orders of magnitude faster than ConvS2S and GNMT).",
         "limitations": "Quadratic computational complexity O(n^2) with respect to input sequence length, requiring massive memory for ultra-long documents.",
         "research_gap": "Absence of linear attention mechanisms for ultra-long sequence modeling and heavy reliance on extensive pre-training corpora.",
-        "future_work": "Exploration of sparse attention patterns, extending to multimodal inputs (images, audio), and localized low-resource dialect adaptation."
+        "future_directions": "Exploration of sparse attention patterns, extending to multimodal inputs (images, audio), and localized low-resource dialect adaptation."
     },
     {
         "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
@@ -131,15 +131,15 @@ DEMO_SHARED_PAPERS = [
         "uploaded_by_id": "201-15-204",
         "file_name": "BERT_Pretraining_Language_Understanding.pdf",
         "abstract": "We introduce BERT (Bidirectional Encoder Representations from Transformers). Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers.",
-        "problem_statement": "Standard language models are strictly unidirectional (left-to-right), which severely limits context fusion during pre-training for token-level and sentence-level question answering tasks.",
-        "objectives": "1. Develop a masked language model (MLM) objective to enable deep bidirectional context learning.\n2. Formulate Next Sentence Prediction (NSP) for cross-sentence relationship capture.\n3. Establish fine-tuning paradigm requiring minimal task-specific architectural changes.",
-        "methodology": "Pre-trained on BooksCorpus and English Wikipedia using Masked LM (15% token masking) and Next Sentence Prediction, followed by single-epoch task fine-tuning.",
-        "dataset": "BooksCorpus (800M words) and English Wikipedia (2,500M words). Evaluated on GLUE benchmark, SQuAD v1.1/v2.0, and SWAG.",
-        "model_technology": "BERT-Base (12 layers, 110M params) and BERT-Large (24 layers, 340M params), Gelu activation, AdamW.",
-        "findings": "Achieved GLUE score of 80.5% (7.7% absolute improvement) and SQuAD v1.1 Test F1 of 93.2, outperforming human performance.",
+        "research_problem": "Standard language models are strictly unidirectional (left-to-right), which severely limits context fusion during pre-training for token-level and sentence-level question answering tasks.",
+        "research_objective": "1. Develop a masked language model (MLM) objective to enable deep bidirectional context learning.\n2. Formulate Next Sentence Prediction (NSP) for cross-sentence relationship capture.\n3. Establish fine-tuning paradigm requiring minimal task-specific architectural changes.",
+        "proposed_methodology": "Pre-trained on BooksCorpus and English Wikipedia using Masked LM (15% token masking) and Next Sentence Prediction, followed by single-epoch task fine-tuning.",
+        "dataset_description": "BooksCorpus (800M words) and English Wikipedia (2,500M words). Evaluated on GLUE benchmark, SQuAD v1.1/v2.0, and SWAG.",
+        "models_algorithms": "BERT-Base (12 layers, 110M params) and BERT-Large (24 layers, 340M params), Gelu activation, AdamW.",
+        "important_findings": "Achieved GLUE score of 80.5% (7.7% absolute improvement) and SQuAD v1.1 Test F1 of 93.2, outperforming human performance.",
         "limitations": "Discrepancy between pre-training and fine-tuning due to [MASK] tokens never appearing during inference; substantial parameter footprint.",
         "research_gap": "Native adaptation to morphologically rich agglutinative languages (like Bengali) without dedicated tokenization vocabularies.",
-        "future_work": "Domain-specific distillations (BioBERT, BanglaBERT) and parameter pruning for edge deployment."
+        "future_directions": "Domain-specific distillations (BioBERT, BanglaBERT) and parameter pruning for edge deployment."
     },
     {
         "title": "Deep Residual Learning for Image Recognition (ResNet)",
@@ -151,15 +151,15 @@ DEMO_SHARED_PAPERS = [
         "uploaded_by_id": "201-15-205",
         "file_name": "Deep_Residual_Learning_ResNet.pdf",
         "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs.",
-        "problem_statement": "When deeper networks start converging, a degradation problem is exposed: with network depth increasing, accuracy gets saturated and then degrades rapidly due to vanishing/exploding gradients.",
-        "objectives": "1. Solve the degradation problem in ultra-deep networks up to 152 layers.\n2. Formulate identity shortcut connections that introduce no additional parameters or computational complexity.\n3. Win 1st place in ImageNet classification, detection, and localization challenges.",
-        "methodology": "Residual building blocks with skip connections F(x) + x, batch normalization after convolutions, global average pooling, and SGD optimization.",
-        "dataset": "ImageNet 2012 classification dataset (1.28 million training images across 1,000 classes) and COCO detection dataset.",
-        "model_technology": "ResNet-50, ResNet-101, ResNet-152, Bottleneck architectures, Batch Normalization.",
-        "findings": "ResNet-152 achieved 3.57% top-5 error on the ImageNet test set, winning 1st place in the ILSVRC 2015 competition and outperforming human-level recognition.",
+        "research_problem": "When deeper networks start converging, a degradation problem is exposed: with network depth increasing, accuracy gets saturated and then degrades rapidly due to vanishing/exploding gradients.",
+        "research_objective": "1. Solve the degradation problem in ultra-deep networks up to 152 layers.\n2. Formulate identity shortcut connections that introduce no additional parameters or computational complexity.\n3. Win 1st place in ImageNet classification, detection, and localization challenges.",
+        "proposed_methodology": "Residual building blocks with skip connections F(x) + x, batch normalization after convolutions, global average pooling, and SGD optimization.",
+        "dataset_description": "ImageNet 2012 classification dataset (1.28 million training images across 1,000 classes) and COCO detection dataset.",
+        "models_algorithms": "ResNet-50, ResNet-101, ResNet-152, Bottleneck architectures, Batch Normalization.",
+        "important_findings": "ResNet-152 achieved 3.57% top-5 error on the ImageNet test set, winning 1st place in the ILSVRC 2015 competition and outperforming human-level recognition.",
         "limitations": "Diminishing marginal returns on depth alone without increased layer width; feature reusability can be constrained compared to dense connections.",
         "research_gap": "Optimal residual weighting in mixed-precision mobile architectures and low-contrast medical imaging.",
-        "future_work": "Wide ResNets, DenseNets, and integration of spatial attention mechanisms."
+        "future_directions": "Wide ResNets, DenseNets, and integration of spatial attention mechanisms."
     }
 ]
 
