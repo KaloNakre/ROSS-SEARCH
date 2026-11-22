@@ -2,8 +2,9 @@ import os
 from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
 from app.models.user import User, UserRole
-from app.models.student import Student
-from app.models.supervisor import Supervisor
+from app.models.student import Student, StudentInterest
+from app.models.supervisor import Supervisor, SupervisorExpertise
+from app.models.research_interest import ResearchInterest
 from app.models.team import Team, TeamMember, MemberRole
 from app.core.security import hash_password
 
@@ -65,6 +66,20 @@ DEMO_SUPERVISORS = [
         "accepting_teams": True,
         "created_days_ago": 6,
     },
+    {
+        "email": "dr.touhid.bhuiyan@diu.edu.bd",
+        "full_name": "Prof. Dr. Touhid Bhuiyan",
+        "designation": "Professor & Head",
+        "department": "Department of Computer Science and Engineering",
+        "room": "Main Academic Bldg-501, DSC",
+        "phone": "+880 1713 456789",
+        "about": "Research interests include Cyber Security, Information Assurance, Intelligent Threat Intelligence, and Trust Models in Cloud.",
+        "education": "Ph.D. in Cyber Security (QUT, Australia); M.Sc. in CSE",
+        "available_slots": 3,
+        "max_slots": 5,
+        "accepting_teams": True,
+        "created_days_ago": 14,
+    },
 ]
 
 
@@ -76,6 +91,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Natural Language Processing",
+        "project_title": "Bengali Sentiment Analysis and Opinion Mining Using Hybrid BiLSTM-BERT Models",
         "phone": "+880 1711 000101",
         "created_days_ago": 5,
     },
@@ -86,6 +102,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Machine Learning",
+        "project_title": "Federated Learning Optimization for Edge Device Model Training",
         "phone": "+880 1711 100102",
         "created_days_ago": 4,
     },
@@ -96,6 +113,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Cyber Security",
+        "project_title": "Cyber-Physical SCADA Network Threat Detection Using Deep Autoencoders",
         "phone": "+880 1711 100103",
         "created_days_ago": 4,
     },
@@ -106,6 +124,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Machine Learning",
+        "project_title": "Context-Aware Dialogue Systems using Bidirectional Attention",
         "phone": "+880 1711 100204",
         "created_days_ago": 4,
     },
@@ -116,6 +135,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_A",
         "preferred_domain": "Cyber Security",
+        "project_title": "Zero-Trust Cloud Architecture and Binary Memory Safety",
         "phone": "+880 1711 100205",
         "created_days_ago": 3,
     },
@@ -126,6 +146,7 @@ DEMO_STUDENTS = [
         "department": "Department of Software Engineering",
         "section": "60_B",
         "preferred_domain": "Cloud Computing & DevOps",
+        "project_title": "Cloud-Native Microservices Autoscaling Using Reinforcement Learning",
         "phone": "+880 1711 100204",
         "created_days_ago": 3,
     },
@@ -136,6 +157,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_B",
         "preferred_domain": "Computer Vision",
+        "project_title": "Automated Brain Tumor Segmentation from Multi-Modal MRI Using Attention U-Net",
         "phone": "+880 1711 100205",
         "created_days_ago": 2,
     },
@@ -146,6 +168,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "61_A",
         "preferred_domain": "Data Science & Big Data",
+        "project_title": "Real-Time Streaming Big Data Analytics for High-Volume Sensor Networks",
         "phone": "+880 1711 100306",
         "created_days_ago": 2,
     },
@@ -156,6 +179,7 @@ DEMO_STUDENTS = [
         "department": "Department of Software Engineering",
         "section": "61_A",
         "preferred_domain": "Blockchain & Distributed Systems",
+        "project_title": "Decentralized Academic Credential Verification Framework on Polygon",
         "phone": "+880 1711 100307",
         "created_days_ago": 1,
     },
@@ -166,6 +190,7 @@ DEMO_STUDENTS = [
         "department": "Department of Computer Science and Engineering",
         "section": "60_C",
         "preferred_domain": "Bioinformatics & Healthcare AI",
+        "project_title": "Early Stage Skin Melanoma Classification Using Explainable Deep CNNs",
         "phone": "+880 1711 100408",
         "created_days_ago": 1,
     },
@@ -173,7 +198,7 @@ DEMO_STUDENTS = [
 
 
 def run_demo_seeder(db: Session):
-    """Seed 4 supervisors and 10 students if not already populated."""
+    """Seed 5 supervisors and 10 students if not already populated."""
     now = datetime.now(timezone.utc)
     seeded_supervisors_count = 0
     seeded_students_count = 0
@@ -207,7 +232,18 @@ def run_demo_seeder(db: Session):
                 accepting_teams=s_data["accepting_teams"],
             )
             db.add(sup)
+            db.flush()
             seeded_supervisors_count += 1
+
+            # Map supervisor expertise domains
+            for interest in db.query(ResearchInterest).all():
+                if interest.name.lower() in sup.about.lower():
+                    exists_exp = db.query(SupervisorExpertise).filter(
+                        SupervisorExpertise.supervisor_id == sup.id,
+                        SupervisorExpertise.interest_id == interest.id
+                    ).first()
+                    if not exists_exp:
+                        db.add(SupervisorExpertise(supervisor_id=sup.id, interest_id=interest.id))
 
     # 2. Seed Students
     for st_data in DEMO_STUDENTS:
@@ -232,10 +268,24 @@ def run_demo_seeder(db: Session):
                 department=st_data["department"],
                 section=st_data["section"],
                 preferred_domain=st_data["preferred_domain"],
+                project_title=st_data.get("project_title"),
                 phone=st_data["phone"],
             )
             db.add(student)
+            db.flush()
             seeded_students_count += 1
+
+            # Map student interest junction
+            interest = db.query(ResearchInterest).filter(
+                ResearchInterest.name.ilike(f"%{st_data['preferred_domain']}%")
+            ).first()
+            if interest:
+                exists_si = db.query(StudentInterest).filter(
+                    StudentInterest.student_id == student.id,
+                    StudentInterest.interest_id == interest.id
+                ).first()
+                if not exists_si:
+                    db.add(StudentInterest(student_id=student.id, interest_id=interest.id))
 
     db.commit()
     return {

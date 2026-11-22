@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.research_knowledge import PreviousProject, SharedPaperKnowledge
+from app.models.research_knowledge import PreviousProject, SharedPaperKnowledge, ResearchQueryLog, StudentSavedPaper, AcademicPaperCache
+from app.models.student import Student
 
 DEMO_PREVIOUS_PROJECTS = [
     {
@@ -142,29 +143,137 @@ DEMO_SHARED_PAPERS = [
         "future_directions": "Domain-specific distillations (BioBERT, BanglaBERT) and parameter pruning for edge deployment."
     },
     {
-        "title": "Deep Residual Learning for Image Recognition (ResNet)",
-        "authors": "Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun",
-        "year": 2016,
-        "journal_or_conference": "CVPR 2016",
+        "title": "DeepLog: Anomaly Detection through Deep Learning from System Logs",
+        "authors": "Min Du, Feifei Li, Guineng Zheng, Vivek Srikumar",
+        "year": 2017,
+        "journal_or_conference": "ACM CCS 2017",
+        "domain": "Cyber Security",
+        "uploaded_by_name": "Jamal Uddin",
+        "uploaded_by_id": "201-15-103",
+        "file_name": "DeepLog_Anomaly_Detection.pdf",
+        "abstract": "Log data is universally available in enterprise software. We propose DeepLog, a deep neural network utilizing Long Short-Term Memory (LSTM) to model a system log as a natural language sequence.",
+        "research_problem": "Traditional log analysis relies on static regex patterns and rule engines that fail to adapt to evolving cyber threats and high-volume streaming log anomalies.",
+        "research_objective": "1. Model log execution paths sequentially using LSTM networks.\n2. Predict future log event types dynamically and flag unexpected sequences.\n3. Diagnose anomaly root causes via parameter value tracking.",
+        "proposed_methodology": "Log key parser (Drain/Spell) converts unstructured text to structured events; Stacked LSTM learns log normal execution sequences; anomaly flagged when actual event falls outside top-g predictions.",
+        "dataset_description": "HDFS log dataset (11,175,629 log entries generated on Amazon EC2) and OpenStack Cloud dataset.",
+        "models_algorithms": "Stacked LSTM (2 layers, 64 hidden units), Softmax probability distribution, Spell log parser.",
+        "important_findings": "Detected over 96% of HDFS anomalies with an extremely low false positive rate (FPR) under 1.8%, significantly outperforming PCA and invariant mining.",
+        "limitations": "Computational overhead during continuous online retraining when log formatting changes during software upgrades.",
+        "research_gap": "Automated recovery and zero-day threat attribution in multi-tenant Kubernetes and cloud microservice environments.",
+        "future_directions": "Transformer-based log representation (LogBERT) and self-supervised contrastive learning for heterogeneous distributed logs."
+    },
+    {
+        "title": "Communication-Efficient Learning of Deep Networks from Decentralized Data",
+        "authors": "H. Brendan McMahan, Eider Moore, Daniel Ramage, Seth Hampson, Blaise Aguera y Arcas",
+        "year": 2017,
+        "journal_or_conference": "AISTATS 2017",
+        "domain": "Machine Learning",
+        "uploaded_by_name": "Kamal Hossain",
+        "uploaded_by_id": "201-15-102",
+        "file_name": "Federated_Learning_McMahan.pdf",
+        "abstract": "Modern mobile devices have access to a wealth of data suitable for learning. We advocate Federated Learning, where training data remains distributed on mobile devices, and a shared model is learned by aggregating locally-computed updates.",
+        "research_problem": "Centralized machine learning requires uploading massive sensitive user data to cloud servers, introducing severe privacy violations and communication latency bottlenecks.",
+        "research_objective": "1. Design a practical algorithm for decentralized model training across millions of edge devices.\n2. Minimize client-to-server communication rounds through iterative local updates.\n3. Maintain model accuracy on unbalanced and non-IID data distributions.",
+        "proposed_methodology": "FederatedAveraging (FedAvg) algorithm combining local stochastic gradient descent (SGD) on client devices with iterative central server model weight averaging.",
+        "dataset_description": "MNIST digit dataset, Federated EMNIST, and The Complete Works of William Shakespeare character-level dataset.",
+        "models_algorithms": "FedAvg, Federated SGD, CNN baselines, LSTM language models.",
+        "important_findings": "Reduced required communication rounds by 10x to 100x compared to synchronized FedSGD, proving robust convergence on non-IID and heavily imbalanced device partitions.",
+        "limitations": "Susceptible to poisoning attacks from malicious nodes and straggler delays from slow mobile connections.",
+        "research_gap": "Personalized federated learning architectures and formal differential privacy guarantees with minimal utility degradation.",
+        "future_directions": "Secure aggregation protocols, split federated learning, and edge hardware accelerators."
+    },
+    {
+        "title": "Dermatologist-Level Classification of Skin Cancer with Deep Neural Networks",
+        "authors": "Andre Esteva, Brett Kuprel, Roberto A. Novoa, et al.",
+        "year": 2017,
+        "journal_or_conference": "Nature 542",
+        "domain": "Bioinformatics & Healthcare AI",
+        "uploaded_by_name": "Farhana Yeasmin",
+        "uploaded_by_id": "201-15-408",
+        "file_name": "Skin_Cancer_Classification_Nature.pdf",
+        "abstract": "Skin cancer, the most common human malignancy, is primarily diagnosed visually. We demonstrate classification of skin lesions using a single deep convolutional neural network (CNN), trained end-to-end from images directly.",
+        "research_problem": "Melanoma accounts for the majority of skin cancer deaths, yet early screening relies heavily on subjective visual inspection by expert dermatologists who are scarce in rural clinics.",
+        "research_objective": "1. Train a deep CNN to differentiate benign lesions from lethal malignant melanomas.\n2. Benchmark performance against 21 board-certified dermatologists on biopsy-proven clinical images.\n3. Enable mobile smartphone screening for remote and underserved populations.",
+        "proposed_methodology": "Google Inception v3 CNN pre-trained on ImageNet and fine-tuned using transfer learning on clinical dermoscopy images across a multi-tier disease taxonomy.",
+        "dataset_description": "Curated clinical dataset of 129,450 dermoscopic and photographic images encompassing 2,032 different skin diseases.",
+        "models_algorithms": "Inception-v3 CNN, Transfer Learning, AUC-ROC curve evaluation, Softmax classification.",
+        "important_findings": "The neural network achieved an area under the curve (AUC) of 0.96 for carcinoma and 0.94 for melanoma, matching the diagnostic sensitivity and specificity of 21 board-certified dermatologists.",
+        "limitations": "Lack of representation for darker skin phototypes (Fitzpatrick scales V-VI) and vulnerability to imaging artifacts like surgical ink marks.",
+        "research_gap": "Explainable saliency maps for clinical validation and multimodal fusion with patient demographic history.",
+        "future_directions": "Deployment on lightweight mobile edge models and prospective real-world clinical trials."
+    }
+]
+
+DEMO_QUERY_LOGS = [
+    ("Bengali BERT sentiment analysis for low-resource social text", "Natural Language Processing", "201-15-101", "Arif Hossain"),
+    ("Federated learning communication optimization on edge devices", "Machine Learning", "201-15-102", "Kamal Hossain"),
+    ("SCADA deep autoencoder anomaly detection in power grid ICS", "Cyber Security", "201-15-103", "Jamal Uddin"),
+    ("Bidirectional transformer dialogue response generation", "Machine Learning", "201-15-104", "Nabila Chowdhury"),
+    ("Zero-trust memory safety and buffer overflow defense", "Cyber Security", "201-15-105", "Farhan Islam"),
+    ("Kubernetes microservices autoscaling using deep Q-learning", "Cloud Computing & DevOps", "201-15-204", "Tanvir Ahmed"),
+    ("Attention U-Net 3D brain tumor MRI segmentation", "Computer Vision", "201-15-205", "Mehedi Hasan"),
+    ("High-throughput sensor stream processing with Apache Kafka", "Data Science & Big Data", "201-15-306", "Sadia Afrin"),
+    ("Polygon IPFS academic certificate verification smart contracts", "Blockchain & Distributed Systems", "201-15-307", "Naimur Rahman"),
+    ("Skin melanoma dermatological screening using deep Inception CNN", "Bioinformatics & Healthcare AI", "201-15-408", "Farhana Yeasmin"),
+]
+
+DEMO_SAVED_PAPERS = [
+    {
+        "student_matric": "201-15-101",
+        "title": "Attention Is All You Need",
+        "authors": "A. Vaswani, N. Shazeer, et al.",
+        "year": 2017,
+        "domain": "Natural Language Processing",
+        "venue": "NeurIPS",
+        "abstract": "Foundational transformer model architecture eliminating recurrence.",
+        "pdf_url": "https://arxiv.org/pdf/1706.03762.pdf",
+        "notes": "Core foundation paper for our Bengali sentiment analysis model.",
+        "reading_status": "completed",
+        "is_downloaded": True
+    },
+    {
+        "student_matric": "201-15-103",
+        "title": "DeepLog: Anomaly Detection through Deep Learning from System Logs",
+        "authors": "M. Du, F. Li, et al.",
+        "year": 2017,
+        "domain": "Cyber Security",
+        "venue": "ACM CCS",
+        "abstract": "Deep neural network utilizing LSTM to model system log sequences.",
+        "pdf_url": "https://arxiv.org/pdf/1706.03762.pdf",
+        "notes": "Downloaded to local research folder; implementing the Drain parser.",
+        "reading_status": "completed",
+        "is_downloaded": True
+    },
+    {
+        "student_matric": "201-15-205",
+        "title": "Attention U-Net: Learning Where to Look for the Pancreas",
+        "authors": "O. Oktay, J. Schlemper, et al.",
+        "year": 2018,
         "domain": "Computer Vision",
-        "uploaded_by_name": "Farhan Islam",
-        "uploaded_by_id": "201-15-205",
-        "file_name": "Deep_Residual_Learning_ResNet.pdf",
-        "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs.",
-        "research_problem": "When deeper networks start converging, a degradation problem is exposed: with network depth increasing, accuracy gets saturated and then degrades rapidly due to vanishing/exploding gradients.",
-        "research_objective": "1. Solve the degradation problem in ultra-deep networks up to 152 layers.\n2. Formulate identity shortcut connections that introduce no additional parameters or computational complexity.\n3. Win 1st place in ImageNet classification, detection, and localization challenges.",
-        "proposed_methodology": "Residual building blocks with skip connections F(x) + x, batch normalization after convolutions, global average pooling, and SGD optimization.",
-        "dataset_description": "ImageNet 2012 classification dataset (1.28 million training images across 1,000 classes) and COCO detection dataset.",
-        "models_algorithms": "ResNet-50, ResNet-101, ResNet-152, Bottleneck architectures, Batch Normalization.",
-        "important_findings": "ResNet-152 achieved 3.57% top-5 error on the ImageNet test set, winning 1st place in the ILSVRC 2015 competition and outperforming human-level recognition.",
-        "limitations": "Diminishing marginal returns on depth alone without increased layer width; feature reusability can be constrained compared to dense connections.",
-        "research_gap": "Optimal residual weighting in mixed-precision mobile architectures and low-contrast medical imaging.",
-        "future_directions": "Wide ResNets, DenseNets, and integration of spatial attention mechanisms."
+        "venue": "MIDL",
+        "abstract": "Novel attention gate model for medical image segmentation.",
+        "pdf_url": "https://arxiv.org/pdf/1804.03999.pdf",
+        "notes": "Downloaded; analyzing dice similarity coefficients on MRI scans.",
+        "reading_status": "completed",
+        "is_downloaded": True
+    },
+    {
+        "student_matric": "201-15-408",
+        "title": "Dermatologist-Level Classification of Skin Cancer with Deep Neural Networks",
+        "authors": "A. Esteva, B. Kuprel, et al.",
+        "year": 2017,
+        "domain": "Bioinformatics & Healthcare AI",
+        "venue": "Nature",
+        "abstract": "Classification of skin lesions using deep convolutional neural networks.",
+        "pdf_url": "https://doi.org/10.1038/nature21056",
+        "notes": "Essential reference paper for our FYP thesis on dermoscopy.",
+        "reading_status": "completed",
+        "is_downloaded": True
     }
 ]
 
 def seed_module2_demo_data(db: Session):
-    """Seed initial previous departmental projects and shared paper knowledge."""
+    """Seed initial previous departmental projects, shared paper knowledge, search query logs, and student libraries."""
     if db.query(PreviousProject).count() == 0:
         for proj in DEMO_PREVIOUS_PROJECTS:
             db.add(PreviousProject(**proj))
@@ -176,3 +285,34 @@ def seed_module2_demo_data(db: Session):
             db.add(SharedPaperKnowledge(**paper))
         db.commit()
         print(f"[ROSS-SEARCH Module 2] Seeded {len(DEMO_SHARED_PAPERS)} shared paper knowledge records.")
+
+    if db.query(ResearchQueryLog).count() == 0:
+        for q_text, q_domain, s_id, s_name in DEMO_QUERY_LOGS:
+            db.add(ResearchQueryLog(
+                query_text=q_text,
+                domain=q_domain,
+                student_id=s_id,
+                student_name=s_name
+            ))
+        db.commit()
+        print(f"[ROSS-SEARCH Module 2] Seeded {len(DEMO_QUERY_LOGS)} realistic student research search query logs.")
+
+    if db.query(StudentSavedPaper).count() == 0:
+        for saved in DEMO_SAVED_PAPERS:
+            st = db.query(Student).filter(Student.student_id == saved["student_matric"]).first()
+            if st:
+                db.add(StudentSavedPaper(
+                    student_id=st.id,
+                    title=saved["title"],
+                    authors=saved["authors"],
+                    year=saved["year"],
+                    domain=saved["domain"],
+                    venue=saved["venue"],
+                    abstract=saved["abstract"],
+                    pdf_url=saved["pdf_url"],
+                    notes=saved["notes"],
+                    reading_status=saved["reading_status"],
+                    is_downloaded=saved["is_downloaded"]
+                ))
+        db.commit()
+        print(f"[ROSS-SEARCH Module 2] Seeded {len(DEMO_SAVED_PAPERS)} downloaded student research library records.")
