@@ -24,6 +24,5 @@ In addition to the software engineering platform, the environment hosts dedicate
 - **Node.js Environment:** Node v20.18.0 at `E:\Thesis\.tools\node-v20.18.0-win-x64`
 - **Python Environment:** Python 3.12.10
 - **Package & Tool Manager:** `uv` & `uvx` at `C:\Users\robay\.local\bin`
-- **Token Compression Proxy:** `rtk` (Rust Token Killer) at `C:\Users\robay\.local\bin\rtk.exe`
 - **Codebase Knowledge Graph:** `graphify` (Graphify-Labs AST parser)
 - **Context Packaging:** `repomix` v1.14.0

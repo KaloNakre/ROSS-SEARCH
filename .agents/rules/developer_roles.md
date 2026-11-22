@@ -7,7 +7,7 @@
 
 ## 2. Python & Backend Developer
 - **Mission:** FastAPI routes, Pydantic schemas, SQLAlchemy ORM queries, database migrations, and security middleware.
-- **Tools:** RTK (`rtk pytest`, `rtk ruff`), Context7, Database Studio.
+- **Tools:** pytest, ruff, Context7, Database Studio.
 - **Guidelines:** Strict type hints, async concurrency where appropriate, SSRF defense, zero unhandled exceptions.
 
 ## 3. Frontend & UI/UX Developer
@@ -27,10 +27,10 @@
 
 ## 6. Debugging & Testing Engineer
 - **Mission:** Root cause analysis, automated regression suites, end-to-end user journey validation.
-- **Tools:** RTK test runner, Playwright, Chrome DevTools.
+- **Tools:** Playwright, Chrome DevTools, test runners.
 - **Guidelines:** Execute tests to verify fixes. Never report a pass without terminal confirmation.
 
 ## 7. Git & Version Control Specialist
 - **Mission:** Commit atomicity, descriptive conventional commit messages, branch hygiene, merge conflict prevention.
-- **Tools:** RTK (`rtk git status`, `rtk git diff`), Git MCP.
+- **Tools:** Git CLI (`git status`, `git diff`), Git MCP.
 - **Guidelines:** Never push untested or broken code; respect `.gitignore` and secret protection.

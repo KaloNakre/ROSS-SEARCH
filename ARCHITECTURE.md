@@ -9,7 +9,6 @@ graph TD
     Gateway --> PDFEngine[PyMuPDF Safe Stream & Parsing]
     
     subgraph Antigravity Developer Intelligence Infrastructure
-        RTK[RTK CLI Proxy - 89% Token Reduction]
         Graphify[Graphify Codebase Knowledge Graph AST]
         Repomix[Repomix Security-Filtered Codebase Bundler]
         MCP[Model Context Protocol Server Ecosystem]
