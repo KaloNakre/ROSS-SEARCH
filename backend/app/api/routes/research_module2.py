@@ -615,8 +615,8 @@ def list_shared_paper_knowledge(
             or_(
                 SharedPaperKnowledge.title.ilike(search_term),
                 SharedPaperKnowledge.research_gap.ilike(search_term),
-                SharedPaperKnowledge.findings.ilike(search_term),
-                SharedPaperKnowledge.model_technology.ilike(search_term)
+                SharedPaperKnowledge.important_findings.ilike(search_term),
+                SharedPaperKnowledge.models_algorithms.ilike(search_term)
             )
         )
     return query.order_by(SharedPaperKnowledge.created_at.desc()).all()
@@ -641,7 +641,7 @@ def save_paper_to_shared_knowledge(
         uploaded_by_id=payload.uploaded_by_id or "DIU-STUDENT",
         file_name=payload.file_name,
         abstract=payload.abstract,
-        # 20 Academic dimensions
+        # 20 Academic dimensions mapped to model columns
         research_objective=payload.research_objective or payload.objectives,
         research_problem=payload.research_problem or payload.problem_statement,
         research_gap=payload.research_gap,
@@ -661,15 +661,7 @@ def save_paper_to_shared_knowledge(
         novel_contributions=payload.novel_contributions or payload.objectives,
         related_work=payload.related_work or "Benchmarked against standard baselines",
         important_findings=payload.important_findings or payload.findings,
-        research_opportunities=payload.research_opportunities or payload.research_gap,
-        # Legacy fields
-        problem_statement=payload.problem_statement or payload.research_problem,
-        objectives=payload.objectives or payload.research_objective,
-        methodology=payload.methodology or payload.proposed_methodology,
-        dataset=payload.dataset or payload.dataset_description,
-        model_technology=payload.model_technology or payload.models_algorithms,
-        findings=payload.findings or payload.important_findings,
-        future_work=payload.future_work or payload.future_directions
+        research_opportunities=payload.research_opportunities or payload.research_gap
     )
     db.add(record)
     db.commit()
