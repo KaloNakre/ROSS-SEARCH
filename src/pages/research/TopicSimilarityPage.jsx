@@ -312,6 +312,14 @@ export const TopicSimilarityPage = () => {
               </div>
             </div>
 
+            {/* Academic Honesty / Plagiarism Disclaimer */}
+            <div className="mt-3 p-3 bg-blue-50/80 rounded-xl border border-blue-200/80 text-xs text-blue-900 leading-relaxed flex items-start gap-2">
+              <ShieldAlert className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+              <div>
+                <strong>Similarity vs Plagiarism Notice:</strong> Similarity score indicates lexical and thematic topic overlap with past archives; it is not a direct plagiarism measure. Final academic originality and proposal approval rest with your supervisor and thesis committee.
+              </div>
+            </div>
+
             {/* Recommendation Box */}
             <div className={`mt-6 p-4 rounded-xl border text-xs leading-relaxed ${
               !result.can_register

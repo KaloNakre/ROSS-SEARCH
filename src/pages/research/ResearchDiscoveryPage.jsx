@@ -38,15 +38,20 @@ import {
 import { module2Service } from '../../services/module2Service';
 import { useAuth } from '../../context/AuthContext';
 
-const DOMAIN_OPTIONS = [
+const FALLBACK_DOMAINS = [
   "All",
+  "Machine Learning",
+  "Data Science",
   "Cyber Security",
+  "AI & Robotics",
   "Natural Language Processing",
   "Computer Vision",
-  "Machine Learning",
-  "Blockchain",
   "Internet of Things",
-  "Healthcare AI"
+  "Cloud Computing",
+  "Bioinformatics",
+  "Blockchain",
+  "Human-Computer Interaction",
+  "Others"
 ];
 
 const BATCH_OPTIONS = ["All", "Batch 40", "Batch 41", "Batch 42", "Batch 43", "Batch 44", "Batch 45"];
@@ -56,6 +61,7 @@ export const ResearchDiscoveryPage = () => {
   const { user } = useAuth();
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
+  const [domainOptions, setDomainOptions] = useState(FALLBACK_DOMAINS);
   const [selectedDomain, setSelectedDomain] = useState("All");
   const [selectedBatch, setSelectedBatch] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -115,6 +121,25 @@ export const ResearchDiscoveryPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Fetch all domains from backend API with fallback
+    const fetchDomains = async () => {
+      try {
+        const res = await fetch('/api/research/interests');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const domainNames = data.map(item => item.name);
+            setDomainOptions(["All", ...domainNames]);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not fetch domain interests from API, using fallback:", e);
+      }
+    };
+    fetchDomains();
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -267,7 +292,7 @@ export const ResearchDiscoveryPage = () => {
           )}
         </div>
         <div className="flex flex-wrap gap-2">
-          {DOMAIN_OPTIONS.map((dom) => {
+          {domainOptions.map((dom) => {
             const active = selectedDomain === dom;
             return (
               <button

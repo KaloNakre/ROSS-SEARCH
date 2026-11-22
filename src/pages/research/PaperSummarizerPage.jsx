@@ -445,6 +445,14 @@ export const PaperSummarizerPage = () => {
                 <strong>Academic Honesty Verification:</strong> All quantitative findings are grounded strictly in the document text. Missing benchmarks, dataset sample counts, or ablation parameters are explicitly marked as <em>"Not reported in the paper"</em> to prevent hallucination.
               </div>
             </div>
+
+            {/* AI Assistant Scope Notice */}
+            <div className="mt-2 p-3 bg-amber-50/80 rounded-xl border border-amber-200/80 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <strong>AI Research Scope:</strong> AI is a research assistance tool, not a thesis or paper writer. It does not guarantee 100% accuracy or absolute novelty; final academic decisions and verification rest solely with the student and faculty supervisor.
+              </div>
+            </div>
           </div>
 
           {/* The 20 Analysis Dimension Cards */}
