@@ -104,23 +104,32 @@ export const SupervisorProfile = () => {
     return () => { mounted = false; };
   }, [id, apiCall, currentUser, currentUserRole]);
 
-  const handleSendRequest = (e) => {
+  const [requestError, setRequestError] = useState('');
+
+  const handleSendRequest = async (e) => {
     e.preventDefault();
     if (!requestMessage.trim()) return;
+    setRequestError('');
 
     const opp = opportunities.find(o => String(o.id) === String(selectedOpportunityId));
+    const finalMessage = opp ? `[Topic: ${opp.title}] ${requestMessage.trim()}` : requestMessage.trim();
 
-    module1Service.submitRequest({
-      supervisorId: supervisor?.id || 1,
-      opportunityId: opp ? opp.id : null,
-      opportunityTitle: opp ? opp.title : 'General Supervision Inquiry',
-      message: requestMessage.trim(),
-    });
+    try {
+      await apiCall('/api/supervision-requests/', {
+        method: 'POST',
+        body: JSON.stringify({
+          supervisor_id: supervisor?.id,
+          message: finalMessage,
+        }),
+      });
 
-    setRequestModalOpen(false);
-    setRequestSuccess(true);
-    setRequestMessage('');
-    setTimeout(() => setRequestSuccess(false), 5000);
+      setRequestModalOpen(false);
+      setRequestSuccess(true);
+      setRequestMessage('');
+      setTimeout(() => setRequestSuccess(false), 5000);
+    } catch (err) {
+      setRequestError(err.message || 'Failed to send supervision request.');
+    }
   };
 
   if (loading) {
@@ -405,6 +414,12 @@ export const SupervisorProfile = () => {
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-diu-blue focus:bg-white"
                 />
               </div>
+
+              {requestError && (
+                <div className="p-2.5 bg-rose-50 text-rose-700 text-xs rounded-xl border border-rose-200 font-medium">
+                  {requestError}
+                </div>
+              )}
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button

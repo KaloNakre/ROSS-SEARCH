@@ -26,7 +26,7 @@ import { useAuth } from '../../context/AuthContext';
 import module1Service from '../../services/module1Service';
 
 export const SupervisorDashboard = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, apiCall } = useAuth();
   const [opportunities, setOpportunities] = useState([]);
   const [requests, setRequests] = useState([]);
   const [assignments, setAssignments] = useState([]);
@@ -34,10 +34,23 @@ export const SupervisorDashboard = () => {
 
   useEffect(() => {
     setOpportunities(module1Service.getOpportunities());
-    setRequests(module1Service.getRequests());
     setAssignments(module1Service.getAssignments());
     setExpertise(module1Service.getExpertise());
-  }, []);
+
+    const loadRequests = async () => {
+      try {
+        const data = await apiCall('/api/supervision-requests/incoming');
+        if (Array.isArray(data)) {
+          setRequests(data);
+        } else {
+          setRequests(module1Service.getRequests());
+        }
+      } catch {
+        setRequests(module1Service.getRequests());
+      }
+    };
+    loadRequests();
+  }, [apiCall]);
 
   const pendingRequests = requests.filter(r => r.status === 'pending');
   const activeAssignments = assignments.filter(a => a.status === 'Active');

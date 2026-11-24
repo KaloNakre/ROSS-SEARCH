@@ -20,9 +20,11 @@ import {
   ArrowRight,
   GraduationCap
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import module1Service from '../../services/module1Service';
 
 export const SupervisorRequestsPage = () => {
+  const { apiCall } = useAuth();
   const [requests, setRequests] = useState([]);
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'accepted' | 'rejected' | 'all'
   const [selectedRequest, setSelectedRequest] = useState(null);
@@ -34,8 +36,24 @@ export const SupervisorRequestsPage = () => {
     refreshRequests();
   }, []);
 
-  const refreshRequests = () => {
-    setRequests(module1Service.getRequests());
+  const refreshRequests = async () => {
+    try {
+      const data = await apiCall('/api/supervision-requests/incoming');
+      const mapped = (Array.isArray(data) ? data : []).map((r) => ({
+        id: r.id,
+        studentName: r.student_name || `Student #${r.student_id}`,
+        studentId: r.student_id_code || String(r.student_id),
+        status: r.status || 'pending',
+        message: r.message || '',
+        responseNote: r.response_note || '',
+        opportunityTitle: 'FYP/Thesis Supervision Request',
+        createdAt: r.created_at,
+      }));
+      setRequests(mapped);
+    } catch (err) {
+      console.error('Failed to fetch incoming requests, falling back:', err);
+      setRequests(module1Service.getRequests());
+    }
   };
 
   const showFeedback = (type, message) => {
@@ -57,16 +75,24 @@ export const SupervisorRequestsPage = () => {
     );
   };
 
-  const handleConfirmResponse = () => {
+  const handleConfirmResponse = async () => {
     if (!responseModal.reqId) return;
-    module1Service.respondToRequest(responseModal.reqId, responseModal.type, responseNote);
-    refreshRequests();
-    showFeedback(
-      'success', 
-      responseModal.type === 'accepted' 
-        ? 'Student supervision request approved. Proceed to Final Assignment when ready.' 
-        : 'Supervision request declined.'
-    );
+    const action = responseModal.type === 'accepted' ? 'accept' : 'reject';
+    try {
+      await apiCall(`/api/supervision-requests/${responseModal.reqId}/${action}`, {
+        method: 'PUT',
+        body: JSON.stringify({ response_note: responseNote }),
+      });
+      await refreshRequests();
+      showFeedback(
+        'success', 
+        responseModal.type === 'accepted' 
+          ? 'Student supervision request approved. Proceed to Final Assignment when ready.' 
+          : 'Supervision request declined.'
+      );
+    } catch (err) {
+      showFeedback('error', err.message || 'Failed to respond to request.');
+    }
     setResponseModal({ open: false, type: '', reqId: null });
     setSelectedRequest(null);
   };
