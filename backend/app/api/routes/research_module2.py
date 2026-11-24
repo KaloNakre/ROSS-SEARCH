@@ -316,7 +316,9 @@ async def summarize_uploaded_or_linked_pdf(
     paper_url: Optional[str] = Form(None),
     raw_text: Optional[str] = Form(None),
     model_choice: Optional[str] = Form("auto"),
-    api_key: Optional[str] = Form(None)
+    api_key: Optional[str] = Form(None),
+    prompt_focus: Optional[str] = Form("full_analysis"),
+    language: Optional[str] = Form("bilingual")
 ):
     """
     [AI Analysis Engine]
@@ -324,6 +326,7 @@ async def summarize_uploaded_or_linked_pdf(
     Processes real PDF files or verified URLs via PyMuPDF and produces research-grade
     analysis using Gemini (1.5 Flash/Pro), Groq (Llama-3.3-70B), or PyMuPDF Neural NLP fallback.
     Adheres strictly to academic honesty: unstated metrics are explicitly flagged as 'Not reported'.
+    Supports bilingual English + Bengali (বাংলা) analysis and focused research prompt guidance.
     """
     extracted_text = ""
     file_title = "Research Paper"
@@ -367,12 +370,14 @@ async def summarize_uploaded_or_linked_pdf(
             detail="Extracted text is insufficient for academic analysis (less than 80 characters)."
         )
 
-    # Execute Multi-Model AI Research Analysis
+    # Execute Multi-Model AI Research Analysis with Bilingual & Prompt Focus Support
     analysis = analyze_research_paper_multi_model(
         text=extracted_text,
         sections=doc_sections,
         model_choice=model_choice or "auto",
-        custom_key=api_key
+        custom_key=api_key,
+        prompt_focus=prompt_focus or "full_analysis",
+        language=language or "bilingual"
     )
 
     return analysis

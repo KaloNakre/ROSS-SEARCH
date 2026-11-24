@@ -95,6 +95,7 @@ export const PaperSummarizerPage = () => {
   const [customApiKey, setCustomApiKey] = useState('');
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState('full_analysis');
+  const [languageView, setLanguageView] = useState('bilingual'); // 'english' | 'bangla' | 'bilingual'
 
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
@@ -134,7 +135,9 @@ export const PaperSummarizerPage = () => {
     try {
       let payload = {
         modelChoice: selectedModel,
-        apiKey: customApiKey
+        apiKey: customApiKey,
+        promptFocus: selectedPrompt,
+        language: languageView
       };
 
       if (inputMode === 'upload') {
@@ -584,6 +587,58 @@ export const PaperSummarizerPage = () => {
             </div>
           </div>
 
+          {/* Language View Switcher & Bilingual Summary */}
+          <div className="bg-white rounded-2xl border border-purple-200 p-4 shadow-xs space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-purple-600" />
+                <span className="text-xs font-bold text-slate-800">Language Output Mode / ভাষা নির্বাচন:</span>
+              </div>
+              <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setLanguageView('english')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    languageView === 'english'
+                      ? 'bg-white text-slate-900 shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  English Academic
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguageView('bangla')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    languageView === 'bangla'
+                      ? 'bg-white text-purple-700 shadow-2xs'
+                      : 'text-slate-600 hover:text-purple-700'
+                  }`}
+                >
+                  বাংলা সারসংক্ষেপ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguageView('bilingual')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    languageView === 'bilingual'
+                      ? 'bg-purple-700 text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  দ্বিভাষিক (English + বাংলা)
+                </button>
+              </div>
+            </div>
+
+            {(languageView === 'bangla' || languageView === 'bilingual') && summary.bilingual_summary?.summary_bn && (
+              <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-200/80 text-xs text-purple-950 leading-relaxed">
+                <strong className="text-purple-800 block mb-1">বাংলায় পেপারের মূল সারসংক্ষেপ (Bengali Executive Summary):</strong>
+                {summary.bilingual_summary.summary_bn}
+              </div>
+            )}
+          </div>
+
           {/* The 20 Analysis Dimension Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* 1. Research Objective */}
@@ -591,6 +646,8 @@ export const PaperSummarizerPage = () => {
               title="1. Research Objective & Goals"
               icon={<Target className="w-4 h-4 text-blue-600" />}
               content={summary.research_objective || summary.objectives}
+              contentBn={summary.bilingual_summary?.research_objective_bn}
+              languageView={languageView}
               badge="Goal Formulation"
               onCopy={() => handleCopy(summary.research_objective || summary.objectives, 'obj')}
               copied={copiedKey === 'obj'}
@@ -601,6 +658,8 @@ export const PaperSummarizerPage = () => {
               title="2. Problem Statement & Bottlenecks"
               icon={<AlertCircle className="w-4 h-4 text-red-600" />}
               content={summary.research_problem || summary.problem_statement}
+              contentBn={summary.bilingual_summary?.research_problem_bn}
+              languageView={languageView}
               badge="Bottleneck"
               onCopy={() => handleCopy(summary.research_problem || summary.problem_statement, 'prob')}
               copied={copiedKey === 'prob'}
@@ -611,6 +670,8 @@ export const PaperSummarizerPage = () => {
               title="3. Unaddressed Research Gap"
               icon={<Compass className="w-4 h-4 text-amber-600" />}
               content={summary.research_gap}
+              contentBn={summary.bilingual_summary?.research_gap_bn}
+              languageView={languageView}
               badge="Literature Gap"
               highlight="border-amber-200 bg-amber-50/20"
               onCopy={() => handleCopy(summary.research_gap, 'gap')}
@@ -622,6 +683,7 @@ export const PaperSummarizerPage = () => {
               title="4. Research Motivation & Significance"
               icon={<TrendingUp className="w-4 h-4 text-indigo-600" />}
               content={summary.research_motivation}
+              languageView={languageView}
               badge="Theoretical Impact"
               onCopy={() => handleCopy(summary.research_motivation, 'mot')}
               copied={copiedKey === 'mot'}
@@ -632,6 +694,8 @@ export const PaperSummarizerPage = () => {
               title="5. Proposed Methodology & Pipeline"
               icon={<Layers className="w-4 h-4 text-purple-600" />}
               content={summary.proposed_methodology || summary.methodology}
+              contentBn={summary.bilingual_summary?.proposed_methodology_bn}
+              languageView={languageView}
               badge="System Architecture"
               onCopy={() => handleCopy(summary.proposed_methodology || summary.methodology, 'meth')}
               copied={copiedKey === 'meth'}
@@ -642,6 +706,8 @@ export const PaperSummarizerPage = () => {
               title="6. Dataset Provenance & Benchmarks"
               icon={<Database className="w-4 h-4 text-emerald-600" />}
               content={summary.dataset_description || summary.dataset}
+              contentBn={summary.bilingual_summary?.dataset_description_bn}
+              languageView={languageView}
               badge="Corpus"
               onCopy={() => handleCopy(summary.dataset_description || summary.dataset, 'data')}
               copied={copiedKey === 'data'}
@@ -692,6 +758,8 @@ export const PaperSummarizerPage = () => {
               title="11. Evaluation Metrics"
               icon={<CheckCircle2 className="w-4 h-4 text-emerald-600" />}
               content={summary.evaluation_metrics}
+              contentBn={summary.bilingual_summary?.evaluation_metrics_bn}
+              languageView={languageView}
               badge="Measurement"
               onCopy={() => handleCopy(summary.evaluation_metrics, 'eval')}
               copied={copiedKey === 'eval'}
@@ -743,6 +811,8 @@ export const PaperSummarizerPage = () => {
               title="16. Future Research Directions"
               icon={<Compass className="w-4 h-4 text-indigo-600" />}
               content={summary.future_directions || summary.future_work}
+              contentBn={summary.bilingual_summary?.future_directions_bn}
+              languageView={languageView}
               badge="Roadmap"
               onCopy={() => handleCopy(summary.future_directions || summary.future_work, 'fut')}
               copied={copiedKey === 'fut'}
@@ -753,6 +823,8 @@ export const PaperSummarizerPage = () => {
               title="17. Novel Scientific Contributions"
               icon={<Sparkles className="w-4 h-4 text-amber-500" />}
               content={summary.novel_contributions}
+              contentBn={summary.bilingual_summary?.novel_contributions_bn}
+              languageView={languageView}
               badge="Originality"
               onCopy={() => handleCopy(summary.novel_contributions, 'nov')}
               copied={copiedKey === 'nov'}
@@ -795,8 +867,10 @@ export const PaperSummarizerPage = () => {
   );
 };
 
-const AnalysisCard = ({ title, icon, content, badge, highlight, onCopy, copied }) => {
+const AnalysisCard = ({ title, icon, content, contentBn, languageView = 'bilingual', badge, highlight, onCopy, copied }) => {
   const isNotReported = content && content.toLowerCase().includes("not reported");
+  const showEnglish = languageView === 'english' || languageView === 'bilingual' || !contentBn;
+  const showBangla = (languageView === 'bangla' || languageView === 'bilingual') && contentBn;
 
   return (
     <div className={`bg-white rounded-2xl border p-5 shadow-xs flex flex-col justify-between transition-all hover:shadow-md ${highlight || 'border-slate-200'}`}>
@@ -815,11 +889,20 @@ const AnalysisCard = ({ title, icon, content, badge, highlight, onCopy, copied }
           )}
         </div>
 
-        <div className={`text-xs leading-relaxed whitespace-pre-wrap ${
-          isNotReported ? 'text-slate-400 italic' : 'text-slate-700'
-        }`}>
-          {content || "Not reported in the paper."}
-        </div>
+        {showEnglish && (
+          <div className={`text-xs leading-relaxed whitespace-pre-wrap ${
+            isNotReported ? 'text-slate-400 italic' : 'text-slate-700'
+          }`}>
+            {content || "Not reported in the paper."}
+          </div>
+        )}
+
+        {showBangla && (
+          <div className={`${showEnglish ? 'mt-3 pt-2.5 border-t border-purple-100/80' : ''} bg-purple-50/50 p-2.5 rounded-xl text-purple-950 text-xs leading-relaxed whitespace-pre-wrap`}>
+            <span className="font-bold text-[10.5px] text-purple-700 block mb-0.5">বাংলা ব্যাখ্যা:</span>
+            {contentBn}
+          </div>
+        )}
       </div>
 
       <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-end">

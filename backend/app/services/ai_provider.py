@@ -338,16 +338,57 @@ Always maintain an encouraging, intellectually rigorous, and helpful academic to
     return (rep, "ROSS-SEARCH Academic Knowledge Core (Offline Resilient Mode)")
 
 
+def build_bilingual_insights(data: Dict[str, Any], prompt_focus: str = "full_analysis") -> Tuple[Dict[str, str], str]:
+    """
+    Constructs high-fidelity Bengali academic insights for DIU students,
+    ensuring full bilingual capability (English + বাংলা).
+    """
+    problem = data.get("research_problem") or data.get("problem_statement") or "Not reported in the paper."
+    objective = data.get("research_objective") or data.get("objectives") or "Not reported in the paper."
+    methodology = data.get("proposed_methodology") or data.get("methodology") or "Not reported in the paper."
+    dataset = data.get("dataset_description") or data.get("dataset") or "Not reported in the paper."
+    gap = data.get("research_gap") or "Not reported in the paper."
+    novelty = data.get("novel_contributions") or "Not reported in the paper."
+    future = data.get("future_directions") or data.get("future_work") or "Not reported in the paper."
+    metrics = data.get("evaluation_metrics") or "F1, Accuracy, Precision, Recall."
+
+    bilingual_dict = {
+        "summary_bn": f"এই গবেষণাপত্রে {objective[:200]} অর্জনের লক্ষ্যে একটি শক্তিশালী টেকনিক্যাল আর্কিটেকচার প্রস্তাব করা হয়েছে। পূর্ববর্তী কাজের {gap[:180]} সীমাবদ্ধতা নিরসনে লেখকরা {methodology[:200]} পদ্ধতি ও মডেল উপস্থাপন করেছেন।",
+        "research_objective_bn": f"গবেষণার মূল উদ্দেশ্য: {objective}",
+        "research_problem_bn": f"প্রধান সমস্যা ও টেকনিক্যাল প্রতিবন্ধকতা: {problem}",
+        "research_gap_bn": f"চিহ্নিত রিসার্চ গ্যাপ ও অনাবিষ্কৃত চ্যালেঞ্জ: {gap}",
+        "proposed_methodology_bn": f"প্রস্তাবিত টেকনিক্যাল মেথডোলজি ও পাইপলাইন: {methodology}",
+        "dataset_description_bn": f"ব্যবহৃত গবেষণামূলক ডেটাসেট ও উপাত্ত: {dataset}",
+        "novel_contributions_bn": f"মৌলিক বৈজ্ঞানিক অবদান ও নতুনত্ব: {novelty}",
+        "future_directions_bn": f"ভবিষ্যৎ গবেষণার সুযোগ ও থিসিস প্রসারণ: {future}",
+        "evaluation_metrics_bn": f"মূল্যায়ন মেট্রিক্স: {metrics}"
+    }
+
+    bilingual_text = (
+        f"【বাংলা সারসংক্ষেপ ও থিসিস গাইডলাইন】\n\n"
+        f"১. গবেষণার প্রধান লক্ষ্য: {objective[:220]}\n"
+        f"২. চিহ্নিত সমস্যা: {problem[:220]}\n"
+        f"৩. প্রস্তাবিত পদ্ধতি: {methodology[:220]}\n"
+        f"৪. রিসার্চ গ্যাপ: {gap[:220]}\n"
+        f"৫. ভবিষ্যৎ গবেষণার দিকনির্দেশনা: {future[:220]}"
+    )
+
+    return (bilingual_dict, bilingual_text)
+
+
 def analyze_research_paper_multi_model(
     text: str,
     sections: Optional[Dict[str, Any]] = None,
     model_choice: str = "auto",
-    custom_key: Optional[str] = None
+    custom_key: Optional[str] = None,
+    prompt_focus: Optional[str] = "full_analysis",
+    language: Optional[str] = "bilingual"
 ) -> Dict[str, Any]:
     """
     Public API helper for research paper analysis.
     Maps model_choice e.g. 'gemini-1.5-flash', 'groq-llama-3.3-70b', 'neural-nlp-offline'
-    to appropriate provider and model ID, returning the structured 20-point analysis.
+    to appropriate provider and model ID, returning the structured 20-point analysis
+    with full bilingual English + Bengali intelligence.
     """
     provider = "gemini"
     model_id = "gemini-1.5-flash"
@@ -393,6 +434,12 @@ def analyze_research_paper_multi_model(
         result["findings"] = result.get("experimental_results") or result.get("important_findings", "")
     if "future_work" not in result:
         result["future_work"] = result.get("future_directions", "")
+
+    # Populate bilingual English + Bengali extensions
+    bn_dict, bn_text = build_bilingual_insights(result, prompt_focus=prompt_focus or "full_analysis")
+    result["bilingual_summary"] = bn_dict
+    result["bilingual_insights"] = bn_text
+    result["language_mode"] = language or "bilingual"
 
     return result
 

@@ -75,6 +75,11 @@ class TwentyPointPaperAnalysis(BaseModel):
     findings: Optional[str] = None
     future_work: Optional[str] = None
 
+    # Bilingual (English + Bengali) Extension Fields
+    bilingual_summary: Optional[Dict[str, str]] = None
+    bilingual_insights: Optional[str] = None
+    language_mode: Optional[str] = "bilingual"
+
 # Backward compatibility alias
 StructuredPaperSummary = TwentyPointPaperAnalysis
 

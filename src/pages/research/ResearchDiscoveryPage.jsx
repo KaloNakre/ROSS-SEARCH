@@ -272,6 +272,34 @@ export const ResearchDiscoveryPage = () => {
               <span>Search</span>
             </button>
           </form>
+
+          {/* Suggested Research Query Commands */}
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-blue-200 font-semibold flex items-center gap-1 shrink-0">
+              <Sparkles size={13} className="text-amber-300" />
+              <span>Suggested Commands:</span>
+            </span>
+            {[
+              { query: "Transformer low-resource Bengali dialect", domain: "Natural Language Processing", label: "Bengali Dialect NLP" },
+              { query: "DeepLog anomaly detection cloud logs", domain: "Cyber Security", label: "Cyber Security Logs" },
+              { query: "Federated learning IoT edge optimization", domain: "Machine Learning", label: "Federated Learning" },
+              { query: "Skin lesion classification vision transformer", domain: "Bioinformatics & Healthcare AI", label: "Healthcare AI" },
+              { query: "Zero-Trust SCADA network defense", domain: "Cyber Security", label: "Zero-Trust SCADA" },
+              { query: "Bangla sentiment analysis BERT BiLSTM", domain: "Natural Language Processing", label: "Bangla Sentiment" }
+            ].map((s) => (
+              <button
+                key={s.label}
+                type="button"
+                onClick={() => {
+                  setSearchQuery(s.query);
+                  if (s.domain) setSelectedDomain(s.domain);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-white text-[11px] font-medium border border-white/20 transition-all flex items-center gap-1"
+              >
+                <span>🔍 {s.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

@@ -79,6 +79,13 @@ async def lifespan(app: FastAPI):
                 seed_module2_demo_data(db)
             except Exception as m2_seed_err:
                 print(f"[ROSS-SEARCH Startup Module 2 Seeder Note] {m2_seed_err}")
+
+            # 5. Seed Module 3 Templates, Teams, Milestones & Submissions
+            try:
+                from app.database.demo_seeder_module3 import run_module3_seeder
+                run_module3_seeder(db)
+            except Exception as m3_seed_err:
+                print(f"[ROSS-SEARCH Startup Module 3 Seeder Note] {m3_seed_err}")
         finally:
             db.close()
     except Exception as e:

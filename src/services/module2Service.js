@@ -68,7 +68,7 @@ export const module2Service = {
   },
 
   // ── AI Research Breakdown Engine (Gemini / Groq / Neural NLP) ──
-  async summarizePaper({ file, paperUrl, rawText, modelChoice = 'auto', apiKey }) {
+  async summarizePaper({ file, paperUrl, rawText, modelChoice = 'auto', apiKey, promptFocus = 'full_analysis', language = 'bilingual' }) {
     const formData = new FormData();
     if (file) {
       formData.append('file', file);
@@ -83,6 +83,12 @@ export const module2Service = {
     formData.append('model_choice', modelChoice);
     if (apiKey && apiKey.trim()) {
       formData.append('api_key', apiKey.trim());
+    }
+    if (promptFocus) {
+      formData.append('prompt_focus', promptFocus);
+    }
+    if (language) {
+      formData.append('language', language);
     }
 
     const res = await fetch(`${API_BASE}/summarize-pdf`, {
