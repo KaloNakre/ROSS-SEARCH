@@ -87,6 +87,7 @@ class SharedPaperKnowledgeCreate(BaseModel):
     uploaded_by_name: Optional[str] = None
     uploaded_by_id: Optional[str] = None
     file_name: Optional[str] = None
+    paper_url: Optional[str] = None
     abstract: Optional[str] = None
 
     # Core 20 Points

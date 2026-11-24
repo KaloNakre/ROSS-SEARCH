@@ -78,6 +78,7 @@ class SharedPaperKnowledge(Base):
     uploaded_by_name = Column(String(150), nullable=True)
     uploaded_by_id = Column(String(50), nullable=True)
     file_name = Column(String(200), nullable=True)
+    paper_url = Column(String(500), nullable=True)
     abstract = Column(Text, nullable=True)
     ai_engine = Column(String(100), default="PyMuPDF Academic Neural Parser")
 

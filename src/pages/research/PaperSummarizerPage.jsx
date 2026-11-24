@@ -47,6 +47,41 @@ const MODEL_OPTIONS = [
   { id: "neural-nlp-offline", name: "PyMuPDF Academic Neural NLP Engine (Offline)", desc: "100% resilient deterministic offline extraction, zero API keys required" }
 ];
 
+const PROMPT_SUGGESTIONS = [
+  {
+    id: "full_analysis",
+    title: "Full Academic Analysis",
+    bangla: "সম্পূর্ণ পেপার বিশ্লেষণ (৯টি কোর ডাইমেনশন)",
+    icon: "⚡",
+    badge: "Comprehensive",
+    desc: "Extracts all 9 foundational research dimensions from problem to benchmark."
+  },
+  {
+    id: "future_gaps",
+    title: "Extract Research Gaps & Novelty",
+    bangla: "রিসার্চ গ্যাপ ও ভবিষ্যৎ কাজের সুযোগ অনুসন্ধান",
+    icon: "🔍",
+    badge: "Gap Discovery",
+    desc: "Highlights unaddressed gaps, limitations, and potential novelty directions."
+  },
+  {
+    id: "bilingual_insights",
+    title: "Bilingual (EN + বাংলা) Insights",
+    bangla: "দ্বিভাষিক টেকনিক্যাল বিশ্লেষণ ও বাংলা সারাংশ",
+    icon: "🌐",
+    badge: "Dual Language",
+    desc: "Generates English technical concepts paired with bilingual explanatory insights."
+  },
+  {
+    id: "models_benchmarks",
+    title: "Models & Benchmark Datasets",
+    bangla: "মডেল আর্কিটেকচার ও পারফরম্যান্স মেট্রিক্স",
+    icon: "🧪",
+    badge: "Quantitative",
+    desc: "Focuses on neural architectures, datasets, hyperparameters, and experimental metrics."
+  }
+];
+
 export const PaperSummarizerPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -59,6 +94,7 @@ export const PaperSummarizerPage = () => {
   const [selectedModel, setSelectedModel] = useState('auto');
   const [customApiKey, setCustomApiKey] = useState('');
   const [showKeyInput, setShowKeyInput] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState('full_analysis');
 
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(null);
@@ -132,6 +168,7 @@ export const PaperSummarizerPage = () => {
   const handleSaveToShared = async () => {
     if (!summary) return;
     try {
+      const targetPaperUrl = (inputMode === 'url' ? paperUrl : (summary.paper_url || paperUrl || null));
       await module2Service.saveToSharedKnowledge({
         title: summary.title || "Academic Research Paper",
         authors: summary.authors || "Identified in Document Metadata",
@@ -140,6 +177,7 @@ export const PaperSummarizerPage = () => {
         uploaded_by_name: user?.full_name || "DIU Student",
         uploaded_by_id: user?.student_id || "201-15-101",
         file_name: file ? file.name : (inputMode === 'url' ? paperUrl : 'text_submission.txt'),
+        paper_url: targetPaperUrl,
         abstract: summary.abstract || summary.research_problem,
         // 20 Academic points
         research_objective: summary.research_objective,
@@ -171,6 +209,27 @@ export const PaperSummarizerPage = () => {
         findings: summary.experimental_results,
         future_work: summary.future_directions
       });
+
+      // Also persist to personal reading library so it's immediately available on Student Dashboard
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      if (token) {
+        try {
+          await module2Service.saveToLibrary({
+            title: summary.title || "Academic Research Paper",
+            authors: summary.authors || "Identified in Document Metadata",
+            year: summary.year || 2026,
+            domain: summary.domain || "Computer Science",
+            venue: summary.journal_or_conference || "Academic Repository",
+            abstract: summary.abstract || summary.research_problem,
+            pdf_url: targetPaperUrl,
+            notes: `Identified Gap: ${summary.research_gap || ''}`,
+            reading_status: 'completed'
+          }, token);
+        } catch (libErr) {
+          console.warn("Personal library auto-sync:", libErr);
+        }
+      }
+
       setSavedToShared(true);
     } catch (err) {
       alert("Failed to save to shared knowledge: " + err.message);
@@ -346,6 +405,50 @@ export const PaperSummarizerPage = () => {
             </div>
           )}
 
+          {/* Guided AI Prompt Suggestions */}
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>Guided AI Prompt Suggestions (প্রম্পট নির্বাচন করুন):</span>
+              </span>
+              <span className="text-[11px] text-slate-400 font-medium">Select focused analysis mode</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              {PROMPT_SUGGESTIONS.map((p) => {
+                const isSelected = selectedPrompt === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setSelectedPrompt(p.id)}
+                    className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
+                      isSelected
+                        ? "bg-purple-50/90 border-purple-400 ring-2 ring-purple-300 text-purple-950 shadow-xs"
+                        : "bg-white border-slate-200 hover:border-purple-200 text-slate-700 hover:bg-slate-50/60"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-base">{p.icon}</span>
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          isSelected ? "bg-purple-200 text-purple-800" : "bg-slate-100 text-slate-600"
+                        }`}>
+                          {p.badge}
+                        </span>
+                      </div>
+                      <div className="font-bold text-xs leading-snug text-slate-900">{p.title}</div>
+                      <div className="text-[10.5px] text-purple-700 font-medium mt-0.5">{p.bangla}</div>
+                    </div>
+                    <div className="text-[10px] text-slate-500 mt-2 line-clamp-2 leading-tight">
+                      {p.desc}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
@@ -378,6 +481,32 @@ export const PaperSummarizerPage = () => {
       {/* ── AI RESEARCH BREAKDOWN RESULTS ── */}
       {summary && (
         <div className="space-y-6">
+          {/* Active Prompt Focus Banner */}
+          {selectedPrompt === 'future_gaps' && (
+            <div className="p-4 bg-amber-500/10 border-2 border-amber-400 rounded-2xl flex items-center justify-between gap-3 text-amber-900 animate-fadeIn">
+              <div className="flex items-center gap-2.5">
+                <Compass className="w-5 h-5 text-amber-600 animate-pulse shrink-0" />
+                <div>
+                  <strong className="text-xs font-bold block">Prompt Focus Active: Research Gaps & Novelty Opportunities</strong>
+                  <span className="text-[11px] text-amber-800">Prioritizing unaddressed limitations, theoretical bottlenecks, and novelty angles for incoming thesis students.</span>
+                </div>
+              </div>
+              <span className="text-xs font-bold bg-amber-200 text-amber-900 px-3 py-1 rounded-full shrink-0">Gap Discovery Mode</span>
+            </div>
+          )}
+
+          {selectedPrompt === 'bilingual_insights' && (
+            <div className="p-4 bg-indigo-50 border-2 border-indigo-300 rounded-2xl flex items-center justify-between gap-3 text-indigo-900 animate-fadeIn">
+              <div className="flex items-center gap-2.5">
+                <Globe className="w-5 h-5 text-indigo-600 shrink-0" />
+                <div>
+                  <strong className="text-xs font-bold block">Prompt Focus Active: Bilingual English + Bengali Insights</strong>
+                  <span className="text-[11px] text-indigo-800">All technical research dimensions are presented in English academic terms alongside contextual guidance for DIU researchers.</span>
+                </div>
+              </div>
+              <span className="text-xs font-bold bg-indigo-200 text-indigo-900 px-3 py-1 rounded-full shrink-0">Bilingual Active</span>
+            </div>
+          )}
           {/* Paper Metadata & Engine Header */}
           <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">

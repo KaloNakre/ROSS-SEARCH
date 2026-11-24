@@ -21,7 +21,8 @@ import {
   ArrowRight, 
   Loader2, 
   Bookmark,
-  Share2
+  Share2,
+  ExternalLink
 } from 'lucide-react';
 import { module2Service } from '../../services/module2Service';
 
@@ -31,7 +32,13 @@ const DOMAIN_OPTIONS = [
   "Computer Vision",
   "Cyber Security",
   "Machine Learning",
-  "Healthcare AI"
+  "Data Science",
+  "Healthcare AI",
+  "Internet of Things",
+  "Cloud Computing",
+  "Bioinformatics",
+  "Blockchain",
+  "Software Engineering"
 ];
 
 export const SharedKnowledgeRepositoryPage = () => {
@@ -70,18 +77,19 @@ export const SharedKnowledgeRepositoryPage = () => {
   return (
     <div className="space-y-6 pb-16">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-amber-700 to-orange-800 rounded-2xl p-6 lg:p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-gradient-to-r from-amber-700 via-amber-800 to-orange-900 rounded-2xl p-6 lg:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold backdrop-blur-xs mb-3 border border-white/20">
             <Database className="w-3.5 h-3.5 text-amber-300" />
-            <span>Shared Paper Knowledge Repository (Persistent Archive)</span>
+            <span>Previous Student Research Sessions & Shared Paper Archive</span>
           </div>
           <h1 className="text-2xl lg:text-3xl font-bold tracking-tight mb-2">
-            Collective Departmental Research Knowledge
+            Previous Student Research Sessions & Shared Knowledge
           </h1>
           <p className="text-amber-100 text-sm leading-relaxed mb-6">
-            All research papers analyzed by students, complete with AI-generated 9-point summaries, 
-            identified research gaps, and benchmark findings are cataloged here for current and future DIU cohorts.
+            Review papers researched by previous students in your domain. Download original publication PDFs, 
+            inspect identified research gaps, and examine recommended novelty directions so you can choose a unique, 
+            non-duplicate research angle with total confidence.
           </p>
 
           {/* Search bar */}
@@ -182,31 +190,57 @@ export const SharedKnowledgeRepositoryPage = () => {
                   {paper.authors} {paper.journal_or_conference ? `• ${paper.journal_or_conference}` : ''}
                 </p>
 
-                {/* Contributor Pill */}
-                <div className="text-[11px] text-slate-600 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 flex items-center gap-1.5 mb-4">
-                  <User className="w-3.5 h-3.5 text-diu-blue" />
-                  <span>Contributed by: <strong>{paper.uploaded_by_name || 'DIU Student'}</strong></span>
+                {/* Contributor Student Badge */}
+                <div className="text-[11px] text-slate-700 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200 flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-diu-blue" />
+                    <span>Researched by: <strong>{paper.uploaded_by_name || 'DIU Student'}</strong></span>
+                  </div>
+                  {paper.uploaded_by_id && (
+                    <span className="text-[10px] font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md">
+                      ID: {paper.uploaded_by_id}
+                    </span>
+                  )}
                 </div>
 
-                {/* Highlighted Research Gap Box */}
-                <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 mb-3">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 mb-1">
-                    <HelpCircle className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Identified Research Gap:</span>
+                {/* Original Paper Link / Download Button */}
+                {paper.paper_url ? (
+                  <a
+                    href={paper.paper_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-all mb-3 group"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-blue-600 group-hover:scale-110 transition-transform" />
+                    <span>📄 Download / View Original Paper PDF</span>
+                    <ExternalLink className="w-3 h-3 text-blue-500 ml-auto" />
+                  </a>
+                ) : (
+                  <div className="text-[11px] text-slate-500 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 mb-3 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Archived Document: {paper.file_name || 'Paper PDF Document'}</span>
                   </div>
-                  <p className="text-xs text-slate-700 line-clamp-2 leading-relaxed">
-                    {paper.research_gap}
+                )}
+
+                {/* Highlighted Research Gap Box */}
+                <div className="bg-amber-50/80 border border-amber-200 rounded-xl p-3 mb-3">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900 mb-1">
+                    <HelpCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                    <span>Identified Research Gap (শনাক্তকৃত রিসার্চ গ্যাপ):</span>
+                  </div>
+                  <p className="text-xs text-slate-700 line-clamp-3 leading-relaxed">
+                    {paper.research_gap || "Identified research gap recorded from student analysis."}
                   </p>
                 </div>
 
-                {/* Key Findings Box */}
-                <div className="bg-teal-50/50 border border-teal-100 rounded-xl p-3 mb-4">
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-teal-900 mb-1">
-                    <TrendingUp className="w-3.5 h-3.5 text-teal-600" />
-                    <span>Findings & Results:</span>
+                {/* Recommended Novelty Direction for Next Cohort */}
+                <div className="bg-purple-50/80 border border-purple-200 rounded-xl p-3 mb-4">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-purple-900 mb-1">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                    <span>Recommended Novelty Direction (কাজের সুযোগ ও পরামর্শ):</span>
                   </div>
                   <p className="text-xs text-slate-700 line-clamp-2 leading-relaxed">
-                    {paper.findings}
+                    {paper.future_directions || paper.novel_contributions || "Explore domain transfer, real-time edge optimization, and benchmark comparisons."}
                   </p>
                 </div>
               </div>
@@ -246,16 +280,31 @@ export const SharedKnowledgeRepositoryPage = () => {
               ✕
             </button>
 
-            <div>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2 inline-block">
-                {selectedPaperModal.domain}
-              </span>
-              <h2 className="text-xl font-bold text-slate-900">
-                {selectedPaperModal.title}
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">
-                Authors: {selectedPaperModal.authors} • Contributed by {selectedPaperModal.uploaded_by_name}
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2 inline-block">
+                  {selectedPaperModal.domain}
+                </span>
+                <h2 className="text-xl font-bold text-slate-900">
+                  {selectedPaperModal.title}
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Authors: {selectedPaperModal.authors} • Contributed by {selectedPaperModal.uploaded_by_name} ({selectedPaperModal.uploaded_by_id || 'DIU Student'})
+                </p>
+              </div>
+
+              {selectedPaperModal.paper_url && (
+                <a
+                  href={selectedPaperModal.paper_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm shrink-0"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Download / View Original PDF</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
             </div>
 
             {/* Structured Research Analysis Sections */}

@@ -640,6 +640,7 @@ def save_paper_to_shared_knowledge(
         uploaded_by_name=payload.uploaded_by_name or "DIU Student",
         uploaded_by_id=payload.uploaded_by_id or "DIU-STUDENT",
         file_name=payload.file_name,
+        paper_url=payload.paper_url,
         abstract=payload.abstract,
         # 20 Academic dimensions mapped to model columns
         research_objective=payload.research_objective or payload.objectives,
