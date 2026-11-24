@@ -14,7 +14,10 @@ import {
   Loader2,
   BookOpen,
   ExternalLink,
-  Compass
+  Compass,
+  FileCheck,
+  HelpCircle,
+  UploadCloud
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { module2Service } from '../services/module2Service';
@@ -100,6 +103,34 @@ export const StudentDashboard = () => {
   ];
 
   const quickActions = [
+    {
+      title: "AI Proposal Checker",
+      desc: "Instant format compliance, missing sections & grammar scan",
+      icon: FileCheck,
+      path: "/proposal/check",
+      color: "text-indigo-600 bg-indigo-50"
+    },
+    {
+      title: "Project Submissions & Milestones",
+      desc: "Upload files, version history and track supervisor feedback",
+      icon: UploadCloud,
+      path: "/project/submissions",
+      color: "text-emerald-600 bg-emerald-50"
+    },
+    {
+      title: "AI Viva Preparation Simulator",
+      desc: "Mock defense viva questions, rubric tips and model answers",
+      icon: HelpCircle,
+      path: "/student/viva-prep",
+      color: "text-purple-600 bg-purple-50"
+    },
+    {
+      title: "Official DIU Templates",
+      desc: "Download official PPT/DOCX proposal & thesis templates",
+      icon: FileText,
+      path: "/proposal/templates",
+      color: "text-blue-600 bg-blue-50"
+    },
     {
       title: "Find a Supervisor",
       desc: "Search faculty by domain and research expertise",

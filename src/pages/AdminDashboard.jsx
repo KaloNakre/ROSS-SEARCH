@@ -11,7 +11,9 @@ import {
   ArrowRight,
   Sparkles,
   Loader2,
-  Database
+  Database,
+  BarChart3,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -85,11 +87,25 @@ export const AdminDashboard = () => {
 
   const quickActions = [
     {
+      title: "Departmental FYP/Thesis Analytics",
+      desc: "Domain distributions, progress pipelines and supervisor workload",
+      icon: BarChart3,
+      path: "/admin/analytics",
+      color: "text-indigo-600 bg-indigo-50"
+    },
+    {
       title: "Live Database Tables Explorer",
       desc: "Tabular live overview of users, students, supervisors, and teams",
       icon: Database,
       path: "/admin/database",
       color: "text-emerald-700 bg-emerald-50"
+    },
+    {
+      title: "Official Thesis Templates",
+      desc: "Manage DIU PPTX and DOCX submission templates for students",
+      icon: FileText,
+      path: "/proposal/templates",
+      color: "text-amber-600 bg-amber-50"
     },
     {
       title: "User Management",

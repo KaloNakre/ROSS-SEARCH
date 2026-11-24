@@ -12,6 +12,13 @@ from app.models.research_knowledge import (
     StudentSavedPaper,
     ExtensionDomainAuditLog
 )
+from app.models.module3 import (
+    AcademicTemplate,
+    ProjectSubmission,
+    ProjectMilestone,
+    ProposalDocumentCheck,
+    VivaPracticeSession
+)
 
 __all__ = [
     "User",
@@ -33,4 +40,9 @@ __all__ = [
     "AcademicPaperCache",
     "StudentSavedPaper",
     "ExtensionDomainAuditLog",
+    "AcademicTemplate",
+    "ProjectSubmission",
+    "ProjectMilestone",
+    "ProposalDocumentCheck",
+    "VivaPracticeSession",
 ]

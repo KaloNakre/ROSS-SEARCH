@@ -55,6 +55,14 @@ import TopicSimilarityPage from './pages/research/TopicSimilarityPage';
 import SharedKnowledgeRepositoryPage from './pages/research/SharedKnowledgeRepositoryPage';
 import PublicResearchChatPage from './pages/research/PublicResearchChatPage';
 
+// Module 3: Proposal Analysis, Project Progress, Viva Prep & Analytics
+import ProposalCheckerPage from './pages/module3/ProposalCheckerPage';
+import TemplatesRepositoryPage from './pages/module3/TemplatesRepositoryPage';
+import StudentSubmissionsPage from './pages/module3/StudentSubmissionsPage';
+import SupervisorReviewPage from './pages/module3/SupervisorReviewPage';
+import VivaPracticePage from './pages/module3/VivaPracticePage';
+import DepartmentalAnalyticsPage from './pages/module3/DepartmentalAnalyticsPage';
+
 
 // Shared
 import ResourcesPage from './pages/ResourcesPage';
@@ -242,6 +250,38 @@ function App() {
             <Route path="/research/shared-knowledge" element={
               <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
                 <SharedKnowledgeRepositoryPage />
+              </ProtectedRoute>
+            } />
+
+            {/* ── Module 3: Proposal Analysis, Submissions, Viva & Analytics ── */}
+            <Route path="/proposal/check" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <ProposalCheckerPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/proposal/templates" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <TemplatesRepositoryPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/project/submissions" element={
+              <ProtectedRoute allowedRoles={['student', 'admin']}>
+                <StudentSubmissionsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/supervisor/submissions" element={
+              <ProtectedRoute allowedRoles={['supervisor', 'admin']}>
+                <SupervisorReviewPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/student/viva-prep" element={
+              <ProtectedRoute allowedRoles={['student', 'supervisor', 'admin']}>
+                <VivaPracticePage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/analytics" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DepartmentalAnalyticsPage />
               </ProtectedRoute>
             } />
 

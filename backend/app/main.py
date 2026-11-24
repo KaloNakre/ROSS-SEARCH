@@ -21,7 +21,7 @@ from app.database.base import Base
 from app.models import user, student, supervisor, research_interest, team, research_knowledge
 from app.models.research_interest import ResearchInterest
 from app.models.supervision_request import SupervisionRequest
-from app.api.routes import auth, students, supervisors, teams, admin, research, supervision_requests, research_module2
+from app.api.routes import auth, students, supervisors, teams, admin, research, supervision_requests, research_module2, module3
 
 
 from app.core.security import hash_password
@@ -151,6 +151,7 @@ app.include_router(research.router)
 app.include_router(research_module2.router)
 app.include_router(research_module2.extension_router)
 app.include_router(supervision_requests.router)
+app.include_router(module3.router, prefix="/api")
 
 
 
@@ -214,6 +215,9 @@ def database_overview():
     from app.models.research_interest import ResearchInterest
     from app.models.team import Team, TeamMember
     from app.models.supervision_request import SupervisionRequest
+    from app.models.module3 import (
+        AcademicTemplate, ProjectSubmission, ProjectMilestone, ProposalDocumentCheck, VivaPracticeSession
+    )
 
     db = SessionLocal()
     try:
@@ -253,6 +257,26 @@ def database_overview():
             "supervision_requests": {
                 "description": "Supervision requests sent by students to supervisors (pending, accepted, rejected)",
                 "count": db.query(SupervisionRequest).count(),
+            },
+            "academic_templates": {
+                "description": "Official proposal, defense PPTX, and thesis presentation templates",
+                "count": db.query(AcademicTemplate).count(),
+            },
+            "project_submissions": {
+                "description": "Student project submissions, versions, and supervisor feedback remarks",
+                "count": db.query(ProjectSubmission).count(),
+            },
+            "project_milestones": {
+                "description": "FYP/Thesis phase milestones, target deadlines, and progress completion",
+                "count": db.query(ProjectMilestone).count(),
+            },
+            "proposal_document_checks": {
+                "description": "AI document structure, missing section, and grammar audit records",
+                "count": db.query(ProposalDocumentCheck).count(),
+            },
+            "viva_practice_sessions": {
+                "description": "AI-generated practice viva defense sessions and model answers",
+                "count": db.query(VivaPracticeSession).count(),
             },
         }
         return {

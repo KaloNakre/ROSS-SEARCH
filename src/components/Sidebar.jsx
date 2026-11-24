@@ -1,15 +1,15 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  User, 
-  Search, 
-  Users, 
-  FolderKanban, 
-  BookOpen, 
-  Settings, 
-  LogOut, 
-  Shield, 
+import {
+  LayoutDashboard,
+  User,
+  Search,
+  Users,
+  FolderKanban,
+  BookOpen,
+  Settings,
+  LogOut,
+  Shield,
   UserCheck,
   Tag,
   Briefcase,
@@ -17,6 +17,11 @@ import {
   UserPlus,
   Sparkles,
   Database,
+  FileCheck,
+  FileText,
+  UploadCloud,
+  BarChart3,
+  HelpCircle,
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +44,10 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { label: 'Topic Matching', path: '/student/matching', icon: Sparkles },
     { label: 'Research Discovery', path: '/research/discovery', icon: BookOpen },
     { label: 'AI Paper Summarizer', path: '/research/summarizer', icon: Sparkles },
+    { label: 'AI Proposal Checker', path: '/proposal/check', icon: FileCheck },
+    { label: 'Project Submissions', path: '/project/submissions', icon: UploadCloud },
+    { label: 'Viva Preparation', path: '/student/viva-prep', icon: HelpCircle },
+    { label: 'Official Templates', path: '/proposal/templates', icon: FileText },
     { label: 'Topic Similarity', path: '/research/similarity', icon: Shield },
     { label: 'Previous Research Sessions', path: '/research/shared-knowledge', icon: Database },
     { label: 'Search Students', path: '/students/section', icon: Users },
@@ -49,6 +58,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
   const supervisorLinks = [
     { label: 'Supervisor Hub', path: '/supervisor/dashboard', icon: LayoutDashboard },
+    { label: 'Student Submissions', path: '/supervisor/submissions', icon: FileCheck },
     { label: 'My Profile', path: '/supervisor/profile', icon: User },
     { label: 'Research Expertise', path: '/supervisor/expertise', icon: Tag },
     { label: 'Publish Topics', path: '/supervisor/interests/publish', icon: BookOpen },
@@ -57,6 +67,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
     { label: 'Assign Student', path: '/supervisor/assign-student', icon: UserPlus },
     { label: 'Assign Team', path: '/supervisor/assign-team', icon: FolderKanban },
     { label: 'Active Assignments', path: '/supervisor/assignments', icon: Users },
+    { label: 'Official Templates', path: '/proposal/templates', icon: FileText },
+    { label: 'AI Proposal Checker', path: '/proposal/check', icon: FileCheck },
     { label: 'All Faculty Directory', path: '/supervisors', icon: Search },
     { label: 'Paper Summarizer', path: '/research/summarizer', icon: Sparkles },
     { label: 'Previous Research Sessions', path: '/research/shared-knowledge', icon: Database },
@@ -66,10 +78,12 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
   const adminLinks = [
     { label: 'Admin Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Department Analytics', path: '/admin/analytics', icon: BarChart3 },
     { label: 'Database Explorer', path: '/admin/database', icon: Database },
     { label: 'Manage Users', path: '/admin/users', icon: Users },
     { label: 'Manage Supervisors', path: '/admin/supervisors', icon: UserCheck },
     { label: 'Role Management', path: '/admin/roles', icon: Shield },
+    { label: 'Official Templates', path: '/proposal/templates', icon: FileText },
     { label: 'Research Discovery', path: '/research/discovery', icon: BookOpen },
     { label: 'Previous Research Sessions', path: '/research/shared-knowledge', icon: Database },
     { label: 'Team Directory', path: '/teams/my-teams', icon: FolderKanban },
@@ -95,9 +109,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-diu-sidebar text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        } shadow-xl lg:shadow-none`}
+        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-diu-sidebar text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          } shadow-xl lg:shadow-none`}
       >
         {/* Brand Header */}
         <div className="h-20 flex items-center justify-between px-5 border-b border-white/10 shrink-0">
@@ -132,10 +145,9 @@ export const Sidebar = ({ isOpen, onClose }) => {
                 to={item.path}
                 onClick={() => { if (window.innerWidth < 1024) onClose(); }}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                    isActive
-                      ? 'bg-diu-blue text-white shadow-sm font-semibold'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
+                    ? 'bg-diu-blue text-white shadow-sm font-semibold'
+                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
                   }`
                 }
               >
