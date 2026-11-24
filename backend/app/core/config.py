@@ -57,9 +57,19 @@ class Settings(BaseSettings):
             return v.strip().lower() in ("true", "1", "t", "yes", "debug")
         return bool(v)
 
+    # AI Provider Keys (loaded from .env or environment)
+    GEMINI_API_KEY: str = ""
+    GROQ_API_KEY: str = ""
+
     @property
     def cors_origins(self) -> List[str]:
         return [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
 
 
 settings = Settings()
+
+# Ensure AI provider keys from .env are available via os.getenv()
+if settings.GEMINI_API_KEY and not os.getenv("GEMINI_API_KEY"):
+    os.environ["GEMINI_API_KEY"] = settings.GEMINI_API_KEY
+if settings.GROQ_API_KEY and not os.getenv("GROQ_API_KEY"):
+    os.environ["GROQ_API_KEY"] = settings.GROQ_API_KEY

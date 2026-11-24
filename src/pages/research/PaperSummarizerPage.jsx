@@ -40,10 +40,10 @@ import { module2Service } from '../../services/module2Service';
 import { useAuth } from '../../context/AuthContext';
 
 const MODEL_OPTIONS = [
-  { id: "auto", name: "Auto Select (Cloud Gemini / Groq / Neural NLP)", desc: "Optimal balance of latency and reasoning depth" },
-  { id: "gemini-1.5-flash", name: "Google Gemini 1.5 Flash (Cloud AI)", desc: "1,000,000 token context window, multimodal reasoning" },
-  { id: "gemini-1.5-pro", name: "Google Gemini 1.5 Pro (Deep Academic Reasoning)", desc: "2,000,000 token window, high-precision mathematical extraction" },
-  { id: "groq-llama-3.3-70b", name: "Groq Cloud (Llama-3.3-70B Versatile)", desc: "Ultra-fast low-latency token inference" },
+  { id: "auto", name: "Auto Select (Cloud Gemini 2.5 / Groq / Neural NLP)", desc: "Optimal balance of latency and reasoning depth" },
+  { id: "gemini-2.5-flash", name: "Google Gemini 2.5 Flash (Cloud AI)", desc: "1,000,000 token context window, multimodal reasoning" },
+  { id: "gemini-2.5-pro", name: "Google Gemini 2.5 Pro (Deep Academic Reasoning)", desc: "2,000,000 token window, high-precision mathematical extraction" },
+  { id: "groq-gpt-oss-120b", name: "Groq Cloud (GPT-OSS 120B)", desc: "Ultra-fast low-latency 120B cloud inference" },
   { id: "neural-nlp-offline", name: "PyMuPDF Academic Neural NLP Engine (Offline)", desc: "100% resilient deterministic offline extraction, zero API keys required" }
 ];
 

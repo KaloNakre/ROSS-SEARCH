@@ -7,42 +7,42 @@ from typing import Dict, Any, List, Optional, Tuple
 SUPPORTED_AI_MODELS = [
     {
         "provider": "gemini",
-        "model_id": "gemini-1.5-flash",
-        "display_name": "Google Gemini 1.5 Flash",
+        "model_id": "gemini-2.5-flash",
+        "display_name": "Google Gemini 2.5 Flash",
         "context_window": "1,000,000 tokens",
         "recommended_for": "High-speed document analysis, multi-modal reasoning",
         "requires_api_key": True
     },
     {
         "provider": "gemini",
-        "model_id": "gemini-1.5-pro",
-        "display_name": "Google Gemini 1.5 Pro",
+        "model_id": "gemini-2.5-pro",
+        "display_name": "Google Gemini 2.5 Pro",
         "context_window": "2,000,000 tokens",
         "recommended_for": "Deep academic reasoning, long-paper comprehensive extraction",
         "requires_api_key": True
     },
     {
         "provider": "gemini",
-        "model_id": "gemini-2.0-flash",
-        "display_name": "Google Gemini 2.0 Flash",
+        "model_id": "gemini-flash-latest",
+        "display_name": "Google Gemini Flash Latest",
         "context_window": "1,000,000 tokens",
-        "recommended_for": "Next-gen multimodal research inference",
+        "recommended_for": "Latest Google Gemini flash research inference",
         "requires_api_key": True
     },
     {
         "provider": "groq",
-        "model_id": "llama-3.3-70b-versatile",
-        "display_name": "Groq Llama 3.3 70B Versatile",
+        "model_id": "openai/gpt-oss-120b",
+        "display_name": "Groq GPT-OSS 120B",
         "context_window": "128,000 tokens",
-        "recommended_for": "Ultra-fast low-latency token generation",
+        "recommended_for": "Ultra-fast high-capacity academic reasoning",
         "requires_api_key": True
     },
     {
         "provider": "groq",
-        "model_id": "mixtral-8x7b-32768",
-        "display_name": "Groq Mixtral 8x7B MoE",
+        "model_id": "qwen/qwen3.8-27b",
+        "display_name": "Groq Qwen 3.8 27B",
         "context_window": "32,768 tokens",
-        "recommended_for": "Fast mixture-of-experts classification",
+        "recommended_for": "Fast multilingual and technical analysis",
         "requires_api_key": True
     },
     {
@@ -90,47 +90,66 @@ Return a STRICT, valid JSON object containing EXACTLY these 20 keys:
 Output pure JSON only, without markdown wrapping.
 """
 
-def extract_with_gemini(text: str, api_key: str, model_id: str = "gemini-1.5-flash") -> Dict[str, Any]:
-    """Call Google Gemini API using modern google.genai or generativeai SDK."""
-    # Try modern google.genai first
-    try:
-        from google import genai
-        client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model=model_id,
-            contents=[f"{ANALYSIS_SYSTEM_PROMPT}\n\nRESEARCH PAPER TEXT:\n{text[:28000]}"]
-        )
-        raw_text = response.text.strip()
-    except Exception:
-        # Fallback to google.generativeai
-        import google.generativeai as legacy_genai
-        legacy_genai.configure(api_key=api_key)
-        model = legacy_genai.GenerativeModel(model_id)
-        response = model.generate_content(f"{ANALYSIS_SYSTEM_PROMPT}\n\nRESEARCH PAPER TEXT:\n{text[:25000]}")
-        raw_text = response.text.strip()
+def extract_with_gemini(text: str, api_key: str, model_id: str = "gemini-2.5-flash") -> Dict[str, Any]:
+    """Call Google Gemini API using modern google.genai SDK with automatic model fallback."""
+    from google import genai
+    from google.genai import types
 
-    raw_text = re.sub(r'^```json\s*', '', raw_text)
-    raw_text = re.sub(r'^```\s*', '', raw_text)
-    raw_text = re.sub(r'\s*```$', '', raw_text)
-    data = json.loads(raw_text.strip())
-    data["ai_engine"] = f"Google Gemini ({model_id})"
-    return data
+    client = genai.Client(api_key=api_key)
+    candidates = [model_id, "gemini-2.5-flash", "gemini-flash-latest"]
+    seen = set()
+    last_err = None
 
-def extract_with_groq(text: str, api_key: str, model_id: str = "llama-3.3-70b-versatile") -> Dict[str, Any]:
-    """Call Groq Cloud API for ultra-fast Llama-3.3 inference."""
+    for cand in candidates:
+        if cand in seen:
+            continue
+        seen.add(cand)
+        try:
+            response = client.models.generate_content(
+                model=cand,
+                contents=[f"{ANALYSIS_SYSTEM_PROMPT}\n\nRESEARCH PAPER TEXT:\n{text[:28000]}"],
+                config=types.GenerateContentConfig(response_mime_type="application/json")
+            )
+            raw_text = response.text.strip()
+            raw_text = re.sub(r'^```json\s*', '', raw_text)
+            raw_text = re.sub(r'^```\s*', '', raw_text)
+            raw_text = re.sub(r'\s*```$', '', raw_text)
+            data = json.loads(raw_text.strip())
+            data["ai_engine"] = f"Google Gemini ({cand})"
+            return data
+        except Exception as e:
+            last_err = e
+
+    raise RuntimeError(f"All Gemini models failed: {last_err}")
+
+def extract_with_groq(text: str, api_key: str, model_id: str = "openai/gpt-oss-120b") -> Dict[str, Any]:
+    """Call Groq Cloud API for ultra-fast inference with automatic model fallback."""
     from groq import Groq
     client = Groq(api_key=api_key)
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": ANALYSIS_SYSTEM_PROMPT},
-            {"role": "user", "content": f"Analyze this academic research paper text:\n\n{text[:18000]}"}
-        ],
-        model=model_id,
-        response_format={"type": "json_object"}
-    )
-    data = json.loads(chat_completion.choices[0].message.content)
-    data["ai_engine"] = f"Groq Cloud ({model_id})"
-    return data
+    candidates = [model_id, "openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b"]
+    seen = set()
+    last_err = None
+
+    for cand in candidates:
+        if cand in seen:
+            continue
+        seen.add(cand)
+        try:
+            chat_completion = client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": ANALYSIS_SYSTEM_PROMPT},
+                    {"role": "user", "content": f"Analyze this academic research paper text:\n\n{text[:18000]}"}
+                ],
+                model=cand,
+                response_format={"type": "json_object"}
+            )
+            data = json.loads(chat_completion.choices[0].message.content)
+            data["ai_engine"] = f"Groq Cloud ({cand})"
+            return data
+        except Exception as e:
+            last_err = e
+
+    raise RuntimeError(f"All Groq models failed: {last_err}")
 
 def extract_with_neural_nlp(text: str, file_name: str = "Document.pdf") -> Dict[str, Any]:
     """
@@ -212,6 +231,13 @@ def analyze_paper_with_selected_ai(
                 return extract_with_gemini(text, key, model_id)
             except Exception as e:
                 print(f"[Gemini Fallback Triggered] {e}")
+        # Cross-provider fallback to Groq if Gemini fails
+        g_key = user_api_key or os.getenv("GROQ_API_KEY")
+        if g_key and len(g_key) > 8:
+            try:
+                return extract_with_groq(text, g_key, "openai/gpt-oss-120b")
+            except Exception as e:
+                print(f"[Groq Cross-Fallback Triggered] {e}")
 
     # 2. Groq Cloud
     elif provider == "groq":
@@ -221,6 +247,13 @@ def analyze_paper_with_selected_ai(
                 return extract_with_groq(text, key, model_id)
             except Exception as e:
                 print(f"[Groq Fallback Triggered] {e}")
+        # Cross-provider fallback to Gemini if Groq fails
+        gem_key = user_api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if gem_key and len(gem_key) > 8:
+            try:
+                return extract_with_gemini(text, gem_key, "gemini-2.5-flash")
+            except Exception as e:
+                print(f"[Gemini Cross-Fallback Triggered] {e}")
 
     # 3. Deterministic Academic Neural NLP Fallback
     return extract_with_neural_nlp(text)
@@ -252,12 +285,12 @@ def chat_research_assistant(
 
     # Map model choice
     choice = (model_choice or "auto").lower()
-    if "groq" in choice or "llama" in choice:
+    if "groq" in choice or "llama" in choice or "gpt-oss" in choice or "qwen" in choice:
         provider = "groq"
-        model_id = "llama-3.3-70b-versatile"
+        model_id = "qwen/qwen3.8-27b" if "qwen" in choice else "openai/gpt-oss-120b"
     elif "pro" in choice:
         provider = "gemini"
-        model_id = "gemini-1.5-pro"
+        model_id = "gemini-2.5-pro"
     elif "offline" in choice or "neural" in choice:
         provider = "neural_nlp"
         model_id = "pymupdf-neural-nlp"
@@ -266,10 +299,10 @@ def chat_research_assistant(
         groq_key = user_api_key or os.getenv("GROQ_API_KEY")
         if gemini_key:
             provider = "gemini"
-            model_id = "gemini-1.5-flash"
+            model_id = "gemini-2.5-flash"
         elif groq_key:
             provider = "groq"
-            model_id = "llama-3.3-70b-versatile"
+            model_id = "openai/gpt-oss-120b"
         else:
             provider = "neural_nlp"
             model_id = "pymupdf-neural-nlp"
@@ -391,15 +424,15 @@ def analyze_research_paper_multi_model(
     with full bilingual English + Bengali intelligence.
     """
     provider = "gemini"
-    model_id = "gemini-1.5-flash"
+    model_id = "gemini-2.5-flash"
 
     choice = (model_choice or "auto").lower()
-    if "groq" in choice or "llama" in choice or "mixtral" in choice:
+    if "groq" in choice or "llama" in choice or "mixtral" in choice or "gpt-oss" in choice or "qwen" in choice:
         provider = "groq"
-        model_id = "llama-3.3-70b-versatile" if "mixtral" not in choice else "mixtral-8x7b-32768"
+        model_id = "qwen/qwen3.8-27b" if "qwen" in choice else "openai/gpt-oss-120b"
     elif "pro" in choice:
         provider = "gemini"
-        model_id = "gemini-1.5-pro"
+        model_id = "gemini-2.5-pro"
     elif "neural" in choice or "offline" in choice:
         provider = "neural_nlp"
         model_id = "pymupdf-neural-nlp"
@@ -409,10 +442,10 @@ def analyze_research_paper_multi_model(
         groq_key = custom_key or os.getenv("GROQ_API_KEY")
         if gemini_key:
             provider = "gemini"
-            model_id = "gemini-1.5-flash"
+            model_id = "gemini-2.5-flash"
         elif groq_key:
             provider = "groq"
-            model_id = "llama-3.3-70b-versatile"
+            model_id = "openai/gpt-oss-120b"
         else:
             provider = "neural_nlp"
             model_id = "pymupdf-neural-nlp"

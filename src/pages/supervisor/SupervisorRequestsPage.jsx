@@ -6,15 +6,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Inbox, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  User, 
-  Eye, 
-  FileText, 
-  AlertCircle, 
+import {
+  Inbox,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  User,
+  Eye,
+  FileText,
+  AlertCircle,
   Search,
   MessageSquare,
   ArrowRight,
@@ -69,7 +69,7 @@ export const SupervisorRequestsPage = () => {
   const handleOpenResponse = (reqId, type) => {
     setResponseModal({ open: true, type, reqId });
     setResponseNote(
-      type === 'accepted' 
+      type === 'accepted'
         ? 'Accepted. Please schedule an initial discussion during office hours.'
         : 'Thank you for your application. Unfortunately, research slots for this cycle are at capacity.'
     );
@@ -85,9 +85,9 @@ export const SupervisorRequestsPage = () => {
       });
       await refreshRequests();
       showFeedback(
-        'success', 
-        responseModal.type === 'accepted' 
-          ? 'Student supervision request approved. Proceed to Final Assignment when ready.' 
+        'success',
+        responseModal.type === 'accepted'
+          ? 'Student supervision request approved. Proceed to Final Assignment when ready.'
           : 'Supervision request declined.'
       );
     } catch (err) {
@@ -126,11 +126,10 @@ export const SupervisorRequestsPage = () => {
 
       {/* Feedback Banner */}
       {feedback.message && (
-        <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 ${
-          feedback.type === 'success' 
-            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+        <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-center gap-2.5 ${feedback.type === 'success'
+            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
             : 'bg-rose-50 text-rose-800 border border-rose-200'
-        }`}>
+          }`}>
           {feedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
           <span>{feedback.message}</span>
         </div>
@@ -147,16 +146,14 @@ export const SupervisorRequestsPage = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-2 ${
-              activeTab === tab.id
+            className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-2 ${activeTab === tab.id
                 ? 'bg-diu-blue text-white shadow-xs'
                 : 'text-slate-600 hover:bg-slate-100'
-            }`}
+              }`}
           >
             <span>{tab.label}</span>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-              activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
-            }`}>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+              }`}>
               {tab.count}
             </span>
           </button>
@@ -172,13 +169,12 @@ export const SupervisorRequestsPage = () => {
           >
             <div className="space-y-2 flex-1">
               <div className="flex flex-wrap items-center gap-2.5">
-                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
-                  req.status === 'pending'
+                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${req.status === 'pending'
                     ? 'bg-amber-50 text-amber-700 border-amber-200'
                     : req.status === 'accepted'
-                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                    : 'bg-rose-50 text-rose-700 border-rose-200'
-                }`}>
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-rose-50 text-rose-700 border-rose-200'
+                  }`}>
                   {req.status === 'pending' && <Clock size={11} />}
                   {req.status === 'accepted' && <CheckCircle2 size={11} />}
                   {req.status === 'rejected' && <XCircle size={11} />}
@@ -362,9 +358,8 @@ export const SupervisorRequestsPage = () => {
               </button>
               <button
                 onClick={handleConfirmResponse}
-                className={`px-5 py-2 text-white text-xs font-bold rounded-xl shadow-xs ${
-                  responseModal.type === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
-                }`}
+                className={`px-5 py-2 text-white text-xs font-bold rounded-xl shadow-xs ${responseModal.type === 'accepted' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
+                  }`}
               >
                 Confirm {responseModal.type === 'accepted' ? 'Approval' : 'Rejection'}
               </button>
