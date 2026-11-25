@@ -178,15 +178,11 @@ ROSS-SEARCH/
 
 ---
 
-## ✅ Platform Verification Status
+## 🧠 Codebase Knowledge Graph (Graphify)
 
-| Verification Suite | Result |
-|---|---|
-| Core system (auth, teams, admin) — 3 iterations | **27/27 PASS** |
-| Module 2 Research Intelligence & Bilingual AI (5 runs) | **5/5 PASS (100%)** |
-| Module 3 Proposal, Submissions, Viva & Analytics (5 runs) | **5/5 PASS (100%)** |
-| Beast-Mode E2E (15 Students, 7 Supervisors, Real Binary PDFs) | **100% PASS** |
-| Frontend production build | **✅ 1661 modules, 0 errors** |
+![ROSS-SEARCH Codebase Knowledge Graph](docs/graphify-knowledge-graph.png)
+
+> *Generated with [Graphify](https://github.com/Graphify-Labs/graphify) — 1,018 nodes, 3,015 edges, and 69 architectural communities across the React frontend and FastAPI backend.*
 
 ---
 
