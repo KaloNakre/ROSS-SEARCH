@@ -81,3 +81,6 @@ backend/*.db
 backend/ross_search_backup_*.db
 .env
 node_modules/
+
+# Presentation script PDF (local only, never push to GitHub)
+ROSS_SEARCH_10Min_Presentation_Script_BN.pdf
