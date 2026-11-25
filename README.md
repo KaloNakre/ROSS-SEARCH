@@ -180,10 +180,39 @@ ROSS-SEARCH/
 
 ## 🧠 Interactive Motion Knowledge Graph (Graphify)
 
+<div align="center">
+
+<!-- Graphify Knowledge Graph Badge -->
+<a href="https://ross-search.onrender.com/graph.html">
+  <img src="https://img.shields.io/badge/🧠_Knowledge_Graph-Live_Interactive-6366f1?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjUiIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSI1IiBjeT0iMTkiIHI9IjIiIGZpbGw9IiNmZmYiLz48Y2lyY2xlIGN4PSIxOSIgY3k9IjE5IiByPSIyIiBmaWxsPSIjZmZmIi8+PGxpbmUgeDE9IjEyIiB5MT0iNyIgeDI9IjUiIHkyPSIxNyIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjEuNSIvPjxsaW5lIHgxPSIxMiIgeTE9IjciIHgyPSIxOSIgeTI9IjE3IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMS41Ii8+PGxpbmUgeDE9IjciIHkxPSIxOSIgeDI9IjE3IiB5Mj0iMTkiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIxLjUiLz48L3N2Zz4=&labelColor=1a1a2e&color=6366f1" alt="Graphify Knowledge Graph"/>
+</a>
+&nbsp;
+<a href="https://ross-search.onrender.com/graph.html">
+  <img src="https://img.shields.io/badge/Nodes-1%2C018-22c55e?style=for-the-badge&labelColor=0f0f1a" alt="1018 Nodes"/>
+</a>
+&nbsp;
+<a href="https://ross-search.onrender.com/graph.html">
+  <img src="https://img.shields.io/badge/Edges-3%2C015-3b82f6?style=for-the-badge&labelColor=0f0f1a" alt="3015 Edges"/>
+</a>
+&nbsp;
+<a href="https://ross-search.onrender.com/graph.html">
+  <img src="https://img.shields.io/badge/Communities-69-f59e0b?style=for-the-badge&labelColor=0f0f1a" alt="69 Communities"/>
+</a>
+
+</div>
+
+<br/>
+
 [![ROSS-SEARCH Motion Knowledge Graph](docs/graphify-motion.gif)](https://ross-search.onrender.com/graph.html)
 
-> **🚀 [Launch Live Interactive Motion HTML Graph (Zoom, Pan, Drag & Click Nodes)](https://ross-search.onrender.com/graph.html)**  
-> *Auto-tours key modules (`useAuth`, `ai_provider.py`, `module3_ai.py`, `research_module2.py`) with motion-zoom spotlights. Move your cursor, scroll to zoom, or click any node to pause and explore freely (1,018 nodes • 3,015 edges • 69 communities).*
+<div align="center">
+
+**🚀 [Launch Live Interactive Graph — Zoom · Pan · Drag · Click Nodes](https://ross-search.onrender.com/graph.html)**
+
+*Auto-tours key modules: `useAuth` → `ai_provider.py` → `module3_ai.py` → `research_module2.py`*  
+*Move your cursor, scroll to zoom, or click any node to pause and explore freely.*
+
+</div>
 
 ---
 
