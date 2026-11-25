@@ -183,22 +183,64 @@ ROSS-SEARCH/
 | Verification Suite | Result |
 |---|---|
 | Core system (auth, teams, admin) — 3 iterations | **27/27 PASS** |
-| Research intelligence API — 9 endpoint tests | **9/9 PASS** |
-| Frontend production build | **✅ 1648 modules, 0 errors** |
+| Module 2 Research Intelligence & Bilingual AI (5 runs) | **5/5 PASS (100%)** |
+| Module 3 Proposal, Submissions, Viva & Analytics (5 runs) | **5/5 PASS (100%)** |
+| Beast-Mode E2E (15 Students, 7 Supervisors, Real Binary PDFs) | **100% PASS** |
+| Frontend production build | **✅ 1661 modules, 0 errors** |
 
 ---
 
-## 🔧 Backend API Endpoints (Key)
+## 🌐 Live Presentation Links — Module 2 & Module 3 (By Team Member)
+
+* **Live Web Portal:** https://ross-search.onrender.com
+* **Live Backend API & Swagger Docs:** https://ross-search-api.onrender.com/docs
+* **Live System Health:** https://ross-search-api.onrender.com/api/health
+
+### Quick Demo Login Credentials
+| Role | Login Page | Email / ID | Password |
+|---|---|---|---|
+| **Student** | https://ross-search.onrender.com/#/login | `arif.hossain@diu.edu.bd` | `Diu@12345` |
+| **Supervisor** | https://ross-search.onrender.com/#/login | `dr.syed.tareq@diu.edu.bd` | `Diu@12345` |
+| **Admin** | https://ross-search.onrender.com/#/admin/login | ID: `ADM-101` / `admin@diu.edu.bd` | `Admin@12345` |
+
+### 1. Riya Saha (ID: `232-35-715`)
+| Module | Feature | Frontend Live Link | Backend API Link |
+|---|---|---|---|
+| **Module 2.1** | Research Domain & Paper Discovery | https://ross-search.onrender.com/#/research/discovery | https://ross-search-api.onrender.com/api/research/academic-papers |
+| **Module 3.2** | Student Submissions & Milestones | https://ross-search.onrender.com/#/project/submissions | https://ross-search-api.onrender.com/docs#/Module%203%3A%20Proposal%2C%20Progress%2C%20Viva%20%26%20Analytics |
+| **Module 3.2** | Supervisor Review & Feedback Portal | https://ross-search.onrender.com/#/supervisor/submissions | https://ross-search-api.onrender.com/docs#/Module%203%3A%20Proposal%2C%20Progress%2C%20Viva%20%26%20Analytics |
+
+### 2. Robayet Islam (ID: `232-35-809`)
+| Module | Feature | Frontend Live Link | Backend API Link |
+|---|---|---|---|
+| **Module 2.2** | AI Paper Summarizer (English + বাংলা) | https://ross-search.onrender.com/#/research/summarizer | https://ross-search-api.onrender.com/docs#/Research%20Discovery%20%26%20Shared%20Knowledge |
+| **Module 3.1** | Official DIU Templates Repository | https://ross-search.onrender.com/#/proposal/templates | https://ross-search-api.onrender.com/api/module3/templates |
+| **Module 3.1** | AI Proposal Structure & Grammar Checker | https://ross-search.onrender.com/#/proposal/check | https://ross-search-api.onrender.com/docs#/Module%203%3A%20Proposal%2C%20Progress%2C%20Viva%20%26%20Analytics |
+| **Module 3.3** | AI Practice Viva Defense Simulator | https://ross-search.onrender.com/#/student/viva-prep | https://ross-search-api.onrender.com/docs#/Module%203%3A%20Proposal%2C%20Progress%2C%20Viva%20%26%20Analytics |
+
+### 3. Tamim Hasan Sami (ID: `232-35-313`)
+| Module | Feature | Frontend Live Link | Backend API Link |
+|---|---|---|---|
+| **Module 2.3** | Topic Similarity & Duplicate Detection | https://ross-search.onrender.com/#/research/similarity | https://ross-search-api.onrender.com/docs#/Research%20Discovery%20%26%20Shared%20Knowledge |
+| **Module 2.4** | Shared Paper Knowledge Repository | https://ross-search.onrender.com/#/research/shared-knowledge | https://ross-search-api.onrender.com/api/research/shared-knowledge |
+| **Module 3.4** | Departmental FYP Analytics (Admin) | https://ross-search.onrender.com/#/admin/analytics | https://ross-search-api.onrender.com/api/module3/analytics/departmental |
+
+---
+
+## 🔧 Backend API Endpoints (Module 2 & Module 3)
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/api/research/academic-papers` | GET | Federated paper discovery with year/author filters |
-| `/api/research/summarize-pdf` | POST | AI Research Breakdown engine |
-| `/api/research/chat` | POST | Public AI research assistant |
-| `/api/research/check-similarity` | POST | Topic duplicate detection |
-| `/api/research/suggest-topics` | GET | Novel thesis topic suggestions |
-| `/api/research/library` | GET/POST | Personal reading library management |
-| `/api/research/library/export` | GET | BibTeX citation export |
-| `/api/extension/analyze-domain` | POST | 12-section domain security audit |
+| `/api/research/academic-papers` | GET | Federated paper discovery with domain/year/author filters |
+| `/api/research/summarize-pdf` | POST | Multi-model AI Research Breakdown (English + বাংলা) |
+| `/api/research/check-similarity` | POST | Topic duplicate detection via TF-IDF Cosine Similarity |
+| `/api/research/shared-knowledge` | GET/POST | Shared departmental paper summaries & research gaps |
+| `/api/research/library` & `/library/save` | GET/POST | Personal reading library management |
+| `/api/module3/templates` | GET/POST | Official DIU PPTX/DOCX/PDF templates repository |
+| `/api/module3/check-document` | POST | AI proposal structure, missing sections & grammar checker |
+| `/api/module3/submissions` & `/{id}/review` | GET/POST/PUT | Versioned project submissions & supervisor review |
+| `/api/module3/milestones` | GET/POST/PUT | 5-phase FYP milestone & progress tracking |
+| `/api/module3/viva/generate` | POST | AI practice viva defense question generator |
+| `/api/module3/analytics/departmental` | GET | Departmental domain distribution & supervisor workload |
 
 > **Academic Integrity:** All academic papers sourced from authentic open-access repositories (arXiv, Crossref, OpenAlex). Zero fabricated citations or AI-generated research results.
