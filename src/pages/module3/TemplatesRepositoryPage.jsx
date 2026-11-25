@@ -37,7 +37,7 @@ const CATEGORIES = [
 
 export const TemplatesRepositoryPage = () => {
   const { currentUser } = useAuth();
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
   const isAdmin = currentUser?.role === 'admin';
 
   const [templates, setTemplates] = useState([]);

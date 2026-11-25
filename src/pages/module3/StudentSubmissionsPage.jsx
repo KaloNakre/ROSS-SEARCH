@@ -40,7 +40,7 @@ const PHASES = [
 
 export const StudentSubmissionsPage = () => {
   const { currentUser } = useAuth();
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const [submissions, setSubmissions] = useState([]);
   const [milestones, setMilestones] = useState([]);

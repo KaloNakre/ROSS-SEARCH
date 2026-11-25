@@ -214,7 +214,7 @@ export const PaperSummarizerPage = () => {
       });
 
       // Also persist to personal reading library so it's immediately available on Student Dashboard
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
       if (token) {
         try {
           await module2Service.saveToLibrary({

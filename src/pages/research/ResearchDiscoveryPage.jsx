@@ -59,7 +59,7 @@ const BATCH_OPTIONS = ["All", "Batch 40", "Batch 41", "Batch 42", "Batch 43", "B
 export const ResearchDiscoveryPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const [domainOptions, setDomainOptions] = useState(FALLBACK_DOMAINS);
   const [selectedDomain, setSelectedDomain] = useState("All");
@@ -126,7 +126,8 @@ export const ResearchDiscoveryPage = () => {
     // Fetch all domains from backend API with fallback
     const fetchDomains = async () => {
       try {
-        const res = await fetch('/api/research/interests');
+        const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const res = await fetch(`${apiBase}/api/research/interests`);
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {

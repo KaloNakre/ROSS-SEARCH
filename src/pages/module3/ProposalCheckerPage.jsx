@@ -63,7 +63,7 @@ Experiments are conducted on 25,000 traffic flow instances from the BoT-IoT data
 
 export const ProposalCheckerPage = () => {
   const navigate = useNavigate();
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const [documentTitle, setDocumentTitle] = useState('IoT Intrusion Detection Proposal');
   const [documentType, setDocumentType] = useState('proposal');

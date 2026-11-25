@@ -8,7 +8,8 @@
  * 4. [Topic Intelligence]: Shared paper knowledge repository
  */
 
-const API_BASE = '/api/research';
+const API_ORIGIN = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = `${API_ORIGIN}/api/research`;
 
 export const module2Service = {
   // ── Published Academic Papers Catalog (arXiv, Crossref) ──
@@ -281,7 +282,7 @@ export const module2Service = {
 
   // ── Browser Extension Domain Auditor ─────────────────────────────────────
   async auditDomain(urlOrDomain) {
-    const res = await fetch('/api/extension/analyze-domain', {
+    const res = await fetch(`${API_ORIGIN}/api/extension/analyze-domain`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url_or_domain: urlOrDomain })

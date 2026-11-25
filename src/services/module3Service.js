@@ -9,7 +9,8 @@
  * 4. [Tamim Hasan Sami - ID: 313]: Departmental FYP Analytics & Supervisor Workload Dashboard
  */
 
-const API_BASE = '/api/module3';
+const API_ORIGIN = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = `${API_ORIGIN}/api/module3`;
 
 export const module3Service = {
   // ── 1. Official Academic Templates (Admin & Students) ────────────────────

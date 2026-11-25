@@ -34,7 +34,7 @@ export const StudentDashboard = () => {
     let mounted = true;
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
         const [profileRes, teamsRes, supsRes, libraryRes] = await Promise.allSettled([
           apiCall('/api/students/me'),
           apiCall('/api/teams/my-teams'),

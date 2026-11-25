@@ -55,7 +55,7 @@ const CATEGORY_ICONS = {
 };
 
 export const VivaPracticePage = () => {
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('ross_token') || localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const [projectTitle, setProjectTitle] = useState('Bengali Sentiment Analysis Using Transformer Models');
   const [domain, setDomain] = useState('Natural Language Processing');
