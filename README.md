@@ -178,11 +178,12 @@ ROSS-SEARCH/
 
 ---
 
-## 🧠 Codebase Knowledge Graph (Graphify)
+## 🧠 Interactive Motion Knowledge Graph (Graphify)
 
-![ROSS-SEARCH Codebase Knowledge Graph](docs/graphify-knowledge-graph.png)
+[![ROSS-SEARCH Motion Knowledge Graph](docs/graphify-motion.gif)](https://ross-search.onrender.com/graph.html)
 
-> *Generated with [Graphify](https://github.com/Graphify-Labs/graphify) — 1,018 nodes, 3,015 edges, and 69 architectural communities across the React frontend and FastAPI backend.*
+> **🚀 [Launch Live Interactive Motion HTML Graph (Zoom, Pan, Drag & Click Nodes)](https://ross-search.onrender.com/graph.html)**  
+> *Auto-tours key modules (`useAuth`, `ai_provider.py`, `module3_ai.py`, `research_module2.py`) with motion-zoom spotlights. Move your cursor, scroll to zoom, or click any node to pause and explore freely (1,018 nodes • 3,015 edges • 69 communities).*
 
 ---
 
